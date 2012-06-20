@@ -1,0 +1,130 @@
+
+\lettrine{H}{ere}, you describe your approach to the problem. If you are developing an
+algorithm, here is where you would describe the details of your algorithm. If you are
+simulating something, this is where you describe how you set up the simulation and
+how you plan to run the experiment. You should aim to describe things to a sufficient
+level of detail that a reader could duplicate your work (or at least come very close to
+it).
+
+\par Be as descriptive as possible. Don’t just describe what you did, but give motivations
+for why you did it that way. Describing why you did what you did is very important,
+because it allows the reader to understand where you are coming from. However,
+avoid discussing actual results (they go in Chapter 4).
+
+\par Break the design down into small sections—it’s easier to write, and easier to read.
+
+\subsection{Requirements}
+\par The Address Routing Gateway focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization, but we will cover them here to provide a common frame of reference for the goals of ARG. 
+
+\par ARG worries primarily about protecting communication outside of military-controlled networks and preventing external entities from probing internally. This means that our implementation is intended to be employed for all traffic traveling between bases. Base networks, in this case, include both those on permanent installations and those in deployed, forward locations. ARG is not directly concerned with protecting internal networks; that is left to more traditional defenses. However, ARG will have the ability to detect invalid packets and this information can be handed off to those traditional defenses---i.e., an IDS---for analysis.
+
+\par ARG must operate over the commercial Internet. Some proposals for network address space randomization require changes to the existing routing infrastructure \cite{CONTRA}. Deploying such a solution may be possible and beneficial in the long run, but we want a solution that could be deployed today without participation from outside entities.
+
+\par Base networks can generate huge volumes of traffic, so ARG must scale well. It may be possible to divide a particularly large installation into sections, but this may not be feasible or desirable in all situations. Due to the critical nature of military networks, ARG's implementation must not introduce significant latency under any foreseeable load. Likewise, there can never be a brief period where all connections drop. Military networks support critical services and any interruption could be catastrophic. At a minimum, given the number of nodes inside the network, dropped connections would result in a massive amount of wasted bandwidth as they were reestablished and the data retransmitted.
+
+\par Military networks contain a wide range of hardware and software. Much of this software cannot be altered to accommodate ARG, so it must function transparently. Host-level implementations might be feasible for generic workstation images---i.e., an alteration to the operating system's network stack---, but the ability to function in another way must exist to allow legacy equipment to continue operating.
+
+\par Finally, resource constraints---monetary and manpower---preclude some options. ARG is intended to be easily configurable and usable with reasonable hardware investments. While no experimentation has been run yet to determine exact performance, ARG requires only a single gateway system for each network it is intended to protect, rather than hardware and/or software for every client inside those networks.
+
+\subsection{Implementation Details}
+%\par Based on these requirements and the previously cited literature, this paper proposes the Address Routing Gateway. While actual testing of this setup is beyond the scope of this paper, we will attempt to analyze the advantages it would provide, based on previous experimentation.
+
+\par As illustrated in Figure \ref{fig:argnetwork}, ARG functions entirely around standard networks with hopping gateways. As with \cite{TAO}, these gateways are standalone systems, not intended to be used for other tasks. Individual hosts inside these networks will have no knowledge that their communication is being transformed by the gateway, whether their connections are routing to a host inside the local network, to a host inside another associated hopping network, or to an external network. The implementation of ARG allows the deployment of standard passive defense technologies like firewalls inside the network without reconfiguration. Each gateway maintains a NAT-like table to ensure that existing connections are maintained across hops (essentially temporarily leaving the old IP active for just those connections using it already).
+
+% TBD remove the top system on diagram and make the WAN the Internet
+\begin{figure}
+	\centering
+	\includegraphics[width=0.75\textwidth]{../diagrams/argnetwork}
+	\caption{ARG network layout overview}
+	\label{fig:argnetwork}
+\end{figure}
+
+\par Each gateway is pre-configured with knowledge of at least one other gateway. This knowledge includes the subnet the other gateway is handling and a public key to use for authentication with it. Additionally, the gateway must be given what subnet it is permitted to hop within and its own private key. Gateways employ IPv6 for communication between one another, as this gives the potential for a much wider range of addresses to hop within, but IPv4 will still work seamlessly across the system due to an IPSec-style tunneling \cite{rfc4301}. In addition, IPv6 allows the easy addition of extension headers, which are used by ARG for such things are packet type flags (i.e., there is an admin flag to indicate a packet should be given to the administrative handler).
+
+\par As an important note, multi-homed networks are not taken into account in this proposal. Further research is needed to see what changes would need to be made to support this setup. If an ARG gateway were placed at each of the connections to the outside network, it is likely that some communication between the two is required to keep them working together \cite{SandiaDynat}, but the exact form this would take needs consideration.
+
+\subsection{Organization}
+\par ARG contains several threads and modules that work in concert to accomplish routing. Joining and coordinating them all is the main thread, which is responsible for initializing ARG in the appropriate sequence and monitoring local information (configuration and shutdown requests from the system administrator, for example). The sequencing of this thread is shown in Figure \ref{fig:flow_main}.
+
+\begin{figure}
+	\centering
+	\includegraphics{../diagrams/flow_main}
+	\caption{Main thread flow}
+	\label{fig:flow_main}
+\end{figure}
+
+\par Main starts threads to handle packets it encounters on the external interface, then creates an administrative thread. This administrative thread is responsible for communication with other associated ARG gateways throughout the run of ARG. When it first launches, the administrative thread establishes initial connections to other gateways, then notifies the main thread. Main is then free to launch internal packet handlers, which deal with packets received on the interface facing the internal network.
+
+\subsubsection{Administrative Handler}
+\label{sec:admin_handler}
+
+\par Although technically the external handler threads starts before the administrative thread, their only job at that point will be to place packets in the administrative queue. The full operation of the external handlers is covered below, in section \ref{sec:external_handler}.
+
+\par Figure \ref{fig:flow_admin} contains an overview of the execution of the admin handler. When it first starts, it attempts to initiate connections with the other ARG networks it has configuration information about. This connection sequence is modeled after other common security-focused protocols such as HTTPS \cite{rfc2818} and is illustrated in Figure \ref{fig:conn_seq} on page \pageref{fig:conn_seq}.
+
+\begin{figure}
+	\centering
+	\includegraphics{../diagrams/flow_admin}
+	\caption{Admin handler flow}
+	\label{fig:flow_admin}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics{../diagrams/conn_seq}
+	\caption{ARG connection sequence}
+	\label{fig:conn_seq}
+\end{figure}
+
+\par Each packet in the connection exchange is encrypted with the public and private keys of the participating gateways. The connecting gateway first sends a \texttt{GatewayHello} message with a random number to an already-established gateway. Upon receipt of such a message, the other gateway decrypts it, then responds with a \texttt{GatewayWelcome} message, containing the random number sent to it, plus its own number. The joining gateway is able to verify the identity of the established gateway with this packet, then responds with a \texttt{GatewayVerified} message with the random number from the established gateway, allowing the confirmation of its own identify.
+
+\par Once both gateways have verified the other, the established gateway sends a \texttt{PathInfo} message, containing an encryption key it would like to use for all future communications between itself and the new gateway, its hopping key, and its hopping time step. The connecting server responds back with its own \texttt{PathInfo} message that contains its own information and a duplication of the requested path key (assuming it accepts it). It then immediately follows up with a \texttt{GatewayTimestampRequest} message to initialize its clock, as covered in more detail below. If at any point either gateway does not recognize the other during this exchange it sends an \texttt{AuthFailed} message and ends the connection process.
+
+\par This process is repeated for every gateway the initializing ARG gateway knows about. It then notifies the main thread that the system is ready to begin passing packets. From this point the admin handler is concerned with performing the computations for the current IP, listening for new connections from other gateways, re-keying an existing connection, and ensuring the gateways times stay in-synch. % TBD fix state diagram?
+
+\par At configurable increments of time the gateway will switch to listening to a new IP. Listening IPs are chosen based on a Time-based One Time Pad (TOTP) \cite{rfc6238} based on the gateway's hopping key and current time. The number of bits the gateway is permitted to hop within (based on a netmask given in the configuration) is extracted from here and added to its base. As an example, say that the gateway may hop within the address space \texttt{::abcd:0/112}. The gateway thus pulls 16 bits (128 bits in a IPv6 address - 112 bits locked by netmask) from the TOTP and bit-wise ORs them with \texttt{::abcd:} to create its ``current'' address.
+
+\par The optimal time interval depends on network congestion and latency. For example, if the path between gateways is averaging a 50ms round trip time (RTT), a 300ms hop time should be sufficient to ensure most packets make it with no issue, barring a latency spike. Whether such a number is achievable in the real world needs to be measured. Although it is not discussed in this paper, ARG will also incorporate the ability to adjust the hop interval by small amounts as it perceives latency changes in the system. These changes will be limited, however, to avoid a denial of service attack causing the interval to grow so large that changes essentially never occur.
+
+\par At any point a gateway may send a new key via a \texttt{PathInfo} message. The sending gateway will still continue to use the previous key for encryption until it receives a \texttt{PathInfo} response using the new key. New keys are sent periodically, using the public and private keys of the gateways. This protects the confidentiality of as much traffic as possible, even if one symmetric key is lost.
+
+\par Finally, the gateway clocks must be kept in fairly close sync with one another in order to ensure the hopping channel remains viable \cite{SandiaDynat, HopProactiveDef}. To ensure this, each gateway periodically sends a \texttt{GatewayTimestampRequest} message containing its own millisecond-precision timestamp to the others. In response, receiving gateways respond with a \texttt{GatewayTimestampResponse} message containing the received timestamp as well as their own. When the original gateway gets this message, it determines the latency between the gateways based off its own timestamp, adjusts the responder's timestamp based on that difference, and finally saves the offset between its internal clock and the responder's. Once several other gateway's offsets have been determined, the gateway's own internal clock is adjusted by the average offset. As all gateways perform this process, over time they should converge to very close synchronization.
+
+\subsubsection{External Handler}
+\label{sec:external_handler}
+
+\par The external handlers work with all packets encountered on the externally-facing interface. Several of these threads read from a shared queue of packets and work independently beyond that. External handlers serve as the primary gatekeepers to the network, as they are responsible for identifying if a packet is valid---i.e., sent to the correct IP, from an expected system, and so on---and transforming those valid packets for routing on the internal network. The flow of external handlers is illustrated in Figure \ref{fig:flow_external}.
+% on page \pageref{fig:flow_external}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{../diagrams/flow_external}
+	\caption{External handler flow}
+	\label{fig:flow_external}
+\end{figure}
+
+\par Jumping beyond the boiler plate of getting packets and checking for a shutdown request, we see that for each new packet the gateway begins by inspecting the source IP to decide where to go for further packet validation. If the source does not lie within the range of a known hopping gateway, it is checked against the NAT table, the details of which are covered in Section \ref{sec:internal_handler}. A match in that table results in the packet being dropped onto the internal network after being modified per the matching NAT entry, otherwise the packet is marked as invalid. How invalid packets are handled is flexible: the gateway may drop them without notification or route them to an IDS \cite{NAH} or honeypot, as previous work mentions \cite{SandiaDynat, HopProactiveDef}. It is this latter approach that we have an interest in exploring further in the future.
+
+\par If the source is a hopping gateway and the admin flag is set on the packet, it is decrypted with the local private key and its digital signature is verified against the remote gateway's public key. Assuming that process succeeds, it is placed on the admin queue, where it will be handled as already discussed in \ref{sec:admin_handler}. It is important to note here that the destination IP is \textit{not} checked when the admin flag is set, as a newly connecting gateway will have no knowledge of which IP its peers are currently listening on and yet must have the ability to send them the initial connection packets; this allows that to occur. However, to prevent easy tracking of admin traffic by an adversary, most admin packets between already-connected gateways are encrypted with the standard path key and contain the admin indicator as part of the payload. This is checked for once normal packets are decrypted, as described below.
+
+\par If the source is a hopping gateway and the admin flag is \textit{not} set, we check if the destination IP matches either the current or previous IP of the gateway. Allowing the previous IP in as well is required because there will still be some traffic en route when the hop happens---even if the transition is perfectly coordinated between all gateways---and we want to avoid dropping those packets.
+
+% TBD rewrite to not assume already knowing packet structure
+\par Assuming the destination IP is correct, the hopping router then unpacks the contents of the packet, verifying validity as it goes. Packets coming from other ARG gateways are IPv6 packets, with an encrypted version of the original packet as the payload and a Hash-based Message Authentication Code (HMAC) as an Extension Header \cite{rfc2460}. To retrieve this information, the external handler first decrypts the packet payload using the path key, producing the original packet. An HMAC is then computed based on the unencrypted packet and the wrapper's source and destination information. If the computed HMAC does not match the one given in the wrapper, the gateway can handle it in the same way as a packet with an incorrect IP. If everything is correct to this point, the original, unencrypted packet is dropped onto the internal network, where it routes as usual.
+
+\subsubsection{Internal Handler}
+\label{sec:internal_handler}
+
+\begin{figure}
+	\centering
+	\includegraphics{../diagrams/flow_internal}
+	\caption{Internal handler flow}
+	\label{fig:flow_internal}
+\end{figure}
+
+\par Outbound packets, sent from the internal network to the outside, are given to the internal handler. This system is vastly simpler than the external handler, as it does not have to worry about invalid packets and any real packet inspection. The way each packet is handled is predicated entirely on the destination IP.
+
+\par If the destination matches the IP of a hopping network the gateway is connected to, the internal handler first encrypts the packet---including everything from the IP layer up---using the path key and wraps it in an IPv6 container. This new packet has a source of the local gateway's current IP and a destination of the remote gateway's current IP. Ports are copied over verbatim from the old packet, although this would be easy to alter as well. Finally an HMAC using the path key is computed for the original packet (unencrypted form), the new source, and the new destination. This is added to the new packet as an Extension Header. The gateway then drops the packet on the external network, letting it route to the other gateway. (The decryption/validation procedure for this is covered in Section \ref{sec:internal_handler}.)
+
+\par If it does not match a hopping network, the packet is looked up in the NAT table. If there is no current entry a new one is created. This entry contains the current gateway IP, a unique source port, the original IP and source port, the destination IP and port, and a timestamp. (The timestamp is used for expiring old connections.) The packet is rewritten to use the gateway IP and new source port and placed on the external network. If an entry already exists, the timestamp is updated and the saved source IP and port are applied to the packet.
+

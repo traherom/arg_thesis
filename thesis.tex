@@ -1,0 +1,250 @@
+\documentclass[]{afit-etd}
+
+% The afit-etd class requires the following packages: url, refcount, graphicx,
+%                                                     sf298, hyperref
+%
+% Required files to support the afit-etd class are:
+%      afit-etd.cls
+%      afitlogo.pdf or afitlogo.eps
+%      af298.sty (slight modifications required to fix a 'glitch')
+% All of the required files must be located in your LaTeX search path.  The
+% easiest place to put them is in the working directory along side with your
+% thesis.tex file.
+%
+% Additional files used in this shell but not required are:
+%     thesis.bib (used as an example only)
+%     thesnum3.bst (can be replaced with any other bibliography style file)
+%     CampusPhoto.pdf and CampusPhoto.eps (used as an example only)
+% This shell will not process without these files, but if you delete sample
+% text and replace the BST file with another, then these will not be required
+% at all.
+
+
+% The following packages and macros are recommended but not required:
+\usepackage{xcolor}                  % standard package for including colors
+\usepackage[printonlyused]{acronym}  % facilitates the use of acronyms
+\usepackage[square,sort&compress,numbers]{natbib} % better citations
+                                % especially when including a string of
+                                % citations
+%\newcommand\citenum[1]{#1}
+\usepackage{subfig}
+
+% Packages for fonts
+\usepackage{amssymb}  % math symbols (amsmath & amsthm are defined in afit-etd)
+\usepackage{lettrine} % provides dropped characters to lead off a paragraph.
+                      % These are not required, but some people like them at
+                      % the start of each chapter.
+\usepackage{bm}       % The most comprehensive package for bold math figures
+\usepackage{textcomp} % \texttimes, \textdegree, \textohm, \textmu
+
+% Packages for tables
+\usepackage{booktabs} % improved rules (lines) for tables
+\usepackage{dcolumn}  % align at decimal in tables
+\usepackage{multirow} % table elements spanning multiple rows
+
+\graphicspath{{figures/}} % reduce clutter by storing figures elsewhere
+
+% Defining macros for all references makes it easy to change format later from
+% "Equation 1" to "Eqn (1)", for example
+\newcommand{\fig}[1]{Figure~\ref{fig:#1}}
+\newcommand{\tab}[1]{Table~\ref{tab:#1}}
+\newcommand{\eq}[1]{Equation~\eqref{eq:#1}}
+\newcommand{\eqtwo}[2]{Equations~\eqref{eq:#1} and \eqref{eq:#2}}
+\newcommand{\chap}[1]{Chapter~\ref{chap:#1}}
+\newcommand{\sect}[1]{Section~\ref{sec:#1}}
+\newcommand{\Ref}[1]{Reference~\citenum{#1}}
+
+
+%%%%% Required front matter definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title  {A \LaTeX{} Template for AFIT Theses, Dissertations,\\
+         and Graduate Research Papers} % \\ can be used to force a linebreak
+\doctype{THESIS} % or GRADUATE RESEARCH PAPER, DISSERTATION, or REPORT
+                 % REPORT will generate a simplified format more suitable for
+                 % class assignments
+
+\author          {Ryan A.}{Morehart}
+\rank            {Second Lieutenant, USAF}
+\previousdegrees {B.S.} % Abbreviate any previous degrees
+
+% Uncomment the following lines if there is a second author
+% \coauthor          {FirstName I. LastName} 
+% \corank            {Major, USAF}
+% \copreviousdegrees {B.S.} 
+
+\degree          {Master of Science}
+\graduation      {27}{March}{2013} % format is {DD}{Month}{YYYY} where
+                                   % Month must be: March, June,
+                                   % September, or December
+
+\designator{AFIT/GE/ENG/12-XX} % assigned by the graduate advisor in
+                               % during the student's final quarter
+
+
+\distribution{DISTRIBUTION STATEMENT A:\\APPROVED FOR PUBLIC RELEASE;
+  DISTRIBUTION UNLIMITED} % or other appropriate distribution statement from the
+                          % AFIT Style Guide
+
+\committee{ % Advisor must be listed first in the list of committee members
+  {Dr. Barry Mullins, PhD (Chairman)},
+  {Dr. Rusty Baldwin, PhD (Member)},
+  {Dr. Timothy Lacey, PhD (Member)}
+}
+
+\department {Department of Electrical and Computer Engineering}
+\deptsymbol {ENG}
+
+\school     {Graduate School of Engineering and Management}
+\dean       {M. U. Thomas} % only used for PhD dissertations
+
+% Uncomment the following line to switch from blank signature lines on
+% the approval page to lines marked with ``/signed/'' and the
+% corresponding dates.  This avoid having to scan the signature page into the
+% final PDF document for the electronic version, but it also doesn't look as 
+% professional.  Similarly, the Dean's signature can be indicated using the 
+% second line below.  Note that the original signatures are still required on
+% the hardcopy submitted to the library.
+
+% \committeeSignedDates{2 Jun 2011,3 Jun 2011,4 Jun 2011}
+% \deanSignedDate{9 Jun 2011}
+
+\abstract{Insert abstract here.}
+% The abstract can also be saved in a separate file, called abstract.tex for 
+% example, and included here using: "\abstract{\input{abstract}}"
+
+%%%% Required SF298 macros %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\DatesCovered{Oct 2011--Mar 2013} % First quarter of classes to Graduation
+\ContractNumber{}   % "in house" if AFIT sponsored or blank otherwise
+\ProjectNumber{}    % JON number (per advisor) or blank
+\SponsoringAgency{} % sponsor address or '\relax' (will appear blank)
+\Acronyms{}         % sponsor unit/office symbol or blank
+\SMReportNumber{}   % blank unless sponsoring agency assigned a report number
+\AddlSupplementaryNotes{}   % Add any other comments as necessary
+\ReportClassification {U}   % document classification
+\AbstractClassification {U} % abstract classification
+\PageClassification {U}     % SF 298 classification
+\AbstractLimitation {UU}    % change to 'SAR' if limited distribution
+\SubjectTerms{Networks,}
+\RPTelephone {(937) 255-3636 ext. XXXX}  % advisors 4 digit extension
+
+%%%% Optional macro definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\dedication{\centering Insert optional dedication or remove/comment out this line completely.  The text will be centered vertically and horizontally on the page} 
+
+%\acknowledgments{Insert optional acknowledgments or remove/comment out this line completely.} 
+% If you prefer to provide "acknowledgements" instead (note the added "e"
+% between the "g" and the "m") then add the "e" in the macro name so that
+% it reads "\acknowledgements".}
+
+%\vita{Insert optional vita or remove/comment out this line completely.}
+
+% The default disclaimer and copyright statement is included by default.  An
+% alternate disclaimer for foreign students or others can also be
+% used by uncommenting the following line:
+%
+% \govtdisclaimer{Alternate Disclaimer.//See the Style Guide for more information}    
+
+% The List of Tables and Figures can be omitted if not needed:
+%
+% \notables  
+% \nofigures
+
+% Additional "lists" can be added to the end of the front matter using the
+% \addlistof macro.  For example, one might insert a list of symbols using the
+%  tabbing environment with:
+\addlistof{Symbols}{
+\begin{tabbing}
+  Symbol\quad \= Definition \kill % This sets up the tab stop
+  Symbol \> Definition \\
+  $I$    \> current (amps) \\
+  $R$    \> resistance (ohms) \\
+  $V$    \> voltage (volts) \\
+  \null\\
+  \textit{Subscripts}\\
+  $rms$ \> root mean square \\
+  $t$ \> true \\
+  $0$ \> nominal\\
+  \null\\
+  \textit{Superscripts}\\
+  $b$ \> body reference frame \\
+  $n$ \> navigation reference frame \\
+\end{tabbing}
+}
+
+% Alternatives to the preceding list of symbols and the following list of
+% acronyms can be created using:
+%
+% \listofsymbols
+% \listofabbreviations[5em]
+% 
+%% where the corresponding symbols and abbreviations must then be marked at
+%% their first occurence in the text with "\addsymbol{Definition}{Symbol}" or
+%% "\addabbrev{Definition}{Symbol}", respectively.  If the symbols are
+%% too wide for the table, the alloted width can be increased by including
+%% an optional width in square brackets, as in  "\listofsymbols[.3in]".  
+%% Both of these lists will be listed in the order that they appear in the text.
+
+\begin{document}
+
+% The acronym package can be used to add a list of acronyms.  Because
+% the acronym formatting is modified to match the AFIT Style Guide,
+% the following command must be in the body of the document prior to the
+% call to \makePrefatoryPages
+\listofacronyms{
+\begin{acronym}[WPAFB]
+  \acro{AFRL}{Air Force Research Laboratory}
+  \acro{AFIT}{Air Force Institute of Technology}
+  \acro{WPAFB}{Wright Patterson Air Force Base}
+\end{acronym}
+}
+
+% The following line is required to generate the prefatory pages
+\makePrefatoryPages 
+
+%% Body of the text follows, using \chapter, \section, \subsection,
+%% \subsubsection, \paragraph, and \subparagraph to generate the
+%% section headings.  For convenience, it may be useful to break the
+%% full document into separate files, perhaps divided by chapters.  In
+%% that case, the files would be loaded here using "\input{filename}"
+
+\chapter{Introduction}
+\input{chapter1}
+\cite{rfc2}
+
+\chapter{Background}
+\input{chapter2}
+
+\chapter{Methodology}
+\input{chapter3}
+
+\chapter{Results and Analysis}
+\input{chapter4}
+
+\chapter{Conclusions and Recommendations}
+\input{chapter5}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Appendices
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix    % Indicates the transition from chapters to appendices.  If there
+             % is only one appendix it will not be labeled (can't have an "A"
+             % without a "B"...).  The labels will be added automatically if 
+             % there are more than one.  To get the counter in sync, a third 
+             % "latex" may be required on the file.
+
+\chapter{Stuff}
+\lettrine{A}ppendix goes here
+
+% The \references command should be used to insert the list of references.
+% Assuming one is using BibTeX, this should contain both a \bibliographystyle
+% and a \bibliography command referencing a separate bibliography file.
+
+\references{
+  \bibliographystyle{thesnumb3} % or ieeetr, spie, aiaa, etc.
+  \bibliography{research,rfc}
+ }
+\end{document}
+

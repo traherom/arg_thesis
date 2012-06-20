@@ -1,0 +1,12 @@
+\lettrine{T}{his} is where you describe the problem you are trying to solve, describe what others
+have done with this problem, and tell where your work fits into all of this.
+- This chapter will typically include the following topics (not necessarily in this order):
+
+\par Traditional network defenses consist of largely static tools; firewalls and intrusion detection systems (IDS) form the backbone of protection in most information technology shops.  Recently, however, there has been an interest in more active defense mechanisms, such as reputation and trust-based security \cite{Untrustworthiness} and network address space randomization (NASR) \cite{APOD, NAH}. This paper focuses on the latter in a military setting.
+
+\par At a high level, the concept of NASR is simple: rather than a system sitting on a single Internet Protocol (IP) address, it changes its address rapidly, hopping amongst a set of IP addresses assigned to it. This is similar in concept to a frequency hopping radio, although the effect varies. 
+
+\par Normally an attacker wishing to target a given network is capable of gaining a great deal of intelligence through simple scanning, checking each IP inside the network and then checking each port on the active IPs to see what services are available. With this knowledge, the attacker can almost certainly find an entrance into the network. IP hopping mitigates this issue by making it difficult to probe the network in the first place and quickly invalidating any network map that the attacker does manage to generate; even if they do manage to look a system's internal IP at one point in time, the address will change just moments later.
+
+\par In this paper we propose an IP address hopping system called the Address Routing Gateway (ARG). It incorporates many of the features of previous address-hopping schemes, with an eye on the specific needs of the military. In this context each of the existing systems presents drawbacks that we attempt to avoid with ARG. Additionally, the design of ARG is intended to allow its future integration with a traditional IDS and honeypot, potentially gaining additional insight into an attacker's behavior.
+

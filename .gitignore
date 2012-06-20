@@ -1,0 +1,11 @@
+rfc.bib
+*.pdf
+*.log
+*.aux
+*.blg
+*.bbl
+*.lot
+*.lof
+*.toc
+*.aft
+
