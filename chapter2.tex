@@ -8,7 +8,29 @@ because when you get to the various topics already covered in Chapter 2, you can
 reference back to that chapter, rather than have to describe the basic theory along with
 whatever you uniquely did.
 
-\subsection{IP Address Hopping in Detail}
+\par To be covered:
+\begin{enumerate}
+\item Introduction (describe what's in chapter)
+\item IP routing
+\item IP address hopping and network address space randomization
+\item IPv6 (especially extension headers)
+\item IPsec
+\item TOTP
+\item Related research
+\item Conclusion
+\end{enumerate}
+
+\section{Introduction}
+\lettrine{T}his chapter provides an introduction to... Section \ref{sec:routing} describes how Internet Protocol (IP) routing works generally and Section \ref{sec:hopping} discusses IP address space randomization. Section \ref{sec:ipv6} discusses details of IPv6 packets, including how Extension Headers work. Section \ref{sec:ipsec} covers IPsec. % needed?
+Section \ref{sec:totp} provides a description of Time-Based One Time Pads (TOTP). Finally, Section \ref{sec:related_research} examines previous effects in IP address hopping.
+
+\section{IP Routing}
+\label{sec:routing}
+\par 
+
+% Original paper
+\section{IP Address Hopping in Detail}
+\label{sec:hopping}
 \par As the introduction mentions, address hopping is a simple concept at a high level: we take the basic identifiers of a network and mutate them in a way that only those we wish to communicate with can follow. In doing so, we make it difficult for an adversary to correlate sniffed traffic with individual machines and even more difficult to probe into the network to enumerate hosts. In trying to actually implement such a system, however, several issues arise. 
 
 \par To aid the discussion of these problems we will use the example network illustrated in Figure \ref{fig:exnetwork}. As it shows, we have two main networks \textit{A} and \textit{B} that are assigned the displayed IP ranges, are connected by the Internet, and have an interest in communicating freely with one-another. Each of these has a few friendly ends nodes (\textit{A1}, \textit{A2}, etc) behind a main router (\textit{AR} and \textit{BR}). Additionally, network \textit{B} has a potentially rogue client inside it named M1. Outside of those two networks, we see the friendly \textit{C2} node, who has an interest in at least occasionally communicating with nodes inside \textit{A}/\textit{B}, and malicious \textit{M2}, who wants access to said networks. The details of the routes between them and \textit{A} and \textit{B} are inconsequential.
@@ -25,7 +47,7 @@ whatever you uniquely did.
 
 \par There are two basic ways IP address hopping could be deployed on this network: each end point hops individually or the network gateways transform incoming and outgoing packets. Both options and their strengths and weaknesses are discussed below.
 
-\subsubsection{End Point Hopping}
+\subsection{End Point Hopping}
 \par For our example network, each end point hopping would mean that all of the nodes behind \textit{AR} and \textit{BR} (\textit{A1}, \textit{A2}, \textit{B1}, etc.) change addresses on a periodic basis, independent of one another. Despite the apparent simplicity of this setup, several questions must be answered.
 
 \par First, how do the nodes keep track of one another? If every node knows about all the others, then scalability might become an issue, as every client presumably has to maintain some amount of data on fellow hopping clients to determine where each one is at any given time. It may be possible to devise a scheme where this flaw is mitigated by having all clients hop using the same secret and they each know just the broad IP ranges where fellow hoppers reside (i.e., the \textit{AR} nodes know that 10.2.2.0/24 is a network they talk to with hopping), but this accentuates the next question: how do clients choose their hops?
@@ -42,7 +64,7 @@ whatever you uniquely did.
 
 \par Despite these negatives end point hopping does have advantages. First, scalability issues lie more in storage space and key lookup than actual computation, as every node only has to perform packet transformations for their own ingress and egress packets. Although not discussed yet, it is likely that any IP hopping scheme will also incorporate packet encryption, so distributing this load certainly cannot hurt. Second, end point hopping protects clients from probing no matter where the adversary is in the network. For example, as long as \textit{M1} in our example network lacks the hopping key, they have no more of an advantage in scanning any of the \textit{A} or \textit{B} nodes than \textit{M2}, who is outside the network. Finally, end point hopping comes with the ability for individual nodes such as \textit{C1} to connect to the main hopping network, without requiring any additional work or software development.
 
-\subsubsection{Gateway hopping}
+\subsection{Gateway hopping}
 \par The alternative to end point hopping is to move the hopping to network gateways. In such a scheme, networks that we wish to protect are placed behind gateways that alter all traffic passing through them appropriately. What ``appropriately'' means varies with every implementation, but in one way or another, a gateway outside of the actual end points alters the IP traffic to make it appear as though the systems inside are changing IP addresses.
 
 \par Nodes inside the network may or may not have knowledge of the hopping. In most instances the hopping occurs with no modification of the end points and is largely transparent. This need to only deploy a small number of systems, rather than altering every system, gives gateway-based hopping an advantage over end point-based on larger networks. Applying software and/or hardware changes to every system is costly in terms of both time and manpower. Even more significantly, legacy systems running older operating systems would likely need custom solutions and might be completely unsupportable as a result.
@@ -51,14 +73,18 @@ whatever you uniquely did.
 
 \par Because of this required state tracking and the need for a single system to alter all traffic in and out of an entire network, gateway-based hopping presents a possible performance problem. This should not be an insurmountable obstacle, however, and some studies have already shown a CPU impact of around 10\% \cite{TAO} (even when encryption was being applied). Additionally, gateway hopping has difficulty with individual nodes connecting to the network. In \textit{C1}'s case, for instance, it would likely need software for just the individual machine, almost exactly as an end-point hopping scheme would require.
 
-\subsection{Other stuff to cover}
-\begin{enumerate}
-\item IPv6 packet structure?
-\item TOTP
-\item a
-\end{enumerate}
+\section{IPv6 Packet Structure}
+\label{sec:ipv6}
 
-\subsection{Previous Implementations}
+\section{IPsec}
+\label{sec:ipsec}
+
+\section{Time-Based One Time Pad}
+\label{sec:totp}
+
+
+\section{Previous Implementations}
+\label{sec:related_research}
 \par With the proceeding discussion in mind, let us look at some previous implementations of this concept and the important results from their experimentation.
 
 \subsubsection{BBN's Dynamic Network Address Translation (DYNAT)}
@@ -102,19 +128,3 @@ whatever you uniquely did.
 \par Finally, in 2006 a system called Transparent Address Obfuscation (TAO) was proposed \cite{TAO}. This system focused on protection of the Internet as a whole from hitlist-based worms and was somewhat based on the previous work in NASR \cite{NASR}. It featured gateways on networks that maintained external-to-internal address mappings for all nodes inside the protected network, with the external addresses changing with a configurable frequency. To maintain existing connection regardless of mapping changes, TAO included a NAT table. 
 
 \par A disadvantage of this design was address space overhead. Testing showed that around 10\% more address space was needed for three simulations on large-scale networks, based on the need to reserve addresses to maintain connections while continuing to change address mappings. However, TAO had the distinct advantage of only requiring the addition of a single box at the network's edge and no cooperation from remote hosts was needed for it to provide its services.
-
-\section{Implementation Proposal}
-\label{sec:implementation}
-\subsection{Requirements}
-\par The Address Routing Gateway focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization, but we will cover them here to provide a common frame of reference for the goals of ARG. 
-
-\par ARG worries primarily about protecting communication outside of military-controlled networks and preventing external entities from probing internally. This means that our implementation is intended to be employed for all traffic traveling between bases. Base networks, in this case, include both those on permanent installations and those in deployed, forward locations. ARG is not directly concerned with protecting internal networks; that is left to more traditional defenses. However, ARG will have the ability to detect invalid packets and this information can be handed off to those traditional defenses---i.e., an IDS---for analysis.
-
-\par ARG must operate over the commercial Internet. Some proposals for network address space randomization require changes to the existing routing infrastructure \cite{CONTRA}. Deploying such a solution may be possible and beneficial in the long run, but we want a solution that could be deployed today without participation from outside entities.
-
-\par Base networks can generate huge volumes of traffic, so ARG must scale well. It may be possible to divide a particularly large installation into sections, but this may not be feasible or desirable in all situations. Due to the critical nature of military networks, ARG's implementation must not introduce significant latency under any foreseeable load. Likewise, there can never be a brief period where all connections drop. Military networks support critical services and any interruption could be catastrophic. At a minimum, given the number of nodes inside the network, dropped connections would result in a massive amount of wasted bandwidth as they were reestablished and the data retransmitted.
-
-\par Military networks contain a wide range of hardware and software. Much of this software cannot be altered to accommodate ARG, so it must function transparently. Host-level implementations might be feasible for generic workstation images---i.e., an alteration to the operating system's network stack---, but the ability to function in another way must exist to allow legacy equipment to continue operating.
-
-\par Finally, resource constraints---monetary and manpower---preclude some options. ARG is intended to be easily configurable and usable with reasonable hardware investments. While no experimentation has been run yet to determine exact performance, ARG requires only a single gateway system for each network it is intended to protect, rather than hardware and/or software for every client inside those networks.
-

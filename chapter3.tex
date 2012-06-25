@@ -1,4 +1,3 @@
-
 \lettrine{H}{ere}, you describe your approach to the problem. If you are developing an
 algorithm, here is where you would describe the details of your algorithm. If you are
 simulating something, this is where you describe how you set up the simulation and
@@ -12,6 +11,28 @@ because it allows the reader to understand where you are coming from. However,
 avoid discussing actual results (they go in Chapter 4).
 
 \par Break the design down into small sections—it’s easier to write, and easier to read.
+
+\par To be covered:
+\begin{enumerate}
+\item Problem definition
+\item Goals
+\end{enumerate}
+
+\section{Implementation Proposal}
+\label{sec:implementation}
+\subsection{Requirements}
+\par The Address Routing Gateway focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization, but we will cover them here to provide a common frame of reference for the goals of ARG. 
+
+\par ARG worries primarily about protecting communication outside of military-controlled networks and preventing external entities from probing internally. This means that our implementation is intended to be employed for all traffic traveling between bases. Base networks, in this case, include both those on permanent installations and those in deployed, forward locations. ARG is not directly concerned with protecting internal networks; that is left to more traditional defenses. However, ARG will have the ability to detect invalid packets and this information can be handed off to those traditional defenses---i.e., an IDS---for analysis.
+
+\par ARG must operate over the commercial Internet. Some proposals for network address space randomization require changes to the existing routing infrastructure \cite{CONTRA}. Deploying such a solution may be possible and beneficial in the long run, but we want a solution that could be deployed today without participation from outside entities.
+
+\par Base networks can generate huge volumes of traffic, so ARG must scale well. It may be possible to divide a particularly large installation into sections, but this may not be feasible or desirable in all situations. Due to the critical nature of military networks, ARG's implementation must not introduce significant latency under any foreseeable load. Likewise, there can never be a brief period where all connections drop. Military networks support critical services and any interruption could be catastrophic. At a minimum, given the number of nodes inside the network, dropped connections would result in a massive amount of wasted bandwidth as they were reestablished and the data retransmitted.
+
+\par Military networks contain a wide range of hardware and software. Much of this software cannot be altered to accommodate ARG, so it must function transparently. Host-level implementations might be feasible for generic workstation images---i.e., an alteration to the operating system's network stack---, but the ability to function in another way must exist to allow legacy equipment to continue operating.
+
+\par Finally, resource constraints---monetary and manpower---preclude some options. ARG is intended to be easily configurable and usable with reasonable hardware investments. While no experimentation has been run yet to determine exact performance, ARG requires only a single gateway system for each network it is intended to protect, rather than hardware and/or software for every client inside those networks.
+
 
 \subsection{Requirements}
 \par The Address Routing Gateway focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization, but we will cover them here to provide a common frame of reference for the goals of ARG. 
