@@ -24,4 +24,10 @@ research.bib :
 
 rfc.bib :
 	wget http://www.tm.uka.de/~bless/rfc.bib
-	
+
+# Sweave Rnw files
+%.tex : %.Rnw Sweave.sty
+	R CMD Sweave $<
+
+Sweave.sty : 
+	cp `locate Sweave.sty | head -n 1` .
