@@ -18,6 +18,10 @@ avoid discussing actual results (they go in Chapter 4).
 \item Goals
 \end{enumerate}
 
+<<>>=
+5 + 2
+@
+
 \section{Implementation Proposal}
 \label{sec:implementation}
 \subsection{Requirements}

@@ -1,7 +1,7 @@
 all : thesis.pdf
 
 test : all
-	evince thesis.pdf &
+	open thesis.pdf &
 
 clean : clean-temp
 	rm -f thesis.pdf
@@ -27,7 +27,7 @@ rfc.bib :
 
 # Sweave Rnw files
 %.tex : %.Rnw Sweave.sty
-	R CMD Sweave $<
+	R CMD Sweave --encoding=utf-8 $<
 
 Sweave.sty : 
 	cp `locate Sweave.sty | head -n 1` .
