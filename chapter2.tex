@@ -24,9 +24,15 @@ whatever you uniquely did.
 \lettrine{T}his chapter provides an introduction to... Section \ref{sec:routing} describes how Internet Protocol (IP) routing works generally and Section \ref{sec:hopping} discusses IP address space randomization. Section \ref{sec:ipv6} discusses details of IPv6 packets, including how Extension Headers work. Section \ref{sec:ipsec} covers IPsec. % needed?
 Section \ref{sec:totp} provides a description of Time-Based One Time Pads (TOTP). Finally, Section \ref{sec:related_research} examines previous effects in IP address hopping.
 
+\section{IPv6 Packet Structure}
+\label{sec:ipv6}
+
+
 \section{IP Routing}
 \label{sec:routing}
-\par 
+\par This thesis makes the assumption that the reader has a familiarity with how Internet Protocol (IP). This section, however, discusses how actual routing occurs with 
+
+\par IPv4 address space is divided into 
 
 % Original paper
 \section{IP Address Hopping in Detail}
@@ -72,9 +78,6 @@ Section \ref{sec:totp} provides a description of Time-Based One Time Pads (TOTP)
 \par The most common observable side effect of gateway hopping (beyond the latency associated with the additional processing) is TCP connection dropping. Because TCP depends on IP addresses and ports numbers to identify on-going connections, any alterations to this information would traditionally kill the connection. This is a problem also faced by end point hopping schemes, but is more easily corrected because the individual machines know the state of connections and can correct appropriately. With gateway hopping, however, the situation can be much more delicate and likely requires significant state tracking at the gateway.
 
 \par Because of this required state tracking and the need for a single system to alter all traffic in and out of an entire network, gateway-based hopping presents a possible performance problem. This should not be an insurmountable obstacle, however, and some studies have already shown a CPU impact of around 10\% \cite{TAO} (even when encryption was being applied). Additionally, gateway hopping has difficulty with individual nodes connecting to the network. In \textit{C1}'s case, for instance, it would likely need software for just the individual machine, almost exactly as an end-point hopping scheme would require.
-
-\section{IPv6 Packet Structure}
-\label{sec:ipv6}
 
 \section{IPsec}
 \label{sec:ipsec}
