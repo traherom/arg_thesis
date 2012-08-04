@@ -1,7 +1,7 @@
 all : thesis.pdf
 
 test : all
-	open thesis.pdf &
+	open thesis.pdf
 
 clean : clean-temp
 	rm -f thesis.pdf
@@ -25,9 +25,7 @@ research.bib :
 rfc.bib :
 	wget http://www.tm.uka.de/~bless/rfc.bib
 
-# Sweave Rnw files
-%.tex : %.Rnw Sweave.sty
-	R CMD Sweave --encoding=utf-8 $<
+# Knitr for Rnw files
+%.tex : %.Rnw
+	R -e 'library("knitr"); knit("$<")'
 
-Sweave.sty : 
-	cp `locate Sweave.sty | head -n 1` .
