@@ -10,3 +10,6 @@ Sweave.sty
 *.toc
 *.aft
 *.out
+*.swp
+*.loa
+

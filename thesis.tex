@@ -22,7 +22,6 @@
 
 % The following packages and macros are recommended but not required:
 \usepackage{xcolor}                  % standard package for including colors
-\usepackage[printonlyused]{acronym}  % facilitates the use of acronyms
 \usepackage[square,sort&compress,numbers]{natbib} % better citations
                                 % especially when including a string of
                                 % citations
@@ -31,6 +30,7 @@
 
 % Packages for fonts
 \usepackage{amssymb}  % math symbols (amsmath & amsthm are defined in afit-etd)
+\usepackage[printonlyused]{acronym}
 \usepackage{lettrine} % provides dropped characters to lead off a paragraph.
                       % These are not required, but some people like them at
                       % the start of each chapter.
@@ -41,9 +41,6 @@
 \usepackage{booktabs} % improved rules (lines) for tables
 \usepackage{dcolumn}  % align at decimal in tables
 \usepackage{multirow} % table elements spanning multiple rows
-
-% Allow the use of Sweave
-\usepackage{Sweave}
 
 \graphicspath{{figures/}} % reduce clutter by storing figures elsewhere
 
@@ -57,11 +54,12 @@
 \newcommand{\sect}[1]{Section~\ref{sec:#1}}
 \newcommand{\Ref}[1]{Reference~\citenum{#1}}
 
+% Todo tag
+\newcommand{\tbd}[1]{{\color{red} #1}}
 
 %%%%% Required front matter definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title  {A \LaTeX{} Template for AFIT Theses, Dissertations,\\
-         and Graduate Research Papers} % \\ can be used to force a linebreak
+\title  {Malicious Traffic Detection through Internet Protocol Address Hopping}
 \doctype{THESIS} % or GRADUATE RESEARCH PAPER, DISSERTATION, or REPORT
                  % REPORT will generate a simplified format more suitable for
                  % class assignments
@@ -195,11 +193,7 @@
 % the following command must be in the body of the document prior to the
 % call to \makePrefatoryPages
 \listofacronyms{
-\begin{acronym}[WPAFB]
-  \acro{AFRL}{Air Force Research Laboratory}
-  \acro{AFIT}{Air Force Institute of Technology}
-  \acro{WPAFB}{Wright Patterson Air Force Base}
-\end{acronym}
+	\input{acronyms.tex}
 }
 
 % The following line is required to generate the prefatory pages
@@ -239,7 +233,7 @@
              % "latex" may be required on the file.
 
 \chapter{Stuff}
-\lettrine{A}ppendix goes here
+\lettrine{A}{ppendix} goes here
 
 % The \references command should be used to insert the list of references.
 % Assuming one is using BibTeX, this should contain both a \bibliographystyle

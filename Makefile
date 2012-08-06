@@ -1,3 +1,5 @@
+temptex := $(patsubst %.Rnw,%.tex,$(wildcard *.Rnw))
+
 all : thesis.pdf
 
 test : all
@@ -8,20 +10,17 @@ clean : clean-temp
 
 clean-temp : 
 	rm -f *.aux *.log *.blg *.bbl *.out *.lot *.lof *.toc *.aft
+	rm -f $(temptex)
 
-thesis.pdf : thesis.aux research.bbl
+thesis.pdf : thesis.aux
 	pdflatex thesis
 	pdflatex thesis
 
-thesis.aux : thesis.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex rfc.bib research.bib
-	pdflatex thesis
-
-research.bbl : research.bib thesis.aux
+thesis.aux : thesis.tex $(wildcard?.tex) $(temptex) rfc.bib research.bib acronyms.tex
+	pdflatex -draftmode thesis
 	bibtex thesis
 
-research.bib : 
-	ln -s ../papers/research.bib .
-
+# Download RFC bib if needed
 rfc.bib :
 	wget http://www.tm.uka.de/~bless/rfc.bib
 

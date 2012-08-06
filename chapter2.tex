@@ -8,53 +8,41 @@ because when you get to the various topics already covered in Chapter 2, you can
 reference back to that chapter, rather than have to describe the basic theory along with
 whatever you uniquely did.
 
-\par To be covered:
-\begin{enumerate}
-\item Introduction (describe what's in chapter)
-\item IP routing
-\item IP address hopping and network address space randomization
-\item IPv6 (especially extension headers)
-\item IPsec
-\item TOTP
-\item Related research
-\item Conclusion
-\end{enumerate}
-
 \section{Introduction}
-\lettrine{T}his chapter provides an introduction to... Section \ref{sec:routing} describes how Internet Protocol (IP) routing works generally and Section \ref{sec:hopping} discusses IP address space randomization. Section \ref{sec:ipv6} discusses details of IPv6 packets, including how Extension Headers work. Section \ref{sec:ipsec} covers IPsec. % needed?
+\lettrine{T}{his} chapter provides an introduction to... Section \ref{sec:routing} describes how Internet Protocol (IP) routing works generally and Section \ref{sec:hopping} discusses IP address space randomization. Section \ref{sec:ipv6} discusses details of IPv6 packets, including how Extension Headers work. Section \ref{sec:ipsec} covers IPsec. % needed?
 Section \ref{sec:totp} provides a description of Time-Based One Time Pads (TOTP). Finally, Section \ref{sec:related_research} examines previous effects in IP address hopping.
 
-\section{IPv6 Packet Structure}
-\label{sec:ipv6}
+\section{Internet Protocol}
+\par This thesis makes the assumption that the reader has a famility with how Internet Protocol (IP) works. However, several aspects of this protocol are critical to the functioning of the system described later and are detailed here. 
 
-
-\section{IP Routing}
+\subsection{IP Routing}
 \label{sec:routing}
-\par This thesis makes the assumption that the reader has a familiarity with how Internet Protocol (IP). This section, however, discusses how actual routing occurs with 
+\par IP packets are routed from system to system based on the destination address contained in their header. IP version 4 uses 32-bit addresses to uniquely identify each system on the public Internet. These addresses are typically represented in a ``dotted quad'' format: for example, 74.125.228.36. IP version 6 uses 128-bit address, typically represented in heximdecimal separated by colons (i.e. \texttt{a3d3:2d42::8c24}).
 
-\par IPv4 address space is divided into 
+\par Regardless of which version is in use, high-level routing remains the same. When a router receives a packet, it examines its routing table and decides what interface to send the packet out on based on the most specific entry in the table. This scheme allows a router to direct packets without having to know every individual IP, they only have to know broad swaths of addresses. A corporation's network, for instance, may contain hundreds or thousands of addresses, but the routers directing packets to them need only have one entry in their table to correctly route packets to them. The internal routers of the corporation are then in charge, a key fact that allows IP hopping to work.
 
-% Original paper
-\section{IP Address Hopping in Detail}
-\label{sec:hopping}
-\par As the introduction mentions, address hopping is a simple concept at a high level: we take the basic identifiers of a network and mutate them in a way that only those we wish to communicate with can follow. In doing so, we make it difficult for an adversary to correlate sniffed traffic with individual machines and even more difficult to probe into the network to enumerate hosts. In trying to actually implement such a system, however, several issues arise. 
+\subsection{IPv6 Packet Structure}
+\label{sec:ipv6}
+\par IPv6 and IPv4 packets are rather different with packet structure, with IPv6 eliminating much of the cruft and complication in the older standard. This was done by eliminating packet fragmenting, checksums at the network layer, 
 
-\par To aid the discussion of these problems we will use the example network illustrated in Figure \ref{fig:exnetwork}. As it shows, we have two main networks \textit{A} and \textit{B} that are assigned the displayed IP ranges, are connected by the Internet, and have an interest in communicating freely with one-another. Each of these has a few friendly ends nodes (\textit{A1}, \textit{A2}, etc) behind a main router (\textit{AR} and \textit{BR}). Additionally, network \textit{B} has a potentially rogue client inside it named M1. Outside of those two networks, we see the friendly \textit{C2} node, who has an interest in at least occasionally communicating with nodes inside \textit{A}/\textit{B}, and malicious \textit{M2}, who wants access to said networks. The details of the routes between them and \textit{A} and \textit{B} are inconsequential.
+\section{IP Hopping in Detail}
+\par Address hopping is a simple concept at a high level: take the basic identifiers of a network and mutate them in a way that only those we wish to communicate with can follow. Doing so makes it difficult for an adversary to correlate sniffed traffic with individual machines and even more difficult to probe into the network to enumerate hosts. In trying to actually implement such a system, however, several issues arise. 
+
+\par To aid the discussion of these problems we will use the example network illustrated in Figure \ref{fig:exnetwork}. As it shows, we have two main networks \textit{A} and \textit{B} that are assigned the displayed IP ranges, are connected by the Internet, and have an interest in communicating freely with one-another. Each of these has a few friendly ends nodes (\textit{A1}, \textit{A2}, etc) behind a main router (\textit{AR} and \textit{BR}). Additionally, network \textit{B} has a potentially rogue client inside it named \textit{M1}. Outside of those two networks, we see the friendly \textit{C2} node, who has an interest in at least occasionally communicating with nodes inside \textit{A}/\textit{B}, and malicious \textit{M2}, who wants access to said networks. The details of the routes between them and \textit{A} and \textit{B} are inconsequential.
 
 \par Note that for the sake of this discussion non-routable IPv4 addresses are largely used. This is done merely for convenience and readability, the discussions apply to IPv6 as well unless otherwise noted.
 
-% TBD modify image to include IPs?
 \begin{figure}
 	\centering
 	\includegraphics[width=0.75\textwidth]{../diagrams/exnetwork}
-	\caption{Example network layout}
+	\caption{Example network layout \tbd{include IP addresses}}
 	\label{fig:exnetwork}
 \end{figure}
 
 \par There are two basic ways IP address hopping could be deployed on this network: each end point hops individually or the network gateways transform incoming and outgoing packets. Both options and their strengths and weaknesses are discussed below.
 
 \subsection{End Point Hopping}
-\par For our example network, each end point hopping would mean that all of the nodes behind \textit{AR} and \textit{BR} (\textit{A1}, \textit{A2}, \textit{B1}, etc.) change addresses on a periodic basis, independent of one another. Despite the apparent simplicity of this setup, several questions must be answered.
+\par For the example network, each end point hopping would mean that all of the nodes behind \textit{AR} and \textit{BR} (\textit{A1}, \textit{A2}, \textit{B1}, etc.) change addresses on a periodic basis, independent of one another. Despite the apparent simplicity of this setup, several questions must be answered.
 
 \par First, how do the nodes keep track of one another? If every node knows about all the others, then scalability might become an issue, as every client presumably has to maintain some amount of data on fellow hopping clients to determine where each one is at any given time. It may be possible to devise a scheme where this flaw is mitigated by having all clients hop using the same secret and they each know just the broad IP ranges where fellow hoppers reside (i.e., the \textit{AR} nodes know that 10.2.2.0/24 is a network they talk to with hopping), but this accentuates the next question: how do clients choose their hops?
 
@@ -62,16 +50,16 @@ Section \ref{sec:totp} provides a description of Time-Based One Time Pads (TOTP)
 
 \par Just as importantly, however, is the question of how nodes coordinate their IP address choices. IP routing requires addresses follow a largely hierarchical setup, with broad ranges like 10.0.0.0 leading to 10.1.0.0 to 10.1.1.0 and so on. Thus, if \textit{A} has the network address range 10.1.1.0/24, then all of its nodes should fall within the address range of 10.1.1.1 through 10.1.1.255. This means that when each node hops it must remain within the valid range of the network it is a part of \textit{and} that the address it chooses must not already be taken another node. Given enough nodes in a subnet, a conflict is quite possible, leading to unpredictable network behavior. 
 
-\par It is likely possible to devise a reasonably robust algorithm for all nodes to hop simultaneously and end up on unique IPs, but this encounters a few issues with the link-layer of a network's architecture. On local networks, machines are identified by a Media Access Code (MAC) and systems must map IP addresses to the hardware MAC using Address Routing Protocol (ARP). Nodes virtually always cache this information for speed, so for the period of time from a hop to the cache entry expiration time, packets sent to nodes on the local network will likely contain an incorrect MAC and not arrive at the correct destination. TCP would then detect the packet loss and retransmit, trying until either the connection timed out or the ARP cache updated. Even if ARP information is only cached for a few seconds, at best this could result in bursts of traffic on local networks and at worst dropped connections. A similar problem also exists at the switches in the network, although this would likely resolve itself quickly.
+%\par It is likely possible to devise a reasonably robust algorithm for all nodes to hop simultaneously and end up on unique IPs, but this encounters a few issues with the link-layer of a network's architecture. On local networks, machines are identified by a Media Access Code (MAC) and systems must map IP addresses to the hardware MAC using Address Routing Protocol (ARP). Nodes virtually always cache this information for speed, so for the period of time from a hop to the cache entry expiration time, packets sent to nodes on the local network will likely contain an incorrect MAC and not arrive at the correct destination. TCP would then detect the packet loss and retransmit, trying until either the connection timed out or the ARP cache updated. Even if ARP information is only cached for a few seconds, at best this could result in bursts of traffic on local networks and at worst dropped connections. A similar problem also exists at the switches in the network, although this would likely resolve itself quickly.
 
-\par It would be possible to work around this issue by having whatever utility is handling the hopping also alter the ARP cache. To do so, every node would need to compute the correct locations of all other nodes and do so at precisely the same time. While not infeasible, this becomes even more platform-specific than the general IP hopping was. Approaching it the other way, nodes could all send gratuitous ARPs when their IP changes, but this still generates extra traffic on the network and \textit{forces} systems to be extremely vulnerable to ARP spoofing, a common part of a network attack.
+%\par It would be possible to work around this issue by having whatever utility is handling the hopping also alter the ARP cache. To do so, every node would need to compute the correct locations of all other nodes and do so at precisely the same time. While not infeasible, this becomes even more platform-specific than the general IP hopping was. Approaching it the other way, nodes could all send gratuitous ARPs when their IP changes, but this still generates extra traffic on the network and \textit{forces} systems to be extremely vulnerable to ARP spoofing, a common part of a network attack.
 
-\par The easiest solution to this problem is to give each node a unique, non-overlapping address range in which to hop. This avoids the ARP problem because there will never be a different node that used to have the same IP but a different MAC. However, this has the difficulty of requiring a large enough address space to make hopping beneficial. If a given node only has five possible addresses in which to hop, for instance, it becomes trivial for an attacker to just keep trying a single one until the node returns to it. IPv6 would avoid this problem, as the Internet Engineering Task Force recommends the allocation of a /64 address space ($2^{64}$ addresses) to every link \cite{rfc3267}, but IPv4 with its extremely limited address space would not allow this flexibility and, unfortunately, the reality of current networks mandates support for IPv4. % TBD see if a paper has an analysis of the needed address space for usability
+\par The easiest solution to this problem is to give each node a unique, non-overlapping address range in which to hop. This avoids the ARP problem because there will never be a different node that used to have the same IP but a different MAC. However, this has the difficulty of requiring a large enough address space to make hopping beneficial. If a given node only has five possible addresses in which to hop, for instance, it becomes trivial for an attacker to just keep trying a single one until the node returns to it. IPv6 would avoid this problem, as the Internet Engineering Task Force recommends the allocation of a /64 address space ($2^{64}$ addresses) to every link \cite{rfc3267}, but IPv4 with its extremely limited address space would not allow this flexibility and, unfortunately, the reality of current networks mandates support for IPv4. \tbd{TBD see if a paper has an analysis of the needed address space for usability}
 
 \par Despite these negatives end point hopping does have advantages. First, scalability issues lie more in storage space and key lookup than actual computation, as every node only has to perform packet transformations for their own ingress and egress packets. Although not discussed yet, it is likely that any IP hopping scheme will also incorporate packet encryption, so distributing this load certainly cannot hurt. Second, end point hopping protects clients from probing no matter where the adversary is in the network. For example, as long as \textit{M1} in our example network lacks the hopping key, they have no more of an advantage in scanning any of the \textit{A} or \textit{B} nodes than \textit{M2}, who is outside the network. Finally, end point hopping comes with the ability for individual nodes such as \textit{C1} to connect to the main hopping network, without requiring any additional work or software development.
 
 \subsection{Gateway hopping}
-\par The alternative to end point hopping is to move the hopping to network gateways. In such a scheme, networks that we wish to protect are placed behind gateways that alter all traffic passing through them appropriately. What ``appropriately'' means varies with every implementation, but in one way or another, a gateway outside of the actual end points alters the IP traffic to make it appear as though the systems inside are changing IP addresses.
+\par The alternative to end point hopping is to move the hopping to network gateways. In such a scheme, networks are placed behind gateways that alter all traffic passing through them appropriately. What ``appropriately'' means varies with every implementation, but in one way or another, a gateway outside of the actual end points alters the IP traffic to make it appear as though the systems inside are changing IP addresses.
 
 \par Nodes inside the network may or may not have knowledge of the hopping. In most instances the hopping occurs with no modification of the end points and is largely transparent. This need to only deploy a small number of systems, rather than altering every system, gives gateway-based hopping an advantage over end point-based on larger networks. Applying software and/or hardware changes to every system is costly in terms of both time and manpower. Even more significantly, legacy systems running older operating systems would likely need custom solutions and might be completely unsupportable as a result.
 
@@ -81,10 +69,11 @@ Section \ref{sec:totp} provides a description of Time-Based One Time Pads (TOTP)
 
 \section{IPsec}
 \label{sec:ipsec}
+\par IPsec is a common standard for establishing encrypted and/or authenticated connections. Rather than working at the transport and session layers---i.e., SSL in conjunction with TCP---, IPsec functions on the network layer. \tbd{cite IPsec rfc, layer info}  
 
 \section{Time-Based One Time Pad}
 \label{sec:totp}
-
+\tbd{TOTP description, how to get more than the default number of bits}
 
 \section{Previous Implementations}
 \label{sec:related_research}
