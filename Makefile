@@ -3,6 +3,8 @@ temptex := $(patsubst %.Rnw,%.tex,$(wildcard *.Rnw))
 all : thesis.pdf
 
 test : all
+	echo $(wildcard chapter[1-6].tex)
+	echo $(temptex)
 	open thesis.pdf
 
 clean : clean-temp
@@ -16,7 +18,7 @@ thesis.pdf : thesis.aux
 	pdflatex thesis
 	pdflatex thesis
 
-thesis.aux : thesis.tex $(wildcard?.tex) $(temptex) rfc.bib research.bib acronyms.tex
+thesis.aux : thesis.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex rfc.bib research.bib acronyms.tex
 	pdflatex -draftmode thesis
 	bibtex thesis
 
