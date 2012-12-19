@@ -1,84 +1,75 @@
-\section{Background}
-\par Traditional network defenses consist of largely static tools; firewalls and \acp{IDS} form the backbone of protection in most information technology shops.  Recently, however, there has been an interest in more active defense mechanisms, such as reputation and trust-based security \cite{Untrustworthiness} and \ac{NASR} \cite{APOD, NAH}. This paper focuses on the latter in a military setting.
-
-\par At a high level, the concept of \ac{NASR} is simple: rather than a system sitting on a single \ac{IP} address, it changes its address rapidly, hopping amongst a set of \ac{IP} addresses assigned to it. This is similar in concept to a frequency hopping radio, although the effect is different. 
-
-\par Normally an attacker wishing to target a given network gains a great deal of intelligence through simple scanning, checking each \ac{IP} inside the network and then checking each port on the active \acp{IP} to see what services are available. With this knowledge, the attacker may find entrance into the network. \ac{IP} hopping mitigates this issue by making it difficult to probe the network \cite{BBNDYNAT} and quickly invalidating any network map the attacker does manage to generate. Even if they locate a system's internal \ac{IP} address at some point in time, the address will change a few moments later.
-
-\par Extensive research shows the utility of address-space randomization as a tool for obfuscating network traffic \cite{BBNDYNAT, NAH, TAO}. Further work demonstrates its usefulness as a tool for avoiding \ac{IP} hitlist-based attacks, wherein malware is given a preset list of \acp{IP} to attack \cite{NASR}. Finally, Sandia discusses virtually every aspect of this area \cite{SandiaDynat} and includes the assertion that \ac{IPsec} and \ac{DYNAT} could complement each other. In particular, Sandia suggests that \ac{DYNAT} allows networks to quickly drop invalid packets without performing expensive \ac{IPsec} operations.
-
-%\par In this paper we propose an \ac{IP} address hopping system called the Address Routing Gateway (\ac{ARG}). It incorporates many of the features of previous address-hopping schemes, with an eye on the specific needs of the military. In this context each of the existing systems presents drawbacks that we attempt to avoid with \ac{ARG}. Additionally, the design of ARG is intended to allow its future integration with a traditional IDS and honeypot, potentially gaining additional insight into an attacker's behavior.
-
-\par This suggestion by Sandia is the focus of this research. Section \ref{sec:problem_def} of this paper more closely defines the question being addressed. Section \ref{sec:boundaries} defines the \ac{SUT}, including limitations and scope. 
+\par This chapter discusses the methodology used to measure the effectiveness of \ac{ARG} at correctly classifying invalid and valid traffic, the maximum supportable hop rate at various network latencies, and the overall stability of the system under test. Section \ref{sec:problem_def} discusses the problem this research seeks to answer. Section \ref{sec:boundaries} defines the \ac{SUT} and Section \ref{sec:services} goes into detail on the possible outcomes of the \ac{CUT}. Section \ref{sec:workload} covers the workload presented to the \ac{SUT}, Section \ref{sec:metrics} covers the metrics collected, and Section \ref{sec:parameters} covers the configurable parameters of the \ac{SUT}. Section \ref{sec:factors} brings the previous sections together, giving a comprehesive list of the factors varied for each test. Section \ref{sec:exp_design} details the actual tests and the purpose of each.
 
 \section{Problem Definition}
 \label{sec:problem_def}
 \subsection{Goals and Hypothesis}
 \label{sec:goals}
-\par This research determines the validity of the Sandia claim \cite{SandiaDynat}: would a \ac{DYNAT} allow reliable packet filtering? This question is answered by measuring the accuracy of packet classification. If the claim is validated, it is safe to state that the introduction of \ac{DYNAT} into a network would positively benefit security.
+\par This research seeks to test whether network address space randomization is a suitable for deployment on a military network. As such, chapter 3 presents the details of custom solution that fuses much of the previous research with the needs of the military. Tests against this system seek to answer four basic questions.  First, does \ac{ARG} classify traffic correctly? What percentage of false positives (valid packets blocked) and false negatives (invalid traffic allowed through) does it introduce? Second, what is the max packet rate \ac{ARG} can handle? Third, what is the max hop rate---the frequency with which \ac{ARG} changes \acp{IP}---that is supportable? How does latency affect this? Fourth and finally, is \ac{ARG} stable when presented with corrupt, malformed, or replayed packets?
 
 %\par The software developed and tested here attempts to interfere minimally with the network, a critical requirement for the real-world deployment of such technology. Systems \ac{ARG} touches---both inside and outside the ``protected'' networks---do not need any modifications to continue to function. The research done here provides data on whether this is true as a side effect, potentially valuable information for an organization considering employing a \ac{DYNAT} solution. However, validation of this design goal is not a primary objective. 
 
-\par The working hypothesis for this research is, as speculated by Sandia, a \ac{DYNAT} system allows for quick identification of unexpected (and potentially malicious) packets entering a network. There are few identifiers within the scope of \ac{DYNAT} by which outgoing packets could be filtered. Given that, no filtering is done for outbound packets and hence no change in behavior is observed when compared to the control network. 
+%\par The working hypothesis for this research is, as speculated by Sandia, a \ac{DYNAT} system allows for quick identification of unexpected (and potentially malicious) packets entering a network. There are few identifiers within the scope of \ac{DYNAT} by which outgoing packets could be filtered. Given that, no filtering is done for outbound packets and hence no change in behavior is observed when compared to the control network. 
+
+\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop rate appropriate for the network latency. In addition, this thesis hypothenizes that the max hop rate sustainable with reasonable loss is twice the network latency, where reasonable loss is traffic loss less than 5\%. The other two questions under test are informational in nature, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 1Mbps of traffic. \tbd{performance wasn't really a design focus} 
 
 \subsection{Approach}
 \label{sec:approach}
-% TBD too low-level?
 \par This research is done on a test network with nodes representing the types of hosts found on a typical, corporate-style network. These include trusted hosts inside trusted networks which communicate freely, internal and external servers that must be accessible to hosts inside these trusted networks, and malicious hosts outside the networks. A configurable custom \ac{DYNAT} sits in front of the trusted networks. \tbd{diagram for last sentence}
 
-\par Traffic generators and collectors run on this network, determining which traffic flows successfully make it to their destination. More importantly, they compare what should have been denied to what the \ac{DYNAT} actually denied. Measurements of allowed traffic flows between networks with a \ac{DYNAT} in place and without is used to answer the research question.
-
-%\par If it is shown... then... QED
+\par Traffic generators and collectors run on this network, determining which traffic flows successfully make it to their destination. More importantly, they compare what should have been denied to what \ac{ARG} actually denied (Type I and Type II errors). After a given test, logs and traffic captures are collated to form a complete picture of the traffic on the network before determining statistics.
 
 \FloatBarrier
 \section{System Boundaries}
 \label{sec:boundaries}
-\par The \ac{SUT} is \ac{ARG}, a custom \ac{DYNAT} solution developed specifically for this effort. The basic components of this system, the various inputs into the system, possible outputs, and the metrics provided are illustrated in Figure \ref{fig:sut}. Many traditional network workload and system parameters are not shown here. The question being explored is not concerned with performance, so physical network characteristics (i.e., bandwidth) are irrelevant. Previous research has shown that similar solutions have minimal impact on performance \cite{NAH}. The only system parameter this research is concerned with is latency, as it dictates the maximum \ac{IP} hopping rate.
+\par The \ac{SUT} is \ac{ARG}, the custom \ac{DYNAT} solution developed specifically for this effort. The basic components of this system, the various inputs into the system, possible outputs, and the metrics provided are illustrated in Figure \ref{fig:sut}. Many traditional network workload and system parameters are not shown here, such as packet rate, packet size, and link bandwidth. In most cases these are controlled to fit \ac{ARG}, as the performance of the system itself is not a primary focus of the research. See Section \ref{sec:workload} for more details on this decision. The only system parameter this research is concerned with is latency, as it dictates the maximum \ac{IP} hopping rate.
 
+\tbd{fix this}
 \begin{figure}
-	\centering
-	\includegraphics[width=1\textwidth]{../diagrams/sut}
 	\caption{Address Routing Gateway}
 	\label{fig:sut}
+	\centering
+	\includegraphics[width=1\textwidth]{../diagrams/sut}
 \end{figure}
 
 \FloatBarrier
 \section{System Services}
 \label{sec:services}
-\par The primary service provided by \ac{ARG} is the \ac{IPHC}. This service maintains a rapidly-changing external \ac{IP} address, details on paired \ac{ARG} networks, and other administrative information. Virtually all other aspects of \ac{ARG} rely on the information it provides. Most importantly, all packets leaving \ac{ARG} are altered to contain the current \ac{IP} as the source and, if the packet is destined for another paired \ac{ARG} network, the destination is changed to the current \ac{IP} for that gateway.
+\par \ac{ARG} has three components that this thesis tests. Most important is the hopper module, which provides a rapidly-changing external IP address and details on connected ARG networks. Using this information, it transports packets between ARG-protected networks. Packets to and from external hosts---hosts that are not part of an ARG network---go through the \ac{NAT} module. The director module hands packets off to each of the other modules and collects the results back to be logged and potentially acted upon. More details on these components are in Chapter \ref{chp:implementation}.
 
-\par Rewriting \tbd{define what is meant by rewriting} is handled by the \ac{PTE}. Packets to and from non-\ac{ARG} networks (refered to ``extra-ARG'' \tbd{consider inter vs intra instead} traffic) are forwarded based on their source and destination identifiers (\acp{IP} and port numbers) via a lookup in a \ac{NAT} table. Packets to paired \ac{ARG} networks (referred to as ``inter-ARG'') are wrapped in \ac{IPv6} packets with header information from the \ac{IPHC} and extracted on the other end. Incoming packets that do not match the current gateway \ac{IP} or have an entry in the \ac{NAT} table---whichever is appropriate for the source of the packet---are rejected.
+\par The potential output of the Director is shown below, broken into separate sections based on incoming or outgoing packets. Other services do not directly offer outcomes relevant to this research.
 
-%\par Ultimately the simplest method of understanding \ac{ARG} is to view it as a router that p
-
-\par Additionally, \ac{IPsec}-style encryption takes place between linked \ac{ARG} networks. This encryption may be disabled for speed, although previous research into \acp{DYNAT} found it to be an important factor in truly protecting the network \cite{BBNDYNAT, NAH}. Even without full encryption, \ac{ARG} still includes signatures for packets sent between \ac{ARG} networks for authentication and integrity. These signatures are used as a secondary rejection measure for packets claiming to be from a paired \ac{ARG} network. Packets to and from hosts outside a linked \ac{ARG} network are never encrypted or signed by the gateway (internal hosts may still use encryption for connections, just as on a normal network).
-
-%\par Finally, \ac{ARG} provides a NAT table for connections to hosts outside paired \ac{ARG} networks. This table allows connections to persist across external \ac{IP} address changes and is vital for communications to outside hosts. Outgoing packets are transformed based on the data cached here and incoming packets are redirected to the correct internal host. Between \ac{ARG} networks, however, this table is not used. The maximum size of the table is configurable, from infinite (within memory and port number limits, obviously) to just a few on-going connections. This table is used as the primary rejection method for packets from non-\ac{ARG} networks. % TBD: use "linked" or "paired?"
-
-\par The potential for the \ac{PTE} are shown below, broken into separate sections based on incoming or outgoing packets. Other services do not directly offer outcomes relevant to this research.
 \begin{itemize}
-\item \acl{PTE} - Incoming
+\item Director - Incoming
 	\begin{itemize}
-	\item Rejected based on \ac{IP} - Packet is coming from an \ac{ARG} network but does not have the current local gateway \ac{IP} as the destination.
-	\item Rejected based on signature - Packet signature invalid/nonexistent (if coming from an \ac{ARG} network).
-	\item Rejected based on \ac{NAT} - Packet is coming from a non-\ac{ARG} network but does not have a valid entry in the \ac{NAT} table.
-	\item Dropped - Processing queue full. If this outcome does occur the packet rate during experimentation will be slowed. Section \ref{sec:factors} provides more details.
+	\item Incorrect source \ac{IP} - Packet is coming from an \ac{ARG} network but does not have the what the local gateway believes is the current source IP for the other gateway.
+	\item Incorrect destination \ac{IP} - Packet is coming from an \ac{ARG} network but does not have the current local gateway \ac{IP} as the destination.
+	\item Incorrect message size - The message length does not match the message type.
+	\item Incorrect sequence number - The message's sequence number was not monotonically increasing. 
+	\item Unable to verify signature/\ac{HMAC} - Packet signature invalid/nonexistent (if coming from an \ac{ARG} network).
 	\item Unwrapped and forwarded - Packet is from \ac{ARG} network and passed the above tests. Contents are extracted and forwarded internally.
+
+	\item No \ac{NAT} bucket/entry - Packet is coming from a non-\ac{ARG} network but does not have a valid entry in the \ac{NAT} table.
 	\item Rewritten and forwarded - Packet is from non-\ac{ARG} network and is rewritten via \ac{NAT} table before forwarding.
+
+	\item Misc - Some operating system levels may occur, resulting in rare errors in sending or receiving packets.
 	\end{itemize}
-\item \acl{PTE} - Outgoing
+
+\item Director - Outgoing
 	\begin{itemize}
+	\item Gateway not connected - Packet was intended for an ARG network the gateway is aware of but not yet connected to.
 	\item Wrapped and forwarded - Packet is destined for an \ac{ARG} network. Wrapped and placed on the external network.
+
 	\item Rewritten and forwarded - Packet is destined for non-\ac{ARG} network. An entry is made/retrieved from the \ac{NAT} table and used to rewrite packet.
-	\item Dropped - Processing queue is full.  If this outcome occurs the packet rate during experimentation will slow. Section \ref{sec:factors} provides more details.
+
+	\item Misc - Some operating system levels may occur, resulting in rare errors in sending or receiving packets.
 	\end{itemize}
 \end{itemize}
 
 \section{Workload}
 \label{sec:workload}
-\par Workload to the system is the traffic flowing through the \ac{ARG} gateways. Standard network traffic parameters like packet rate, packet size, number of simultaneous ongoing connections, and lifetime of connections play a role. However, it is important to note that the network performance itself is not a large concern of this research. If \ac{ARG} begins dropping packets during experimentation, the network parameters and packet rate are reduced.
+\par Workload to the system is the traffic flowing through the \ac{ARG} gateways. Standard network traffic parameters like packet rate, packet size, number of simultaneous ongoing connections, and lifetime of connections play a role. However, it is important to note that the network performance itself is not a large concern of this research. Packet rate, for example, does provide useful information about the performance of \ac{ARG} itself, but the numbers apply \textit{only} to this specific implementation. \ac{ARG}'s develop does not focus on performance in this first iteration, so there are many possible areas for improvement. Previous research has shown that similar solutions have minimal impact on performance \cite{NAH}. 
 
-\par The only physical network parameter that has a major impact on \ac{ARG} is latency. To ensure that two \ac{ARG} gateways are able to communicate reliably, their hop rate must be less than two times the latency. If it is not, packets sent from one to the other will have the wrong \ac{IP} by the time they reach the destination. % TBD details on why... diagram showing traffic flow?
+\par The only physical network parameter that has a major impact on \ac{ARG} is latency. To ensure that two \ac{ARG} gateways are able to communicate reliably, their hop rate must be less than two times the latency. If it is not, packets sent from one to the other will have the wrong \ac{IP} by the time they reach the destination. \tbd{details on why... diagram showing traffic flow?} \tbd{Would this be an appropriate place to discuss impact of test setup (ethernet vs internet) on latency?}
 
 \par Two parameters are more specific to \ac{ARG}. First, the proportion of inter-\ac{ARG} verses extra-\ac{ARG} traffic varies the validation methods \ac{ARG} uses for each packet. Traffic flows that focus on inter-\ac{ARG} connections rely on current \ac{IP} synchronization and signatures, while traffic that originates externally exercises the \ac{NAT} table.
 
@@ -86,139 +77,105 @@
 
 \section{Performance Metrics}
 \label{sec:metrics}
-\par As previously stated, this research is not particularly concerned with network performance directly. Details on this decision can be found in Section \ref{sec:boundaries}. Measurements on \ac{ARG} therefore focus on the outcomes from the \ac{PTE}. \tbd{Add stressing system to failure point to quantify performance bounds} These are:
+\par As previously stated, this research is not particularly concerned with \ac{ARG} network performance (latency, bandwidth, packets per second). Details on this decision can be found in Section \ref{sec:workload}. Measurements on \ac{ARG} therefore focus on the outcomes from the director. These are:
 
 \begin{itemize}
-\item Proportion rejected/accepted packets to total transmitted
-	\par With identical traffic flows, this provides a quick---albeit imperfect---check for changes in behavior between runs. This measurement cannot be relied upon for detailed analysis because it lacks any indication of why changes occur. For example, the system may reject based primarily on invalid signatures in one run and in a run with a faster hop rate reject primarily on incorrect IP, yet report similar rejection proportions.
-
-\item Proportion of invalid packets accepted
+\item Percentage of invalid packets accepted
 
 	If a packet that should have been rejected is accepted by \ac{ARG}, it is possible for an attacker to sneak into the network regardless of the \ac{DYNAT}'s existence. This then is the true measure of whether or not \ac{ARG} is truly protecting the network. If it functions correctly, this number should remain at zero for all experiments with \ac{ARG} enabled.
 
-\item Proportion of valid packets rejected
-	\par In ideal circumstances, this will also be zero. However, network conditions may result in failures here, which on a real-world network might result in a disruption in service. It is also helpful to record bursts \tbd{how to record timing between failures} of failures, to discover why the system fails.
+\item Percentage of valid packets rejected
+	\par In ideal circumstances, this will also be zero. However, network conditions may result in failures here, which on a real-world network might result in a disruption in service. 
 
-\item Number of each type of rejection (each possible outcome from the \ac{PTE})
+\item Number of each type of rejection (each possible outcome from the director)
 	\par This reveals where in the processing stage packets are typically caught. If packets get caught in the later stages of validation---e.g., signature checking---then processing time has been wasted.
 \end{itemize}
 
 \section{System Parameters}
-\par As a network application, \ac{ARG} is affected by standard network factors like bandwidth and latency. Additionally, the system each \ac{ARG} gateway runs on impacts its operation. The factors that come up most with \ac{ARG}'s local performance are memory speed and the processor speed and cores. As noted in Section \ref{sec:boundaries}, however, these aspects of the system are out of the scope of this research. 
+\label{sec:parameters}
+\par As a network application, \ac{ARG} is affected by standard network factors like bandwidth and latency. Additionally, the system each \ac{ARG} gateway runs on impacts its operation. The factors that come up most with \ac{ARG}'s local performance are processor and memory speeds, with encryption potentially consuming a fair amount of processor time and memory speeds impacting virtually all aspects of operation.
 
-\par \ac{ARG} also has several unique parameters that can be configured, allowing the actual \ac{SUT} to be tweaked. The primary configurable aspects of \ac{ARG} are:
-
-\begin{itemize}
-\item Hop rate
-	\par \ac{ARG} allows the time between hops to be customized from several times a second to minutes apart. However, the hop rate is not fixed at that value; to compensate for latency spikes, \ac{ARG} may choose to slightly increase the hop rate (although it will always remain relatively close to the configured value).
-
-\item Encryption
-	\par Packets between \ac{ARG} gateways are always signed, but they can also be fully encrypted using symmetric keys. This operation can be disabled if desired for speed.
-
-\item Threads
-	\par \ac{ARG} runs several threads to process packets simultaneously, allowing it to more fully utilize the resources of the server on which it is running. The number of threads it uses is configurable.
-\end{itemize}
+\par The primary configuration setting for \ac{ARG} is the hop rate. \ac{ARG} allows the time between hops to be customized from several times a second to minutes apart with millisecond precision. Each gateway may be configured to hop at different rates, but for the sake of this thesis the hop rates are always identical in a given run.
 
 \section{Factors}
 \FloatBarrier
 \label{sec:factors}
-\par Based on the system and workload parameters given above, the following factors are varied as part of the experiment. All others remain constant throughout the experiment. Traffic proportions exclude administrative packets sent directly between \ac{ARG} gateways for synchronization. Factors and levels are summarized in Table \ref{tbl:factors} and described in detail below.
-
-% A summary of the factors may be found in Table \ref{tab:factors}.
+\par Based on the system and workload parameters given above, the following factors are varied as part of the experiment. All others remain constant throughout the experiment. Factors and levels are summarized in Table \ref{tbl:factors} and described in detail below.
 
 \begin{table}
 \begin{center}
 	\caption{Factors and Levels}
 	\label{tbl:factors}
 	
-	\begin{tabular}{r|ccc}
-		& Level 1 & Level 2 & Level 3 \\
+	\begin{tabular}{r|l}
+	Factor & Possible Levels \\
 	\hline
-	Prop. inter-ARG vs. extra-ARG & 0.0 & 0.5 & 1.0 \\
-	Prop. valid vs. invalid traffic & 0.0 & 0.5 & 1.0 \\
-	Hop rate & None & Slow (\textasciitilde5 sec.) & Fast (< 1 sec.) \\
-	Latency & Low (+5ms) & High (\textasciitilde+500ms) & Extreme (\textasciitilde+1000ms)
+	Hop rate & 1000ms, 500ms, 100ms, 50ms, 30ms, 15ms, 10ms, 5ms\\
+	Latency & 0ms, 20ms, 30ms, 100ms, 500ms\\
+	Packet Rate & .2s, .1s, .05s, .01s, .005s, .001s\\
+	Traffic direction and type & See detailed description
 	\end{tabular}
 \end{center}
 \end{table}
 
 \begin{itemize}
-\item Proportion of inter-ARG verses extra-ARG packets
-	\par Varying this parameter tests the extremes of traffic flow as well as a more typical situation with packets flowing many directions. It ensures that the system behaves correctly even if only one validation system \tbd{define earlier when talking about NAT and hopper} is ever put to use. The levels chosen for this study are listed below.
-
-		\begin{itemize}
-		\item 0.0 - All traffic is to systems outside \ac{ARG} networks.
-
-		\item 0.5 - Half of the traffic on the network is to external hosts, half is to hosts in other \ac{ARG} networks. \tbd{add more levels here and the next one}
-
-		\item 1.0 - All traffic is to hosts in other \ac{ARG} networks.
-		\end{itemize}
-
-	\par It is also be possible to add a fourth level with a proportion matching more real-world traffic flows. However, this will likely show no difference in behavior from 0.5.
-
-\item Proportion of valid to invalid traffic
-	\par This parameter hits at the heart of the research: just how good is \ac{ARG} (and \ac{IP} hopping in general) at detecting invalid traffic? The levels for this parameter are:
-		\begin{itemize}
-		\item 0.0 - All traffic sent to the \ac{ARG} gateways from external hosts is invalid.
-
-		\item 0.5 - A simulation of the ``real world,'' where some traffic is valid---i.e., responses to traffic inside of \ac{ARG}---and some is not. 
-
-		\item 1.0 - All traffic is valid. This level exists primarily to verify correct operation of \ac{ARG} and find cases where it incorrectly rejects packets.
-		\end{itemize}
-
 \item Hop rate
-	\par Varying the rate at which \ac{ARG} switches to a new external \ac{IP} allows testing in circumstances where the rate of change may be low enough that an attacker can discover the current \ac{IP} and send packets through before the next switch. Additionally, it allows testing of the maximum supportable hop rate. The levels for this factor are:
-
-		\begin{itemize}
-		\item No hopping - Gateways do not actually hop at all during the test, an extreme case that separates synchronization issues from other factors of the system.
-
-		\item Slow hopping (approximately 5 seconds per hop) - This length of time could allow an intruder to determine the current \ac{IP} and successfully have packets sent with the current data.
-
-		\item Fast hopping (less than 1 second per hop) - Determining the current \ac{IP} and sending data before the gateway has moved to a new \ac{IP} is difficult for an attacker.
-		\end{itemize}
+	\par Varying the rate at which \ac{ARG} switches to a new external \ac{IP} allows testing of the maximum supportable hop rate. Hops every 1000 milliseconds give ample time for packets to travel across the network at all but the most extreme latencies, while hops every 5 milliseconds stress even ideal network conditions.
 
 \item Latency between \ac{ARG} gateways
-	\par While there is an inevitable amount of latency in the experimentation, introducing additional artificial latency simulates an environment where the gateways are further apart. 
-
-		\begin{itemize}
-		\item Low (+20ms) - Latency is around a typical level for a \ac{WAN}, simulating relatively standard operating conditions.
-
-		\item High (approximately +500ms) - Latency is significantly increased, likely affecting the ability of \ac{ARG} to communicate at fast hopping rates. Packets may occasionally arrive destined to the wrong \ac{IP}, even though they are otherwise valid, resulting in their rejection.
-		
-		\item Extreme (approximately +1000ms) - Latency is extremely high. The effects are similar to High latency, but greatly increased.
-		\end{itemize}
+	\par The network upon which the tests are run is run through a single switch, with average latency under 1 millisecond. Introducing artificial latency simulates a more realistic range of environments. \tbd{note here or evaluation technique about the ARPs?}
 \end{itemize}
 
 \section{Evaluation Technique}
 \label{sec:eval_technique}
-\par Measurement is used to obtain results for each factor level. Due to the fairly complex interactions needed between \ac{ARG} gateways and the processing needed to decide how to handle packets, simulating the system in OPNET is infeasible. Even if possible, it would likely require equal work with little benefit.
+\par Measurement is used to obtain results for each factor level. Due to the fairly complex interactions needed between \ac{ARG} gateways and the processing needed to decide how to handle packets, simulating the system would likely require an equal amount of work with little benefit.
 
-\par Setup of the test environment involves a basic six-node network: two gateways running \ac{ARG}, one system on the network protected by each gateway, and two hosts outside the network. Figure \ref{fig:argnetwork} shows the network and the names given to the various systems.
+\par Setup of the test environment involves a basic 7-node network: three gateways running \ac{ARG}, one system on the network protected by each gateway, and one host outside the network. Figure \ref{fig:argnetwork} shows the network and the names given to the various systems.
 
 \begin{figure}
 	\centering
-	\caption{ARG Network Layout Overview}
+	\caption{ARG Network Layout Overview \tbd{fix me, I'm wrong}}
 	\label{fig:argnetwork}
 	\includegraphics[width=0.75\textwidth]{../diagrams/thesis_network}
 \end{figure}
 
-\par Protected clients behind the gateways (\texttt{ProtA1} and \texttt{ProtB1}) may communicate freely. The protected clients may also talk out to the external hosts (\texttt{Extern1} and \texttt{Extern2}), and the external hosts must then---once that connection is established---be able to talk back into the network. These two basic traffic flows are ``valid'' traffic. There is additional administrative traffic directly between the gateways (\texttt{GateA} and \texttt{GateB}), but this is not relevant to the research itself \tbd{run pilot studies to prove this traffic has no effect}.
+\par Protected clients behind the gateways (\texttt{ProtA1}, \texttt{ProtB1}, and \texttt{ProtC1}) may communicate freely. The protected clients may also talk out to the external host (\texttt{Ext1}), and the external hosts must then---once that connection is established---be able to talk back into the network. There is additional administrative traffic directly between the gateways (\texttt{GateA}, \texttt{GateB}, and \texttt{GateC}). These three basic traffic flows are ``valid'' traffic.
 
-\par All traffic beyond what is described above is ``invalid.'' This traffic comes from \texttt{Extern1} and \texttt{Extern2} and is destined for either the protected clients or the gateways themselves. Invalid traffic may take several forms with varying levels of sophistication. At a basic level, an attacker may send in simple connection initiation attempts. More complex attacks by the external clients try to directly circumvent the validation methods used by the gateways: wrapping and fake-signing packet data, pretending to be the other gateway, piggybacking through via old \ac{NAT} table entries, and eavesdropping on the current gateway \acp{IP}.
+\par All traffic beyond what is described above is ``invalid.'' For example, \texttt{Ext1} is not allowed to send traffic in to the protected clients or the gateways without them first initiating the connection. Malformed traffic sent by any host is also considered invalid. In either case, invalid traffic should be stopped at the earliest possible opportunity (i.e., the gateway rejects the packet and keeps it from reaching the internal host) and the system must remain stable.
 
-\par To collect data, each system runs the traffic collection program \texttt{tcpdump} to capture the traffic sent and received. To make flows easier to identify, packets are tagged with a small amount of additional data. After a given trial runs, the traffic logs are collated and processed with custom scripts to determine the metrics described in Section \ref{sec:metrics}. The numbers generated here are then verified against counts that each system keeps on the number of valid and invalid packets they sent.
+\par To collect data, each system runs the traffic collection program \texttt{tcpdump} to capture the traffic sent and received into \ac{PCAP} files. Traffic generators are then spawned as appropriate on each system in the network, each of which logs their sends and receives. After a given trial, the \ac{PCAP} files and traffic generator logs are collated and processed with custom scripts to determine the metrics described in Section \ref{sec:metrics}. More details on the traffic generators and test run sequence can be found in Appendixes \tbd{ref the appendixes} and \tbd{other one}, respectively.
 
-\par \tbd{implementation details on traffic generators and analyzers}
+\par \tbd{implementation details on traffic generators and analyzers IN AN APPENDIX. Document EXACTLY how things happen in each test?}
 
-\par All trials run on a virtual network established within VMWare Workstation 8. The six systems described above run as \acp{VM} with Ubuntu 12.04 Server Edition.
+\par All trials run on physical network on eight servers. Each server runs Ubuntu 12.04.1 Server Edition.
 
 \section{Experimental Design}
 \label{sec:exp_design}
-\par Based on the factors given in Section \ref{sec:factors}, a full factorial experimental design is feasible and allows the most complete analysis. The factors and levels listed in Section \ref{sec:factors} result in $3 \times 3 \times 3 \times 3 = 81$ unique experiments. Due to the possible impact of large network traffic disruptions, a 99\% confidence interval is used. Wide variation is possible in the actual traffic seen in a single run, so 10 replications are used for each experiment. This gives 810 total experiments.
+\par Based on the factors given in Section \ref{sec:factors} and the goals of this research, as layed out in Section \ref{sec:goals}, there are nine traffic flows of interest. Each consists of different types of traffic and flow destinations. There are most easily visualized in Figure \ref{fig:testnum_flows}.
 
-\section{Methodology Summary}
+\tbd{create composite figure of each of the possible tests. Label each with the appropriate text number.}
+
+\par These possible traffic flows are used in four sets of experiments, given below. Each experiment set answers a different research goal.
+\begin{itemize}
+	\item Basic tests
+	\par This sequence of tests validates that \ac{ARG} classifies traffic correctly by running every traffic flow against \ac{ARG}. Latency is set to 20ms for all tests and traffic generators produce packets around every 0.3 seconds (actual traffic rate is higher due to responses and \ac{TCP} acknowledgement packets). To determine if hop rate has an expectedly large impact on certain types of traffic, a slow hop rate (500ms) and one close to double the latency (50ms).
+
+	\item Max packet rate
+	\par This sequence gives an indication of what packet rate \ac{ARG} is capable of handling. Packet rate goes through all levels shown in Table \ref{tbl:factors}. Hop rate changes between 500ms and 50ms to see if the additional \ac{IP} calculation load impacts the maximum rate. Test 4 \tbd{four?} is used in all runs to exercise all possible valid traffic flows. Latency is set to 20ms.
+
+	\item Max hop rate
+	\par This sequence determines the maximum hopping rate at various latencies. Hop rate and latency go through the levels shown in Table \ref{tbl:factors} in a full factorial fashion (every latency-hop rate combination). Packet rate is fixed at 0.3 seconds and Test 4 is used throughout.
+
+	\item Fuzzer
+	\par This sequence is not tested rigorously for traffic flow success and failure, but ensures that \ac{ARG} remains stable despite malformed traffic. Hop rate varies between 500ms and 50ms, latency is fixed at 20ms, and packets are sent at 0.3 second intervals.
+\end{itemize}
+
+\par Due to the possible impact of large network traffic disruptions, a 99\% confidence interval is used. Wide variation is possible in the actual traffic seen in a single run, so 10 replications are used for each experiment.
+
+\section{Summary}
 \label{sec:method_summary}
-\acresetall
+\tbd{don't need this section? Edit if we do}
+
 \par This research determines if \ac{DYNAT}---the use of a gateway with a rapidly changing external \ac{IP} address---can effectively determine whether traffic should be allowed into a network. Several previous research efforts in this area already proved that \ac{DYNAT} made it more difficult to gain knowledge of a network \cite{BBNDYNAT} and that performance could be minimally impacted \cite{NAH}. 
 
 \par A test network composed of two \ac{DYNAT}-protected networks and a few external hosts is used to explore this question. The custom \ac{DYNAT} solution used here, known as \ac{ARG}, allows the tuning of important system parameters. For the sake of this research, the primary factor is the hop rate. Levels used for experimentation include multiple times a second hops, several times a minute, and no hopping at all. Outside of \ac{ARG} itself, most hosts on the network run traffic generation scripts to simulate network activity. These scripts allow for the adjustment of packet rate, proportion of ``valid'' or ``invalid'' traffic produced, and how much traffic flows between the protected networks verses to the external hosts.

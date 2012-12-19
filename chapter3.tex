@@ -1,4 +1,8 @@
+\label{chp:implementation}
+\par The research this thesis presents relies on a custom-developed solution. This chapter covers many of the details of this system, from high-level architecture to the network protocol. Section \ref{sec:arg_requirements} covers the requirements this system strives to meet. Section \ref{sec:arg_impl_overview} gives an architecture overview, while Section \ref{sec:arg_components} covers the details of each component in the system. Section \ref{sec:arg_protocol} details the network protocol used by the system to coordinate gateways.
+
 \section{Requirements}
+\label{sec:arg_requirements}
 \par The \ac{ARG} focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization: locations throughout the world, high availablity requirements, and \tbd{some other cool term}. 
 
 \par ARG worries primarily about protecting communication outside of military-controlled networks and preventing external entities from probing internally. This means that the implementation described is intended to be employed for all traffic traveling between bases, but is unconcerned with internal base traffic. Internal network defense remains the purview of traditional defenses. Base networks, in this case, include both those on permanent installations and those in deployed, forward locations. 
@@ -11,7 +15,8 @@
 
 %\par Finally, resource constraints---monetary and manpower---preclude some options. ARG is intended to be easily configurable and usable with reasonable hardware investments. While no experimentation has been run yet to determine exact performance, ARG requires only a single gateway system for each network it is intended to protect, rather than hardware and/or software for every client inside those networks.
 
-\section{Implementation Overview}
+\section{Architecture Overview}
+\label{sec:arg_impl_overview}
 %\par Based on these requirements and the previously cited literature, this paper proposes the Address Routing Gateway. While actual testing of this setup is beyond the scope of this paper, we will attempt to analyze the advantages it would provide, based on previous experimentation.
 
 \par As illustrated in Figure \ref{fig:argnetwork}, \ac{ARG} functions entirely around standard networks with hopping gateways. This matches the ``gateway hopping'' scheme discussed in Section \ref{sec:gateway_hopping}. As with \cite{TAO}, these gateways are standalone systems, not intended to be used for other tasks. Individual hosts inside these networks have no knowledge of the traffic transformations the gateways perform, whether their connections are routing to a host inside the local network, to a host inside another associated hopping network (hereafter referred to as an ``ARG network''), or to an external network. The implementation of ARG allows the deployment of standard passive defense technologies like firewalls inside the network without reconfiguration. Each gateway maintains a \ac{NAT}-like table to ensure that existing connections are maintained across hops (essentially temporarily leaving the old IP active for just those connections using it already).

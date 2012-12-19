@@ -25,9 +25,23 @@ have some new concepts here that aren’t explicitly described elsewhere.
 
 \par Finally, it is hoped that ARG can be linked with a honeypot and/or intrusion detection system. ARG's unique ability to detect unexpected, potentially malicious packets makes it possible to track the actions of an adversary's actions. This may reveal the identity of an adversary, their goals, and their intended target in the network, all valuable information to those defending the network.
 
+\tbd{include this stuff?}
+\par This research determines if \ac{DYNAT}---the use of a gateway with a rapidly changing external \ac{IP} address---can effectively determine whether traffic should be allowed into a network. Several previous research efforts in this area already proved that \ac{DYNAT} made it more difficult to gain knowledge of a network \cite{BBNDYNAT} and that performance could be minimally impacted \cite{NAH}. 
+
+\par A test network composed of two \ac{DYNAT}-protected networks and a few external hosts is used to explore this question. The custom \ac{DYNAT} solution used here, known as \ac{ARG}, allows the tuning of important system parameters. For the sake of this research, the primary factor is the hop rate. Levels used for experimentation include multiple times a second hops, several times a minute, and no hopping at all. Outside of \ac{ARG} itself, most hosts on the network run traffic generation scripts to simulate network activity. These scripts allow for the adjustment of packet rate, proportion of ``valid'' or ``invalid'' traffic produced, and how much traffic flows between the protected networks verses to the external hosts.
+
+\par All hosts run the packet capture utilities, allowing custom analysis tools to run through each host's logs and pull out the desired metrics. For the research question posed above, the metrics include the overall rejection/acceptance rate of packets, incorrect classification of packets, and why packets are typically rejected. The factors and levels discussed in Section \ref{sec:factors} and the 10 replications result in 810 total experiments.
+
+\subsection{Research Conclusions}
+
+\subsection{Reserach Impact}
+
+
 \subsection{Future Work}
 \par IPv6 support
 \par More extensive fuzzing testing
 \par More intelligent NAT setup (ie, tear down connections on RST/FIN)
 \par Pass rejection information off to a \ac{IDS} to supplement the information it works with
+
+\subsection{Summary}
 
