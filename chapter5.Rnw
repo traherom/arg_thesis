@@ -1,0 +1,35 @@
+\begin{comment}
+\lettrine{D}{escribe} the results you obtained when applying the design described in Chapter 3.
+At the same time, provide a running analysis of the results. This analysis is probably
+the most important part of the whole written thesis, because this is where your real
+insights into the problem/solution are documented. Avoid simply showing
+plots/tables of results with no analysis.
+\end{comment}
+
+\par This chapter presents and analyzes the experimental results. \tbd{sections}
+
+\section{Results and Analysis}
+<<>>=
+# Bring in CSV file and break out into each test, excluding the results.dir and
+# label columns
+results = read.csv('results.csv', header=TRUE)
+basic = results[apply(results, 1, function(x) x['label'] == 'basic'), ]
+hoprate = results[apply(results, 1, function(x) x['label'] == 'hoprate'), ]
+maxpps = results[apply(results, 1, function(x) x['label'] == 'packetrate'), ] 
+fuzzer = results[apply(results, 1, function(x) x['label'] == 'fuzzer'), ]
+@
+
+<<>>=
+# Graph and generate stats on basic tests with test num vs loss rate showing
+# separate lines for each hop rate. Show loss rate of invalid traffic for 
+# tests 5-8. TBD separate them out by hop rate, do t-test to show difference between the two?
+plot(basic[, 'test.num'], basic[, 'valid.loss.rate'])
+@
+
+\par The mean of basic test num X is X with a 99\% confidence interval of X. \tbd{do pretentious stuff like this}
+
+\section{Limitations}
+\par The \ac{IP} hopping system this research implements is \tbd{other stuff} \tbd{note ARP triple-latency problem here?}
+
+\section{Summary}
+

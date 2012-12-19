@@ -55,6 +55,7 @@
 \newcommand{\Ref}[1]{Reference~\citenum{#1}}
 
 % Other stuff I want
+\input{knitr_include} 
 \usepackage{placeins}
 \usepackage{comment}
 
@@ -158,24 +159,24 @@
 % Additional "lists" can be added to the end of the front matter using the
 % \addlistof macro.  For example, one might insert a list of symbols using the
 %  tabbing environment with:
-\addlistof{Symbols}{
-\begin{tabbing}
-  Symbol\quad \= Definition \kill % This sets up the tab stop
-  Symbol \> Definition \\
-  $I$    \> current (amps) \\
-  $R$    \> resistance (ohms) \\
-  $V$    \> voltage (volts) \\
-  \null\\
-  \textit{Subscripts}\\
-  $rms$ \> root mean square \\
-  $t$ \> true \\
-  $0$ \> nominal\\
-  \null\\
-  \textit{Superscripts}\\
-  $b$ \> body reference frame \\
-  $n$ \> navigation reference frame \\
-\end{tabbing}
-}
+%\addlistof{Symbols}{
+%\begin{tabbing}
+%  Symbol\quad \= Definition \kill % This sets up the tab stop
+%  Symbol \> Definition \\
+%  $I$    \> current (amps) \\
+%  $R$    \> resistance (ohms) \\
+%  $V$    \> voltage (volts) \\
+%  \null\\
+%  \textit{Subscripts}\\
+%  $rms$ \> root mean square \\
+%  $t$ \> true \\
+%  $0$ \> nominal\\
+%  \null\\
+%  \textit{Superscripts}\\
+%  $b$ \> body reference frame \\
+%  $n$ \> navigation reference frame \\
+%\end{tabbing}
+%}
 
 % Alternatives to the preceding list of symbols and the following list of
 % acronyms can be created using:
@@ -211,7 +212,6 @@
 
 \chapter{Introduction}
 \input{chapter1}
-\cite{rfc2}
 
 \chapter{Background}
 \input{chapter2}
