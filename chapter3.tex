@@ -1,13 +1,16 @@
 \label{chp:implementation}
+
 \par The research this thesis presents relies on a custom-developed solution. This chapter covers many of the details of this system, from high-level architecture to the network protocol. Section \ref{sec:arg_requirements} covers the requirements this system strives to meet. Section \ref{sec:arg_impl_overview} gives an architecture overview, while Section \ref{sec:arg_components} covers the details of each component in the system. Section \ref{sec:arg_protocol} details the network protocol used by the system to coordinate gateways.
 
 \section{Requirements}
 \label{sec:arg_requirements}
-\par The \ac{ARG} focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization: locations throughout the world, high availablity requirements, and \tbd{some other cool term}. 
+\par The \ac{ARG} focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization: locations throughout the world, high availablity and reliability requirements, and security over any network through which its data travels. 
 
 \par ARG worries primarily about protecting communication outside of military-controlled networks and preventing external entities from probing internally. This means that the implementation described is intended to be employed for all traffic traveling between bases, but is unconcerned with internal base traffic. Internal network defense remains the purview of traditional defenses. Base networks, in this case, include both those on permanent installations and those in deployed, forward locations. 
 
 \par ARG must operate over the commercial Internet. As mentioned in Section \ref{sec:related_research} \tbd{contra isn't actually covered}, some proposals for network address space randomization require changes to the existing routing infrastructure \cite{CONTRA}. Deploying such a solution may be possible and beneficial in the long run, but a solution that could be deployed today without participation from outside entities is more feasible.
+
+\tbd{bases may send out individual host, here's how they could connect back?}
 
 %\par Base networks can generate huge volumes of traffic, so ARG must scale well. It may be possible to divide a particularly large installation into sections, but this may not be feasible or desirable in all situations. Due to the critical nature of military networks, ARG's implementation must not introduce significant latency under any foreseeable load. Likewise, there can never be a brief period where all connections drop. Military networks support critical services and any interruption could be catastrophic. At a minimum, given the number of nodes inside the network, dropped connections would result in a massive amount of wasted bandwidth as they were reestablished and the data retransmitted.
 

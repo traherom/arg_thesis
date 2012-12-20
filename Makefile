@@ -18,7 +18,7 @@ thesis.pdf : thesis.aux
 	pdflatex thesis
 	pdflatex thesis
 
-thesis.aux : thesis.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex rfc.bib research.bib acronyms.tex
+thesis.aux : thesis.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex rfc.bib research.bib acronyms.tex
 	pdflatex -draftmode thesis
 	bibtex thesis
 

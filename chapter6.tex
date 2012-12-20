@@ -1,3 +1,6 @@
+\label{chp:conclusion}
+
+\begin{comment}
 \lettrine{T}{here} are two distinct parts here:
 
 \par Conclusions: Re-state what you have done, summarize the results that you got,
@@ -18,6 +21,7 @@ your research, and comes off far better than trying to pretend that your researc
 has solved every problem, when it really hasn’t). Much of what is covered here
 will have already been stated in the analysis of Chapter 4. However, it’s OK to
 have some new concepts here that aren’t explicitly described elsewhere.
+\end{comment}
 
 \par As networks are hit harder each day by increasingly sophisticated attackers, new methods of defending the the systems inside must be developed. An active measure such as IP address hopping has been shown to provide additional protection from network enumeration \cite{NAH}, traffic sniffing \cite{BBNDYNAT}, and exploitation \cite{APOD}.
 
@@ -32,16 +36,23 @@ have some new concepts here that aren’t explicitly described elsewhere.
 
 \par All hosts run the packet capture utilities, allowing custom analysis tools to run through each host's logs and pull out the desired metrics. For the research question posed above, the metrics include the overall rejection/acceptance rate of packets, incorrect classification of packets, and why packets are typically rejected. The factors and levels discussed in Section \ref{sec:factors} and the 10 replications result in 810 total experiments.
 
-\subsection{Research Conclusions}
+\section{Research Conclusions}
 
-\subsection{Research Impact}
+\section{Research Impact}
+\tbd{sample has this... not in document}
 
+\section{Future Work}
+\subsection{IPv6 support}
+\par \ac{IPv6} support is slowly becoming an absolute requirement for any network system. For a \ac{IP} hopping system, \ac{IPv6} offers the benefit of a greatly increased address space, allowing systems to hop in a much broader range of addresses. \ac{ARG} is entirely \ac{IPv4} in its operation and cannot transport \ac{IPv6} packets to external hosts or to other gateways.
 
-\subsection{Future Work}
-\par IPv6 support
-\par More extensive fuzzing testing
-\par More intelligent NAT setup (ie, tear down connections on RST/FIN)
-\par Pass rejection information off to a \ac{IDS} to supplement the information it works with
+\subsection{More extensive malicous testing}
+\par Due to time constraints, a full battery of robust fuzz tests could not be performed against \ac{ARG}. \tbd{As demonstrated by the fuzz tests discussed before... IT DID CRASH. IT DID NOT CRASH. WHO KNOWS}. More extensive work in both undirected (i.e., fuzz testing) and directed attacks is needed. For example, malicious hosts might attempt to falsly connect to a gateway or perform replay attacks in a more intelligent manner. 
 
-\subsection{Summary}
+\subsection{More intelligent NAT}
+\par \ac{ARG} currently blindly opens holes in the \ac{NAT} when it sees outbound packets and closes them after seeing no activity in a fixed amount of time. A transport layer examination would allow more fine-grained \ac{NAT} work, by watching for actual connection establishment and teardown packets. 
+
+\subsection{Integration with other defenses}
+\par Network defenses often perform better when working in tandem. \ac{ARG} has the potential to detect certain types of probes into the network. If this information could be passed off to an \ac{IDS}, it might alert an operator or take other defense actions on the network. In an even more active approach, \ac{ARG} might work with a honeypot to present a fake view of the network to an attacker. By examing what systems an attacker probes, it might be possible to determine what the goal of an attack is and who's interests they serve.
+
+\section{Summary}
 
