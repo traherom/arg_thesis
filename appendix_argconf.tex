@@ -25,16 +25,16 @@
 }
 
 \par In Ubuntu:
-\begin{terminal}
+\begin{lstlisting}[language=bash]
 sudo apt-get install automake autoconf build-essential linux-headers libpcap-dev libpolarssl-dev
-\end{terminal}
+\end{lstlisting}
 
 \subsection{Compilation}
 \par From the \ac{ARG} source directory:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 ./autogen.sh
 make
-\end{verbatim}
+\end{lstlisting}
 
 \par This should produce two executables, \texttt{arg} and \texttt{gen\_gate\_config}.
 
