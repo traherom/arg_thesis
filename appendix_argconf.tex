@@ -1,32 +1,31 @@
 \chapter{\ac{ARG} Building and Configuration}
 \label{chp:argconf}
 
-\par This appendix documents everthing needed to use \ac{ARG}. Section \ref{sec:arg_buildenv} covers the build environment needed to build \ac{ARG} from source. Section \ref{sec:arg_cmd} documents calling \ac{ARG} and creating the necessary configuration files.
+\par This appendix documents everthing needed to use \ac{ARG}. Section \ref{sec:arg_env} covers the build environment needed to build \ac{ARG} from source. Section \ref{sec:arg_cmd} documents calling \ac{ARG} and creating the necessary configuration files.
 
 \section{Building}
-\label{sec:arg_buildenv}
-\par \ac{ARG} runs on Ubuntu 12.04 and 12.10. Other versions and distrubtions are untested, although they may work if the below requirements are met. 
+\label{sec:arg_env}
+\par \ac{ARG} runs on Ubuntu 12.04 and 12.10. Other versions and distributions are untested, although they may work if the below requirements are met. 
 
 \subsection{Required Packages}
 \tbd{versions}
 {\singlespace
 \begin{itemize}
+\item gcc $>=$4
+\item linux-headers
 \item Autoconf $>=$2.69
 \item Automake
-\item gcc $>=$4
+\item libtool
 \item libpcap-dev
 \item librt-dev
 \item libpthread-dev
 \item libpolarssl-dev
-\item linux-headers
-
-\item \tbd{anything needed for signal.h?}
 \end{itemize}
 }
 
 \par In Ubuntu:
 \begin{lstlisting}[language=bash]
-sudo apt-get install automake autoconf build-essential linux-headers libpcap-dev libpolarssl-dev
+sudo apt-get install automake autoconf build-essential libtool libpcap-dev libpolarssl-dev
 \end{lstlisting}
 
 \subsection{Compilation}

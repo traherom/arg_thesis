@@ -1,3 +1,27 @@
 \chapter{Traffic Generators}
 \label{chp:generators}
 
+\par This appendix covers the required environment for the two traffic generators and their usage. Section \ref{sec:gen_env} lists the required utilites to run the generators. Section \ref{sec:gen_usage} discusses the available command line parameters.
+
+\section{Environment}
+\label{sec:gen_env}
+\par The traffic generators run on Ubuntu 12.04, Ubuntu 12.10, and Mac OSX 10.8. Other versions and distributions are untested, although they may work if the below requirements are met. 
+
+\par The following packages must be available for \texttt{gen\_traffic.py} and \texttt{malicious\_traffic.py} to run:
+{\singlespace
+\begin{itemize}
+\item Python 2.7
+\item python-scapy $>=$2.2.0
+%\item python-libpcap
+\end{itemize}
+}
+
+\par In Ubuntu:
+\begin{lstlisting}[language=bash]
+sudo apt-get install python-libpcap python-scapy
+\end{lstlisting}
+
+\section{Running}
+\label{sec:gen_usage}
+
+

@@ -1,3 +1,32 @@
 \chapter{Results Processor}
 \label{chp:processor}
 
+\par After every test run, a custom utility processes the pcap and log files into a single database and extracts statistics from there. This appendix documents the usage of this tool and its operation. Section \ref{sec:proc_env} covers the required packages to process runs. Section \tbd{finish sections}
+
+\section{Environment}
+\label{sec:proc_env}
+\par The test processor runs on Ubuntu 12.04, Ubuntu 12.10, and Mac OSX 10.8. Other versions and distributions are untested, although they may work if the below requirements are met. 
+
+\par The following packages must be available for \texttt{process\_run.py} to run:
+\tbd{versions}
+{\singlespace
+\begin{itemize}
+\item Python 2.7
+\item python-scapy $>=$2.2.0
+\item python-libpcap
+\end{itemize}
+}
+
+\par In Ubuntu:
+\begin{lstlisting}[language=bash]
+sudo apt-get install python-libpcap python-scapy
+\end{lstlisting}
+
+\section{Running}
+
+\section{Processor Execution}
+\par Run processing follows the steps below:
+\begin{enumerate}
+\item \tbd{do this list of processor steps}
+\end{enumerate}
+
