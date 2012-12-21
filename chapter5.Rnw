@@ -1,3 +1,4 @@
+\chapter{Results and Analysis}
 \label{chp:results}
 
 \begin{comment}
@@ -11,7 +12,13 @@ plots/tables of results with no analysis.
 \par This chapter presents and analyzes the experimental results. \tbd{sections}
 
 \section{Results and Analysis}
-<<>>=
+<<echo=FALSE, message=FALSE>>=
+library(gplots)
+@
+
+<<echo=FALSE>>=
+alpha=.99
+
 # Bring in CSV file and break out into each test, excluding the results.dir and
 # label columns
 results = read.csv('results.csv', header=TRUE)
@@ -21,14 +28,31 @@ maxpps = results[apply(results, 1, function(x) x['label'] == 'packetrate'), ]
 fuzzer = results[apply(results, 1, function(x) x['label'] == 'fuzzer'), ]
 @
 
+\section{Results and Analysis}
+\subsection{Basic Tests}
 <<>>=
 # Graph and generate stats on basic tests with test num vs loss rate showing
 # separate lines for each hop rate. Show loss rate of invalid traffic for 
 # tests 5-8. TBD separate them out by hop rate, do t-test to show difference between the two?
 plot(basic[, 'test.num'], basic[, 'valid.loss.rate'])
+
+plotmeans(basic[, 'valid.loss.rate']~basic[, 'test.num'], p=alpha, minbar=0, maxbar=1,
+		xlab="Test Number", ylab="Valid Packet Loss Rate, Percentage")
+
+invalid_runs = apply(basic, 1, function(x) x['test.num'] > 5)
+plotmeans(basic[invalid_runs, 'invalid.loss.rate']~basic[invalid_runs, 'test.num'], p=alpha, minbar=0, maxbar=1,
+		xlab="Test Number", ylab="Invalid Packet Loss Rate, Percentage")
 @
 
-\par The mean of basic test num X is X with a 99\% confidence interval of X. \tbd{do pretentious stuff like this}
+\par The mean of basic test num X is X with a \Sexpr{alpha*100}\% confidence interval of X. \tbd{do pretentious stuff like this}
+
+\subsection{Maximum Hop Rate}
+<<>>=
+# Graph separate line for each hop rate-latency combination with the averaged 
+# loss rate. 
+
+@
+
 
 \section{Limitations}
 \par The \ac{IP} hopping system this research implements is \tbd{other stuff} \tbd{note ARP triple-latency problem here?}

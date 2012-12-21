@@ -2,23 +2,6 @@
 
 % The afit-etd class requires the following packages: url, refcount, graphicx,
 %                                                     sf298, hyperref
-%
-% Required files to support the afit-etd class are:
-%      afit-etd.cls
-%      afitlogo.pdf or afitlogo.eps
-%      af298.sty (slight modifications required to fix a 'glitch')
-% All of the required files must be located in your LaTeX search path.  The
-% easiest place to put them is in the working directory along side with your
-% thesis.tex file.
-%
-% Additional files used in this shell but not required are:
-%     thesis.bib (used as an example only)
-%     thesnum3.bst (can be replaced with any other bibliography style file)
-%     CampusPhoto.pdf and CampusPhoto.eps (used as an example only)
-% This shell will not process without these files, but if you delete sample
-% text and replace the BST file with another, then these will not be required
-% at all.
-
 
 % The following packages and macros are recommended but not required:
 \usepackage{xcolor}                  % standard package for including colors
@@ -44,23 +27,12 @@
 
 \graphicspath{{figures/}} % reduce clutter by storing figures elsewhere
 
-% Defining macros for all references makes it easy to change format later from
-% "Equation 1" to "Eqn (1)", for example
-\newcommand{\fig}[1]{Figure~\ref{fig:#1}}
-\newcommand{\tab}[1]{Table~\ref{tab:#1}}
-\newcommand{\eq}[1]{Equation~\eqref{eq:#1}}
-\newcommand{\eqtwo}[2]{Equations~\eqref{eq:#1} and \eqref{eq:#2}}
-\newcommand{\chap}[1]{Chapter~\ref{chap:#1}}
-\newcommand{\sect}[1]{Section~\ref{sec:#1}}
-\newcommand{\Ref}[1]{Reference~\citenum{#1}}
-
 % Other stuff I want
 \input{knitr_include} 
 \usepackage{placeins}
 \usepackage{comment}
 
-% Todo tag
-\newcommand{\tbd}[1]{{\color{red} TBD: #1}}
+\input{newcommands}
 
 %%%%% Required front matter definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -83,7 +55,7 @@
                                    % Month must be: March, June,
                                    % September, or December
 
-\designator{AFIT/GE/ENG/12-XX} % assigned by the graduate advisor in
+\designator{AFIT/CGO/ENG/13-M} % assigned by the graduate advisor in
                                % during the student's final quarter
 
 
@@ -114,9 +86,7 @@
 % \committeeSignedDates{2 Jun 2011,3 Jun 2011,4 Jun 2011}
 % \deanSignedDate{9 Jun 2011}
 
-\abstract{Insert abstract here.}
-% The abstract can also be saved in a separate file, called abstract.tex for 
-% example, and included here using: "\abstract{\input{abstract}}"
+\abstract{\input{abstract}}
 
 %%%% Required SF298 macros %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -132,7 +102,7 @@
 \PageClassification {U}     % SF 298 classification
 \AbstractLimitation {UU}    % change to 'SAR' if limited distribution
 \SubjectTerms{Networks,}
-\RPTelephone {(937) 255-3636 ext. XXXX}  % advisors 4 digit extension
+\RPTelephone {(937) 255-3636 ext. XXXX}  % advisors 4 digit extension. TBD Mullin's number?
 
 %%%% Optional macro definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -204,52 +174,28 @@
 % The following line is required to generate the prefatory pages
 \makePrefatoryPages 
 
-%% Body of the text follows, using \chapter, \section, \subsection,
-%% \subsubsection, \paragraph, and \subparagraph to generate the
-%% section headings.  For convenience, it may be useful to break the
-%% full document into separate files, perhaps divided by chapters.  In
-%% that case, the files would be loaded here using "\input{filename}"
+\acresetall
 
-\chapter{Introduction}
 \input{chapter1}
-
-\chapter{Background}
 \input{chapter2}
-
-\chapter{Implementation}
 \input{chapter3}
-
-\chapter{Methodology}
 \input{chapter4}
-
-\chapter{Results and Analysis}
 \input{chapter5}
-
-\chapter{Conclusions and Recommendations}
 \input{chapter6}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 % Appendices
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\appendix    % Indicates the transition from chapters to appendices.  If there
-             % is only one appendix it will not be labeled (can't have an "A"
-             % without a "B"...).  The labels will be added automatically if 
-             % there are more than one.  To get the counter in sync, a third 
-             % "latex" may be required on the file.
+\appendix
+\input{appendix_tests}
+\input{appendix_argconf}
+\input{appendix_generators}
+\input{appendix_processor}
 
-\chapter{Stuff}
-\lettrine{A}{ppendix} goes here
-
-% The \references command should be used to insert the list of references.
-% Assuming one is using BibTeX, this should contain both a \bibliographystyle
-% and a \bibliography command referencing a separate bibliography file.
-
-\tbd{Need to have the labels as author-year, ie AnA06}
 \references{
-  \bibliographystyle{thesnumb3} % or ieeetr, spie, aiaa, etc.
+  \bibliographystyle{alpha} % or alpha, thesnum3, ieeetr, spie, aiaa, etc.
   \bibliography{research,rfc}
  }
+
 \end{document}
 
