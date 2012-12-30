@@ -1,4 +1,5 @@
 temptex := $(patsubst %.Rnw,%.tex,$(wildcard *.Rnw))
+thesis_files := thesis.tex abstract.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex appendix_executer.tex newcommands.tex rfc.bib research.bib acronyms.tex results.csv
 
 all : thesis.pdf
 
@@ -18,9 +19,12 @@ thesis.pdf : thesis.aux
 	pdflatex thesis
 	pdflatex thesis
 
-thesis.aux : thesis.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex newcommands.tex rfc.bib research.bib acronyms.tex results.csv
+thesis.aux : $(thesis_files)
 	pdflatex -draftmode thesis
 	bibtex thesis
+
+watch : 
+	makewatch $(thesis_files) chapter5.Rnw
 
 # Download RFC bib if needed
 rfc.bib :

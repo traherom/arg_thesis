@@ -8,12 +8,11 @@
 \par The test processor runs on Ubuntu 12.04, Ubuntu 12.10, and Mac OSX 10.8. Other versions and distributions are untested, although they may work if the below requirements are met. 
 
 \par The following packages must be available for \texttt{process\_run.py} to run:
-\tbd{versions}
 {\singlespace
 \begin{itemize}
 \item Python 2.7
 \item python-scapy $>=$2.2.0
-\item python-libpcap
+\item python-libpcap $>=$0.6.2
 \end{itemize}
 }
 
@@ -22,11 +21,69 @@
 sudo apt-get install python-libpcap python-scapy
 \end{lstlisting}
 
-\section{Running}
+\section{Usage}
+\par \texttt{process\_run.py} supports a variety of parameters, all of which are optional. The full parameter list and defaults are given in Table \ref{tbl:process_run_param} along with their defaults. Full descriptions of each are given in the list below.
+
+\begin{table}
+\caption{\texttt{process\_run.py} Parameters}
+\label{tbl:process_run_param}
+\centering
+\begin{tabular}{l|l|l}
+Parameter & Short & Default\\
+\hline
+\texttt{--help} & \texttt{-h} & \\
+\texttt{--logdir} & \texttt{-l} & '.' \\
+\texttt{--database} & \texttt{-db} & In-memory\\
+\texttt{--empty-database} & & false\\
+\texttt{--skip-processing} & & false\\
+\texttt{--skip-stats} & & false\\
+\texttt{--offset} & & 0\\
+\texttt{--start-offset} & & 0\\
+\texttt{--end-offset} & & 0\\
+\texttt{--show-cycles} & & false\\
+\texttt{--finish-indicator} & & none
+\end{tabular}
+\end{table}
+
+\begin{itemize}
+\item \texttt{--help} - Display usage message.
+\item \texttt{--logdir}, \texttt{-l} - Path of directory with log and pcap files.
+\item \texttt{--database}, \texttt{-db} - Path of database to database of processed run data. Will be created if needed, otherwise existing data will be used. If the database is only partially processed, \texttt{process\_run.py} will complete it. If not given, defaults to an entirely in-memory database.
+\item \texttt{--empty-database} - If given, all existing data in database is removed.
+\item \texttt{--skip-processing} - Do not attempt to process data, only produce results. If the database is incomplete, nothing will happen.
+\item \texttt{--skip-stats} - Do not calculate statistics after processing run data.
+\item \texttt{--offset} - Number of seconds to ignore at the beginning and end of a run.
+\item \texttt{--start-offset} - Number of seconds to ignore at beginning of run. Overrides value of \texttt{--offset}.
+\item \texttt{--end-offset} - Number of seconds to ignore at end of run. Overrides value of \texttt{--offset}.
+\item \texttt{--show-cycles} - If processing errors occur and the processor is unable to determine the correct receive for a each packet send, show cycles may reveal the problem packet(s). Mostly obsolete.
+\item \texttt{--finish-indicator} - File to create after processing is complete. Intended for automation.
+\end{itemize}
+
+\subsection{Example}
+\par The most common use case, when the caller wants to process the run data in the current directory and leave a database there:
+\begin{lstlisting}
+~/results/basic-t0-l20-hr500ms-2012-11-24-08:54:21$ process_run.py -db run.db
+\tbd{output...}
+\end{lstlisting}
+
+\par If a run takes several seconds to enter a steady state, it may be beneficial to ignore the first 30 seconds of the run. In addition, this example does its work from a different directory but leaves the results in the same location as the previous example:
+\begin{lstlisting}
+~/results$ process_run.py -l basic-t0-l20-hr500ms-2012-11-24-08:54:21 -db basic-t0-l20-hr500ms-2012-11-24-08:54:21/run.db --start-offset 30
+\end{lstlisting}
 
 \section{Processor Execution}
-\par Run processing follows the steps below:
+\par Run processing follows the steps below. It makes assumptions about the test network to determe where packets are headed and what hosts actually send and receive them, so logs must come from a network set up as documented in Figure \ref{fig:argnetwork}.
+
 \begin{enumerate}
-\item \tbd{do this list of processor steps}
+\item Create database.
+\item Read run settings from log files/file names.
+\item Check settings for test setup problems, such as missing hosts.
+\item Enter each pcap file packets into database.
+\item Run through log files to determine who each packet was intended for and if it was intended to be a ``valid'' packet (i.e., should it reach its destination or not?).
+\item Trace packtes through the network, creating a chain of sends and receives. Packets that pass through the gateway follow the transformation through. That is, if the gateway receives a packet, alters it, and sends it out the other side, the packet sequnence continues unbroken.
+\item Check for packet cycles, which would indicate a tracing problem.
+\item Compelete packet intentions. When a host sends a packet, it has an intended receipient. This information is copied into each packet in the chain, making it easier to look up.
+\item Locate packet termations. Each packet in a chain is given the ID number of the packet that ends the chain, allowing the processor to tell where each packet ended and if it reached the intended destination.
+\item Produce stats.
 \end{enumerate}
 

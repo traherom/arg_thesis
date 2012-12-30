@@ -29,15 +29,31 @@
 
 % Other stuff I want
 \input{knitr_include} 
-\usepackage{placeins}
+\usepackage[section]{placeins}
 \usepackage{comment}
 \usepackage{listings}
 
 \lstloadlanguages{Python, C, bash}
 \lstset{
-	language=C,
+	numberbychapter=true,
+	captionpos=t,
+	language=bash,
+	tabsize=4,
 	breaklines=true,
 	breakatwhitespace=true,
+	prebreak=\textbackslash,
+	basicstyle=\small\ttfamily,
+	xleftmargin=10pt,
+	xrightmargin=10pt,
+	framesep=5pt,
+	framerule=2pt,
+	frame=leftline,
+	rulecolor=\color{gray},
+	numbers=left,
+    numberstyle=\small\color{black!85},
+    stepnumber=1, 
+    numbersep=13pt,
+    backgroundcolor=\color{black!5},
 }
 
 \input{newcommands}
@@ -134,33 +150,10 @@
 % \notables  
 % \nofigures
 
-% Additional "lists" can be added to the end of the front matter using the
-% \addlistof macro.  For example, one might insert a list of symbols using the
-%  tabbing environment with:
-%\addlistof{Symbols}{
-%\begin{tabbing}
-%  Symbol\quad \= Definition \kill % This sets up the tab stop
-%  Symbol \> Definition \\
-%  $I$    \> current (amps) \\
-%  $R$    \> resistance (ohms) \\
-%  $V$    \> voltage (volts) \\
-%  \null\\
-%  \textit{Subscripts}\\
-%  $rms$ \> root mean square \\
-%  $t$ \> true \\
-%  $0$ \> nominal\\
-%  \null\\
-%  \textit{Superscripts}\\
-%  $b$ \> body reference frame \\
-%  $n$ \> navigation reference frame \\
-%\end{tabbing}
-%}
-
 % Alternatives to the preceding list of symbols and the following list of
 % acronyms can be created using:
 %
 % \listofsymbols
-% \listofabbreviations[5em]
 % 
 %% where the corresponding symbols and abbreviations must then be marked at
 %% their first occurence in the text with "\addsymbol{Definition}{Symbol}" or
@@ -178,9 +171,11 @@
 \listofacronyms{
 	\input{acronyms.tex}
 }
+%\listofabbreviations[5em]
 
 % The following line is required to generate the prefatory pages
 \makePrefatoryPages 
+\tbd{when you're crazy bored, fix acronyms/abbrevations to produce the listofacronyms style page}
 
 \acresetall
 
@@ -196,6 +191,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
 \input{appendix_tests}
+\input{appendix_executer}
 \input{appendix_argconf}
 \input{appendix_generators}
 \input{appendix_processor}

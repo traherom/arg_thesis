@@ -1,19 +1,10 @@
 \chapter{Results and Analysis}
 \label{chp:results}
+\par This chapter presents and analyzes the experimental results. Each test sequence is discussed in a separate section, with Section \ref{sec:results_basic_tests} covering the basic functionality tests, Section \ref{sec:results_hoprate_tests} determining the effects of hop rate and latency, and Section \ref{sec:results_packetrate_tests} discussing \ac{ARG}'s performance. Finally, Section \ref{sec:results_fuzzer_tests} covers the results of running a fuzzer against \ac{ARG}.
 
-\begin{comment}
-\lettrine{D}{escribe} the results you obtained when applying the design described in Chapter 3.
-At the same time, provide a running analysis of the results. This analysis is probably
-the most important part of the whole written thesis, because this is where your real
-insights into the problem/solution are documented. Avoid simply showing
-plots/tables of results with no analysis.
-\end{comment}
-
-\par This chapter presents and analyzes the experimental results. \tbd{sections}
-
-\section{Results and Analysis}
 <<echo=FALSE, message=FALSE>>=
 library(gplots)
+options(scipen=10)
 @
 
 <<echo=FALSE>>=
@@ -22,40 +13,261 @@ alpha=.99
 # Bring in CSV file and break out into each test, excluding the results.dir and
 # label columns
 results = read.csv('results.csv', header=TRUE)
-basic = results[apply(results, 1, function(x) x['label'] == 'basic'), ]
-hoprate = results[apply(results, 1, function(x) x['label'] == 'hoprate'), ]
-maxpps = results[apply(results, 1, function(x) x['label'] == 'packetrate'), ] 
-fuzzer = results[apply(results, 1, function(x) x['label'] == 'fuzzer'), ]
+results = results[,1:ncol(results)-1] # Remove blank column at end
+
+results[,'hop.rate'] = as.integer(sapply(results[,'gatea.hop.rate'], function(x) {
+		x = as.character(x);
+		substr(x, 1, nchar(x)-2);
+	}))
+
+results[,'kbps'] = apply(results, 1, function(x) { mean(as.integer(
+		c(x['gatea.kbps'], x['gateb.kbps'], x['gatec.kbps'])
+	)) })
+results[,'pps'] = apply(results, 1, function(x) { mean(as.integer(
+		c(x['gatea.pps'], x['gateb.pps'], x['gatec.pps'])
+	)) })
+
+results = split(results, results['label'])
+basic = results$basic
+hoprate = results$hoprate
+packetrate = results$packetrate
+#fuzzer = results$fuzzer
 @
 
-\section{Results and Analysis}
-\subsection{Basic Tests}
-<<>>=
-# Graph and generate stats on basic tests with test num vs loss rate showing
-# separate lines for each hop rate. Show loss rate of invalid traffic for 
-# tests 5-8. TBD separate them out by hop rate, do t-test to show difference between the two?
-plot(basic[, 'test.num'], basic[, 'valid.loss.rate'])
+\section{Basic Tests}
+\label{sec:results_basic_tests}
+\par The first set of tests run tests the basic functioning of \ac{ARG}, as discussed in Section \ref{sec:exp_design}.
 
-plotmeans(basic[, 'valid.loss.rate']~basic[, 'test.num'], p=alpha, minbar=0, maxbar=1,
-		xlab="Test Number", ylab="Valid Packet Loss Rate, Percentage")
+\subsection{Valid Loss Rate}
+\par The raw results for the loss of valid packets on each test is shown in Figure \ref{fig:basic_raw_data} and the means with \acp{CI} are displayed in Figure \ref{fig:basic_mean_ci}. \tbd{show normality/other assumptions hold?}
 
-invalid_runs = apply(basic, 1, function(x) x['test.num'] > 5)
-plotmeans(basic[invalid_runs, 'invalid.loss.rate']~basic[invalid_runs, 'test.num'], p=alpha, minbar=0, maxbar=1,
-		xlab="Test Number", ylab="Invalid Packet Loss Rate, Percentage")
+
+\begin{figure}
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\caption{Basic Tests: Raw Data}
+\label{fig:basic_raw_data}
+<<basic_raw_data, echo=FALSE>>=
+# Graph and generate stats on basic tests with test num vs loss rate 
+plot(basic[,'test'], basic[,'valid.loss.rate'],
+	xlab="Test Number", ylab="Valid Packet Loss Rate, Proportion")
+@
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.5\linewidth}
+\centering
+\caption{Basic Tests: Mean and \ac{CI}}
+\label{fig:basic_mean_ci}
+<<basic_mean_ci, echo=FALSE, warning=FALSE>>=
+# TBD, 3 short on some tests
+plotmeans(basic[,'valid.loss.rate']~basic[,'test'], p=alpha,
+		minbar=0, maxbar=1, connect=FALSE, mean.lab=TRUE,
+		xlab="Test Number", ylab="Valid Packet Loss Rate, Proportion")
+@
+\end{minipage}
+\end{figure}
+
+<<basic_calcs, echo=FALSE>>=
+basic_results = by(basic['valid.loss.rate'], basic['test'], function(x) t.test(x, conf.level=alpha))
+basic_overall = t.test(basic['valid.loss.rate'], conf.level=alpha)
+ci = basic_results['4']$conf.int * 100
+ci_overall = basic_overall$conf.int * 100
+
+# Split by hop rate and check if there is any different between the two
+basic_hr = split(basic, basic['hop.rate'])
+basic_hr_t = t.test(basic_hr$'50'['valid.loss.rate'], basic_hr$'500'['valid.loss.rate'], conf.level=alpha)
+ci_hr = basic_hr_t$conf.int * 100
+@
+\par These figures reveal a low packet loss rate across all test scenarios. At worst, tests 4 and 8---both tests with full \ac{TCP} and \ac{UDP} traffic between all possible hosts---lose between \Sexpr{ci[1]} and \Sexpr{ci[2]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, losses averaged \Sexpr{basic_overall$estimate*100}\%, with a \ac{CI} of $(\Sexpr{I(ci_overall)})$, again with \Sexpr{alpha*100}\% confidence.
+
+\par A two-sample t-test between the two hop rates used in the basic tests gives a p-value of \Sexpr{basic_hr_t$p.value}, convincing evidence that there is a statistically siginificant difference introduced by the different hop rates. However, the \ac{CI} for this difference is a mere $(\Sexpr{I(ci_hr)})$ at a \Sexpr{alpha*100}\% confidence level, minimal for the  This difference is explained in Section \ref{sec:results_hoprate_tests}. 
+
+\subsection{Invalid Loss Rate}
+\par Tests 5 through 8 include invalid traffic that \ac{ARG} should reject and hence should be ``lost.'' Figure \ref{fig:basic_invalid_loss} displays the proportion of invalid traffic rejected. Table \ref{tbl:basic_loss_reasons} displays each of the reasons packets were rejected during the runs.
+
+\begin{figure}
+\caption{Invalid Traffic Loss Rate}
+\label{fig:basic_invalid_loss}
+\centering
+<<basic_invalid_loss, echo=FALSE, warning=FALSE>>=
+# Show loss rate of invalid traffic for tests 5-8.
+invalid_runs = apply(basic, 1, function(x) x['test'] > 5)
+plotmeans(basic[invalid_runs, 'invalid.loss.rate']~basic[invalid_runs, 'test'], p=alpha,
+		minbar=0, maxbar=1, ylim=c(.999, 1),
+		xlab="Test Number", ylab="Mean Invalid Packet Loss Rate, Proportion")
+@
+\end{figure}
+
+\par Figure \ref{fig:basic_invalid_loss} indicates that \ac{ARG} successfully rejects almost all invalid traffic it encounters. Test 8 shows a small deviation of 100\% packet rejection, as 1 of 746 packets made it through. \tbd{why? need to figure out the directory for that run. I would assume processing problems after.} This result offers convincing evidence that \ac{ARG} effectively blocks unexpected inbound traffic, but it gives no indication of its suitablity against more focused attacks. 
+
+<<echo=FALSE, results='asis'>>=
+create_rejection_table = function(name, table) {
+	cat('\\begin{table}\n')
+	cat('\\caption{Invalid Packet Rejection Reasons}\n')
+	cat('\\label{tbl:')
+	cat(name)
+	cat('}\n')
+	cat('\\centering\n')
+	cat('\\begin{tabular}{l|c}\n')
+	cat('Reason & Count\\\\\n')
+	cat('\\hline\n')
+
+	# Sum just the rejection reason columns
+	reasons = table[, sapply(colnames(table), function(x) {
+			return(startsWith(x, 'inbound') || startsWith(x, 'outbound')
+					|| x == 'unknown' || x == 'lost.on.wire')
+		})]
+	reasons = apply(reasons, 2, function(x) sum(x, na.rm=TRUE))
+	reasons = sort(reasons, decreasing=TRUE)
+
+	for(i in 1:length(reasons)) {
+		if(is.na(reasons[i]) || reasons[i] == 0)
+			next
+		
+		r = names(reasons)[i]
+		r = gsub('.', ' ', r, fixed=TRUE)
+		r = paste(toupper(substr(r, 1, 1)), substring(r, 2), sep='')
+
+		cat(r, ' & ', reasons[i])
+		if(i < length(reasons))
+			cat('\\\\\n')
+	}
+
+	cat('\\end{tabular}\n')
+	cat('\\end{table}\n')
+}
+
+# Get the total for each possible rejection reason for the invalid tests only
+create_rejection_table('basic_loss_reasons', basic[invalid_runs,])
 @
 
-\par The mean of basic test num X is X with a \Sexpr{alpha*100}\% confidence interval of X. \tbd{do pretentious stuff like this}
+\par Additionally, Table \ref{tbl:basic_loss_reasons} illustrates that packets are rejected via the \ac{NAT} table quite frequently. This operation costs the gateway minimal processing time, as it can reject after a single hashtable lookup. \tbd{benefit of that}
 
-\subsection{Maximum Hop Rate}
-<<>>=
-# Graph separate line for each hop rate-latency combination with the averaged 
-# loss rate. 
+\section{Maximum Hop Rate}
+\label{sec:results_hoprate_tests}
+\par The maximum hop rate sequence of tests measures the change in packet loss rate at specific latencies as hop rate increases. For these tests, a fixed packet rate and Test 4 is always used. Section \ref{sec:exp_design} covers the specifics of these tests.
 
+\begin{figure}
+\caption{Loss Rate of Latency vs. Hop Rate \tbd{it would be nice to put some more hop rates in here... smooth out the curves}}
+\label{fig:hoprate_loss}
+\centering
+<<echo=FALSE>>=
+# Get mean of each hop rate-latency pair. Matrix
+# rows are latencies, columns are hop rates
+lat_hr_mean = matrix(nrow=length(unique(hoprate[,'latency'])),
+	ncol=length(unique(hoprate[,'hop.rate'])))
+rownames(lat_hr_mean) = sort(unique(hoprate[,'latency']))
+colnames(lat_hr_mean) = sort(unique(hoprate[,'hop.rate']))
+
+worst_sd = 0
+repetitions = c()
+for(lat in rownames(lat_hr_mean)) {
+	for(hr in colnames(lat_hr_mean)) {
+		rows = hoprate[,'latency'] == lat & hoprate[,'hop.rate'] == hr
+		lat_hr_mean[lat, hr] = mean(hoprate[rows, 'valid.loss.rate'])
+
+		repetitions = append(repetitions, length(hoprate[rows, 'valid.loss.rate']))
+
+		curr_sd = sd(hoprate[rows, 'valid.loss.rate'])
+		if(curr_sd > worst_sd)
+			worst_sd = curr_sd
+	}
+}
+
+# Plot. Each latency is separate, x is hop rate, y is loss
+plot.new()
+plot.window(xlim=c(1, ncol(lat_hr_mean)), ylim=c(0,max(lat_hr_mean)))
+title(main="Hop Interval vs. Loss Rate", xlab="Hop Interval (ms)", ylab="Valid Loss Rate, Proportion")
+axis(1, at=1:ncol(lat_hr_mean), labels=colnames(lat_hr_mean))
+axis(2)
+box()
+
+type=1
+for(lat in rownames(lat_hr_mean)) {
+	lines(lat_hr_mean[lat,], col=type, lty=type)
+	points(lat_hr_mean[lat,], col=type, pch=type-1)
+	type = type + 1
+}
+
+legend("bottomleft", title="Latency (RTT)",
+		legend=paste(rownames(lat_hr_mean), "ms"),
+		lty=1:(type-1),
+		col=1:(type-1),
+		pch=0:(type-2)
+		)
+@
+\end{figure}
+
+\tbd{this number includes both to ext and between gateways. We really care about just gateways for this purpose. We should have no loss to ext. Need to have process run produces separate loss rates for between gateways, should only require changes to getting stats. Then do two graphs, one showing no change on prot<->ext and the changes in prot<->prot}
+
+\par Figure \ref{fig:hoprate_loss} displays the results of the hop rate tests, separated by network latency. The values shown here are the means over \Sexpr{round(mean(repetitions))} repetitions. The worst standard deviation in any of the hop rate-latency groups is \Sexpr{worst_sd}, implying relatively predictable losses at each grouping.
+
+\par As expected, far and away the most common rejection reasons are the source and/or destination \acp{IP} being incorrect, as shown in Table \ref{tbl:hoprate_loss_reasons}. Section \ref{sec:goals} hypothesizes that packet loss falls below 5\% when hop rate is more than double the latency. The data appears to support this, \tbd{finish when more hop rates are available} \tbd{ARP nonesense, triple latency}
+
+\par Of particular note in this test is the high hop rate achieved with acceptable packet loss. With a realistic network latency of 30 milliseconds, these tests prove it is possible to change \acp{IP} at least every 50 milliseconds. Previous research into address space randomization and \ac{IP} hopping have limited themselves to hopping on the order of \tbd{look this up}.
+
+<<echo=FALSE, results='asis'>>=
+create_rejection_table('hoprate_loss_reasons', hoprate)
 @
 
+\section{Maximum Packet Rate}
+\label{sec:results_packetrate_tests}
+\par The final numerical test performed against \ac{ARG} tests the maximum packet rate it is capable of handling. For these tests, latency is set to 20 milliseconds and Test 4 is used. Hop rate varies between 50 ms and 500 ms to check if this has an effect on the supported packet rate. Most importantly, traffic generators are run with steadily increasing send rates. See Section \ref{sec:exp_design} for details.
 
-\section{Limitations}
-\par The \ac{IP} hopping system this research implements is \tbd{other stuff} \tbd{note ARP triple-latency problem here?}
+\begin{figure}
+\begin{minipage}[b]{0.5\linewidth}
+\caption{Loss Rate vs. \ac{Mbps} Throughput}
+\label{fig:pr_bps_loss}
+\centering
+<<echo=FALSE>>=
+# Plot 
+max_y = .004
+
+packetrate = packetrate[order(packetrate[,'kbps']),]
+packetrate[,'mbps'] = packetrate[,'kbps']/1024
+plot(packetrate[,'mbps'], packetrate[,'valid.loss.rate'], ylim=c(0,max_y),
+	xlab="Throughput (Mbps)", ylab="Valid Packet Loss Rate, Proportion")
+lines(packetrate[,'mbps'], packetrate[,'valid.loss.rate'])
+@
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[b]{0.5\linewidth}
+\caption{Loss Rate vs. Packets Per Second}
+\label{fig:pr_pps_loss}
+\centering
+<<echo=FALSE>>=
+packetrate = packetrate[order(packetrate[,'pps']),]
+plot(packetrate[,'pps'], packetrate[,'valid.loss.rate'], ylim=c(0,max_y),
+	xlab="Packet Rate (pps)", ylab="Valid Packet Loss Rate, Proportion")
+lines(packetrate[,'pps'], packetrate[,'valid.loss.rate'])
+@
+\end{minipage}
+\end{figure}
+
+<<pr_calcs, echo=FALSE>>=
+basic_results = by(basic['valid.loss.rate'], basic['test'], function(x) t.test(x, conf.level=alpha))
+basic_overall = t.test(basic['valid.loss.rate'], conf.level=alpha)
+ci = basic_results['4']$conf.int * 100
+ci_overall = basic_overall$conf.int * 100
+
+# Split by hop rate and check if there is any different between the two
+basic_hr = split(basic, basic['hop.rate'])
+basic_hr_t = t.test(basic_hr$'50'['valid.loss.rate'], basic_hr$'500'['valid.loss.rate'], conf.level=alpha)
+ci_hr = basic_hr_t$conf.int * 100
+@
+
+\par Figure \ref{fig:pr_bps_loss} depicts the results from this test when looking at bit-wise throughput, while Figure \ref{fig:pr_pps_loss} compares the packet rate. \tbd{cluster, run anova to determine if there's a difference in groups?} Visually, both plots reveals little variation directly attributable to packet rate. \tbd{Clustering the data and performing an \ac{ANOVA} reveales...}
+
+\par Unfortunately, many of the network cards in the test equipment are limited to 10 Mbps, making it difficult to test higher speeds on the current network. Regardless, the results of these tests are limited to just the implementation of \ac{ARG} and imply only a minimally possible throughput. Despite these limitations, \ac{ARG} performs well with reasonably rapid traffic, giving no reason to believe it is not capable of higher rates.
+
+\section{Fuzzing Test}
+\label{sec:results_fuzzer_tests}
+\tbd{this}
+
+\section{Overall Analysis}
+\label{sec:results_overall}
+\tbd{answer the questions posed in chapter 4}
 
 \section{Summary}
+\par This chapter analysizes the results for each test sequence. Interetation of the results is given, as well as limitations on scope and applicability to the broader field of address space randomization. 
 

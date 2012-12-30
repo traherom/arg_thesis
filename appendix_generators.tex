@@ -1,7 +1,7 @@
 \chapter{Traffic Generators}
 \label{chp:generators}
 
-\par This appendix covers the required environment for the two traffic generators and their usage. Section \ref{sec:gen_env} lists the required utilites to run the generators. Section \ref{sec:gen_usage} discusses the available command line parameters.
+\par This appendix covers the required environment for the two traffic generators and their usage. Section \ref{sec:gen_env} lists the required utilites to run the generators. Section \ref{sec:gen_usage} discusses usage of each generator and the available command line parameters.
 
 \section{Environment}
 \label{sec:gen_env}
@@ -12,7 +12,7 @@
 \begin{itemize}
 \item Python 2.7
 \item python-scapy $>=$2.2.0
-%\item python-libpcap
+%\item python-libpcap $>=$0.6.2
 \end{itemize}
 }
 
@@ -21,7 +21,82 @@
 sudo apt-get install python-libpcap python-scapy
 \end{lstlisting}
 
-\section{Running}
+\section{Usage}
 \label{sec:gen_usage}
+\subsection{Normal Traffic Generator}
+\par \texttt{gen\_traffic.py} generates random \ac{TCP} and \ac{UDP} packets with the given characteristics and rates. Table \ref{tbl:gen_traffic_param} shows all the available options and the defaults where applicable. The generator can be stopped by pressing \texttt{Ctrl-c} or sending it \texttt{SIGTERM} via \texttt{kill}.
 
+\subsubsection{Examples}
+\par Send \ac{UDP} traffic to 192.168.1.5:2000 twice a second:
+\begin{lstlisting}
+$ ./gen_traffic.py -t udp -p 2000 -h 192.168.1.5 -d .5
+1356728008.79 LOG4 START: Starting at 28 Dec 2012 15:53:28
+1356728008.79 LOG4 Starting a valid UDP sender to 192.168.1.5:2000
+1356728008.79 LOG4 LOCAL ADDRESS: 192.168.1.115:2000
+1356728009.29 LOG4 Sent valid 17:dae8053de4050a230b106d763665f058 to 192.168.1.5:2000
+1356728009.29 LOG4 Received valid 17:f537a893140dbcc3b911cb69eae34b46 from 192.168.1.5:2000
+1356728009.79 LOG4 Sent valid 17:500b1c56df2e3d17ce50bda4e9be03c9 to 192.168.1.5:2000
+...
+1356728011.81 LOG4 Sent valid 17:f31dd5564b658e956fe74cc35c0f603f to 192.168.1.5:2000
+1356728011.81 LOG4 Received valid 17:ed8104a0ab9835fab38cc453362e8894 from 192.168.1.5:2000
+^C1356728012.25 LOG4 User requested we stop
+1356728012.25 LOG4 UDP sender to 192.168.1.5:2000 dying
+\end{lstlisting}
+
+\par Receive that \ac{UDP} traffic:
+\begin{lstlisting}
+$ ./gen_traffic.py -t udp -l -p 2000
+1356727988.4 LOG4 START: Starting at 28 Dec 2012 15:53:08
+1356727988.4 LOG4 Starting a UDP receiver on port 2000
+1356727988.4 LOG4 LOCAL ADDRESS: 192.168.1.5:2000
+1356728009.29 LOG4 Received valid 17:dae8053de4050a230b106d763665f058 from 192.168.1.115:49958
+1356728009.29 LOG4 Sent valid 17:f537a893140dbcc3b911cb69eae34b46 to 192.168.1.115:49958
+...
+1356728011.81 LOG4 Received valid 17:f31dd5564b658e956fe74cc35c0f603f from 192.168.1.115:49958
+1356728011.81 LOG4 Sent valid 17:ed8104a0ab9835fab38cc453362e8894 to 192.168.1.115:49958
+^C1356728015.71 LOG4 User requested we stop
+1356728015.71 LOG4 UDP listener on port 2000 dying
+\end{lstlisting}
+
+\begin{table}
+\caption{gen\_traffic.py Parameters}
+\label{tbl:gen_traffic_param}
+\centering
+\begin{tabular}{l|p{2in}|l|l}
+Parameter & Description & Possible Values & Default\\
+\hline
+\texttt{--type} & Type of traffic to work with & tcp, udp & \\
+\texttt{--is-invalid} & Log traffic as invalid. No effect on actual traffic. & & false\\
+\texttt{--host} & Host to send to & \ac{IP} or domain name & \\
+\texttt{--port} & Port to send to/listen on & Port number 0-65535 & \\
+\texttt{--listen} & Listen on given port rather than initiating connection & & false\\
+\texttt{--delay} & Delay in seconds between sends & $>=$0.0s & 1.0\\
+\texttt{--echo} & Echo packet data back to sender rather than random & & false\\
+\texttt{--size} & Size of packet data to send & Number of bytes to send & Random\\
+\texttt{--output} & Log to given file & file name & stdout
+\end{tabular}
+\end{table}
+
+\subsection{Malicious Traffic Generator}
+\par \texttt{malicious\_traffic.py} generates malicious ARG traffic by replaying \ac{ARG} protocol traffic with randomly choosen modifications. The possible modications are shown below. Each may be choosen with a 10\% probability.
+{\singlespace
+\begin{itemize}
+\item Zero \ac{ARG} signature/\ac{HMAC}
+\item Change message type
+\item Zero data
+\item Remove the data
+\item Changed sequence number
+\item Changed source \ac{IP} address
+\item Changed destination \ac{IP} address
+\end{itemize}
+}
+
+\begin{lstlisting}
+usage: malicious_traffic.py [-o OUTPUT]
+\end{lstlisting}
+
+\par The \texttt{--output} option here is the same as \texttt{gen\_traffic.py}'s and is covered in Table \ref{tbl:gen_traffic_param}. This is the only option supported by the malicious traffic generator.
+
+\subsubsection{Limitations}
+\par Due to the design of the test network, with a switch connecting the hosts, it is difficult for this tool to reliably sniff traffic (it does not attempt to \ac{ARP} spoof or otherwise redirect traffic flow). To compensate for this the malicious generators are run on the gateways themselves, allowing them to see all of the traffic passing the gateway. A more realistic solution would be to use a true hub (the test network's switch did not allow this configuration) or sniff on a spanning port and send via a separate port.
 

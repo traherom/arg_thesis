@@ -8,23 +8,22 @@
 \par \ac{ARG} runs on Ubuntu 12.04 and 12.10. Other versions and distributions are untested, although they may work if the below requirements are met. 
 
 \subsection{Required Packages}
-\tbd{versions}
 {\singlespace
 \begin{itemize}
 \item gcc $>=$4
-\item linux-headers
+\item linux-headers 3.5.0
 \item Autoconf $>=$2.69
-\item Automake
-\item libtool
-\item libpcap-dev
+\item Automake $>=$1.11
+\item libtool $>=$2.4.2
+\item libpcap-dev $>=$1.3.0
+\item libpolarssl-dev $>=$1.1.4
+\item libpthread-dev 
 \item librt-dev
-\item libpthread-dev
-\item libpolarssl-dev
 \end{itemize}
 }
 
 \par In Ubuntu:
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}
 sudo apt-get install automake autoconf build-essential libtool libpcap-dev libpolarssl-dev
 \end{lstlisting}
 
@@ -37,8 +36,89 @@ make
 
 \par This should produce two executables, \texttt{arg} and \texttt{gen\_gate\_config}.
 
-\section{Running}
+\section{Usage}
 \label{sec:arg_cmd}
-\subsection{Synopsis}
-\par \ac{ARG} must be run 
+\subsection{Command Line}
+\par \ac{ARG} must be run as root. Usage is straight forward:
+\begin{lstlisting}
+# ./arg <conf file>
+\end{lstlisting}
+
+\par A path to a configuration file is required. The path should point to the main configuration file, with supporting files in the same directory as the main one. See Section \ref{sec:arg_conf_files} for more details.
+
+\par \ac{ARG} will start up and configure itself, then after a brief delay attempt to connect to other gateways for which it has configuration information. To end its execution at any time, press \texttt{ctrl-c} to cleanly kill it or send it \texttt{SIGTERM} via \texttt{kill} (i.e. \lstinline{sudo killall -SIGTERM arg}) to end it without cleaning up.
+
+\subsection{Configuration Files}
+\label{sec:arg_conf_files}
+\par \ac{ARG} requires at least three separate configuration files on start up, plus one for every gateway it should have startup knowledge about. The main configuration file may be called anything and contains four lines:
+\lstinputlisting[caption=main.conf]{../arg/conf/main-gateA.conf}
+
+\par In order, these are: gate name, internal network interface, external network interface, and hop rate. Hop rate \textit{must} be given in milliseconds.
+
+\par In the same directory as the main configuration file must be two files giving details on the local gateway called \texttt{<gatename>.pub} and \texttt{<gatename>.priv}. The private file gives the full private key of a gateway, while the public file contains the public key, the base \ac{IP} address of the gate, and the corresponding netmask. Examples of each are given in Listings \ref{lst:ex_pub} and \ref{lst:ex_priv}.
+\lstinputlisting[caption=gateA.pub, label=lst:ex_pub, breakatwhitespace=false]{../arg/conf/gateA.pub}
+\lstinputlisting[caption=gateA.priv, label=lst:ex_priv, breakatwhitespace=false]{../arg/conf/gateA.priv}
+\tbd{get these to wrap}
+
+\par These files can be produced quickly through the included \texttt{gen\_gate\_config} utility. This tool is built alongside \texttt{arg}, see Section \ref{sec:arg_env}. Usage is:
+
+\begin{lstlisting}
+$ ./gen_gate_config <name> <base ip> <mask>
+\end{lstlisting}
+%$ fix syntax highlighting
+
+\par This will produce a \texttt{<name>.pub} and \texttt{<name>.priv} file with the information given and a random public and private key.
+
+\par For every gateway that this gate should know about, another \texttt{<othegatename>.pub} should be placed in the directory. For instance, if \texttt{gateA} knows about \texttt{gateB}, then a \texttt{gateB.pub} file must exist. The information inside is the same format as its own \texttt{.pub} file. Look at Section \ref{sec:arg_run_example} for an example of the file structure and expected output.
+
+\section{\ac{ARG} Execution Example}
+\label{sec:arg_run_example}
+\par In this example \ac{ARG} is being run on \texttt{gateA} and only knows about \texttt{gateB}.
+
+\begin{lstlisting}[caption=ARG Execution Example]
+$ ls
+arg  conf
+$ ls conf
+gateA.pub  gateA.priv  gateB.pub  main-gateA.conf
+$ sudo ./arg conf/main-gateA.conf
+1355979615.731 LOG4 Starting at 20 Dec 2012 00:00:15
+1355979615.731 LOG4 Reading from configuration file conf/main-gateA.conf
+1355979615.731 LOG4 Found public key for gate gateA
+1355979615.731 LOG4 Found public key for gate gateB
+1355979615.731 LOG4 Hopper init
+1355979615.731 LOG4 Locating configuration for gateA
+1355979615.731 LOG4 Configured as gateA
+1355979615.731 LOG4 Generating hop and symmetric encryption keys
+1355979615.731 LOG4 Hop rate set to 1000ms
+1355979615.733 LOG4 Hopper initialized
+1355979615.733 LOG4 NAT init
+1355979615.733 LOG4 NAT initialized
+1355979615.733 LOG4 Director init
+1355979615.733 LOG2 Internal device is eth2, external is eth1
+1355979615.733 LOG4 NAT cleanup thread running
+1355979615.733 LOG4 NAT Table empty
+1355979615.735 LOG4 Using filter '(arp and not dst net 172.1.0.0 mask 255.255.0.0) or (not arp and src net 172.1.0.0 mask 255.255.0.0)' on eth2
+1355979615.739 LOG4 Using filter '(arp and not src net 172.1.0.0 mask 255.255.0.0 and dst net 172.1.0.0 mask 255.255.0.0) or (not arp and dst net 172.1.0.0 mask 255.255.0.0)' on eth1
+1355979615.739 LOG2 Internal IP: 172.1.0.0, external IP: 172.1.0.0, external mask: 255.255.0.0
+1355979615.739 LOG4 Director initialized
+1355979615.739 LOG4 Running
+1355979615.739 LOG4 Starting connection/gateway auth thread
+1355979615.739 LOG4 Connect thread running
+1355979615.742 LOG4 Ready to receive packets on eth2
+1355979615.765 LOG4 Ready to receive packets on eth1
+1355979618.739 LOG4 Sending connect information to gateB
+1355979618.740 LOG0 Outbound: Accept: Admin: connection data sent: /p:253 s:172.1.194.123:0 d:172.2.151.79:0 hash:8fb3b019948229847cd9e3adcd55fd90
+...
+^C
+1355979940.504 LOG4 Director uninit
+1355979940.541 LOG4 Director finished
+1355979940.541 LOG4 Shutting down
+1355979940.541 LOG4 NAT uninit
+1355979940.542 LOG4 NAT finished
+1355979940.542 LOG4 Hopper uninit
+1355979940.542 LOG4 Removing all associated ARG networks
+1355979940.542 LOG4 Hopper finished
+1355979940.542 LOG4 Finished
+\end{lstlisting}
+%$
 

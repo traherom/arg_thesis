@@ -13,7 +13,7 @@
 
 %\par The working hypothesis for this research is, as speculated by Sandia, a \ac{DYNAT} system allows for quick identification of unexpected (and potentially malicious) packets entering a network. There are few identifiers within the scope of \ac{DYNAT} by which outgoing packets could be filtered. Given that, no filtering is done for outbound packets and hence no change in behavior is observed when compared to the control network. 
 
-\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop rate appropriate for the network latency. In addition, this thesis hypothenizes that the max hop rate sustainable with reasonable loss is twice the network latency, where reasonable loss is traffic loss less than 5\%. The other two questions under test are informational in nature, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 1Mbps of traffic. \tbd{performance wasn't really a design focus} 
+\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop rate appropriate for the network latency. In addition, this thesis hypothenizes that the max hop rate sustainable with reasonable loss is twice the network latency, where reasonable loss is defined as less than 5\% \tbd{2\% figure from MIT wifi?}. The other two questions under test are informational in nature, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 1Mbps of traffic. \tbd{performance wasn't really a design focus} 
 
 \subsection{Approach}
 \label{sec:approach}
@@ -173,7 +173,7 @@
 	\par This sequence is not tested rigorously for traffic flow success and failure, but ensures that \ac{ARG} remains stable despite malformed traffic. Hop rate varies between 500ms and 50ms, latency is fixed at 20ms, and packets are sent at 0.3 second intervals.
 \end{itemize}
 
-\par Due to the possible impact of large network traffic disruptions, a 99\% confidence interval is used. Wide variation is possible in the actual traffic seen in a single run, so 10 replications are used for each experiment.
+\par Due to the possible impact of large network traffic disruptions, a 99\% confidence interval is used. Wide variation is possible in the actual traffic seen in a single run, so 20 replications are used for each experiment.
 
 \section{Summary}
 \label{sec:method_summary}
