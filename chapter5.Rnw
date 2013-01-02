@@ -169,14 +169,14 @@ for(lat in rownames(lat_hr_mean)) {
 		repetitions = append(repetitions, length(hoprate[rows, 'valid.loss.rate']))
 
 		curr_sd = sd(hoprate[rows, 'valid.loss.rate'])
-		if(curr_sd > worst_sd)
+		if(!is.na(curr_sd) && curr_sd > worst_sd)
 			worst_sd = curr_sd
 	}
 }
 
 # Plot. Each latency is separate, x is hop rate, y is loss
 plot.new()
-plot.window(xlim=c(1, ncol(lat_hr_mean)), ylim=c(0,max(lat_hr_mean)))
+plot.window(xlim=c(1, ncol(lat_hr_mean)), ylim=c(0,max(lat_hr_mean, na.rm=TRUE)))
 title(main="Hop Interval vs. Loss Rate", xlab="Hop Interval (ms)", ylab="Valid Loss Rate, Proportion")
 axis(1, at=1:ncol(lat_hr_mean), labels=colnames(lat_hr_mean))
 axis(2)
