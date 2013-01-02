@@ -1,5 +1,5 @@
 temptex := $(patsubst %.Rnw,%.tex,$(wildcard *.Rnw))
-thesis_files := thesis.tex abstract.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex appendix_executer.tex newcommands.tex rfc.bib research.bib acronyms.tex results.csv
+thesis_files := thesis.tex abstract.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex appendix_executer.tex newcommands.tex rfc.bib research.bib acronyms.tex flow_director.png results.csv
 
 all : thesis.pdf
 
@@ -33,4 +33,12 @@ rfc.bib :
 # Knitr for Rnw files
 %.tex : %.Rnw
 	R -e 'library("knitr"); knit("$<")'
+
+# DOT .dot files (GraphViz)
+%.png : ../diagrams/%.dot
+	dot "$<" -Tpng -o "$@" 
+%.pdf : ../diagrams/%.dot
+	dot "$<" -Tps -o "$*.ps"
+	ps2eps "$*.ps"
+	ps2pdf -dEPSFitPage "$*.eps" "$@"
 
