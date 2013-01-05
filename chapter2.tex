@@ -229,7 +229,7 @@ Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb
 \label{sec:totp}
 \par The system discussed in this thesis relies heavily on values that are unpredictable to an outsider but calculatable for anyone with the secret key. The algorithm behind these values is \ac{TOTP} \cite{rfc6238}, which in turn relies on the \ac{HOTP} algorithm \cite{rfc4226}. Both of these algorithms are frequently used in the two-factor authentication systems employed by banks and other websites, with a smartphone app or key fob displaying the current password.
 
-\par \ac{HOTP} utilizes a key of at least 128-bits and a ``counter'' to produce its output. These passed to a \ac{SHA}-based \ac{HMAC}, which produces a 20-byte string. It then applies a ``truncation'' process to the \ac{HMAC}, finally returning a four-byte output \cite{rfc4226}. If both sides of an exachange know the key and the current counter, they are able to indepently produce the same value.
+\par \ac{HOTP} utilizes a key of at least 128-bits and a ``counter'' to produce its output. These passed to a \ac{SHA}-based \ac{HMAC}, which produces a 20-byte string. It then applies a ``truncation'' process to the \ac{HMAC}, finally returning a four-byte output \cite{rfc4226}. If both sides of an exchange know the key and the current counter, they are able to indepently produce the same value.
 
 \par The counter for \ac{HOTP} is set based on some event that the system designer decides upon. In the most literal case, the usage of a given output for authentication causes an internal counter to be incremented. In a situation like this, both sides of the HOTP (the sender and the receiver) must keep their counters in-sync or the two will produce differing values and need to be resynchronized. In a system with multiple senders and receivers, this becomes quite challenging.
 
@@ -283,4 +283,8 @@ Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb
 \par A disadvantage of this design was address space overhead. Testing showed that around 10\% more address space was needed for three simulations on large-scale networks, based on the need to reserve addresses to maintain connections while continuing to change address mappings. However, TAO had the distinct advantage of only requiring the addition of a single box at the network's edge and no cooperation from remote hosts was needed for it to provide its services.
 
 \tbd{include CONTRA?}
+
+\section{Summary}
+\label{sec:background_summary}
+\par This chapter presents background topics used in this thesis, including \ac{IP} routing, encryption and authentication, and \aclp{TOTP}. \ac{IP} hopping and the two possible approaches to it---end point or gateway---are discussed, along with an analysis of each of their benefits and challenges. Finally, previous research in this area is covered.
 
