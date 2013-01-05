@@ -12,5 +12,8 @@ Sweave.sty
 *.out
 *.swp
 *.loa
+*.eps
+*.ps
 chapter5.tex
+.dropbox
 
