@@ -4,22 +4,36 @@
 
 <<echo=FALSE, message=FALSE>>=
 library(gplots)
+library(plotrix)
+library(boot)
+library(coin)
 options(scipen=10)
 @
 
 <<echo=FALSE>>=
-alpha=.99
+alpha=.95
+reasonable=2
+replicates=1000
 
 # Bring in CSV file and break out into each test, excluding the results.dir and
 # label columns
 results = read.csv('results.csv', header=TRUE)
 results = results[,1:ncol(results)-1] # Remove blank column at end
 
+# Proportions are small and silly
+results[,'valid.loss.rate'] = results[,'valid.loss.rate'] * 100
+results[,'invalid.loss.rate'] = results[,'invalid.loss.rate'] * 100
+
+# Tests were 0-indexed. Make them 1-indexed for readability
+#results[,'test'] = results[,'test'] + 1
+
+# Convert ms values to integeres
 results[,'hop.rate'] = as.integer(sapply(results[,'gatea.hop.rate'], function(x) {
 		x = as.character(x);
 		substr(x, 1, nchar(x)-2);
 	}))
 
+# Combine stats to make them easy to access
 results[,'kbps'] = apply(results, 1, function(x) { mean(as.integer(
 		c(x['gatea.kbps'], x['gateb.kbps'], x['gatec.kbps'])
 	)) })
@@ -36,54 +50,115 @@ packetrate = results$packetrate
 
 \section{Basic Tests}
 \label{sec:results_basic_tests}
-\par The first set of tests run tests the basic functioning of \ac{ARG}, as discussed in Section \ref{sec:exp_design}.
+\par The first set of tests run tests the basic functioning of \ac{ARG}, as discussed in Section \ref{sec:exp_design}. These tests are intended to validate the basic functionality of \ac{ARG} and demonstrate the accuracy of classification under various circumstances.
+
+<<echo=FALSE>>=
+bootstrap_stats = function (data, idx) {
+	m = mean(data[idx], na.rm=TRUE)
+	return(m)
+}
+
+# Calculate overall average
+basic.boot.overall = boot(data=basic[,'valid.loss.rate'], statistic=bootstrap_stats, R=replicates)
+basic.boot.overall.stat = basic.boot.overall$t0
+basic.boot.overall.ci = boot.ci(basic.boot.overall, conf=alpha, type='basic')$basic[4:5]
+
+# Calculate mean for each test number
+basic.boot = by(basic[,'valid.loss.rate'], basic[,'test'], function(x) {
+		boot(data=x, statistic=bootstrap_stats, R=replicates)
+	})
+basic.boot.stats = sapply(basic.boot, function(x) x$t0)
+basic.boot.ci = sapply(basic.boot, function(x) {
+	ci = boot.ci(x, conf=alpha, type='basic')$basic
+	return(ci[4:5])
+	})
+
+# Calculate 2-sample t-test for <R> bootstrap samples of <x> and <y>
+boot.t.test = function(x, y, R, n=10, conf=.95) {
+	# Create replicates
+	x_resampled = list()
+	y_resampled = list()
+	for(i in 1:R) {
+		x_resampled[[i]] = sample(x, n)
+		y_resampled[[i]] = sample(y, n)
+	}
+
+	# Test
+	t = c()
+	for(i in 1:R) {
+		t = c(t, t.test(x_resampled[[i]], y_resampled[[i]], conf.level=conf)$statistic)
+	}
+
+	# Confidence intervals
+	t = sort(t)
+	cutoff = floor((1-conf) * length(t))
+	return(c(t[cutoff], t[length(t) - cutoff]))
+}
+
+basic.hr = split(basic, basic[,'hop.rate'])
+basic.hr.t = boot.t.test(basic.hr$'50'[,'valid.loss.rate'], basic.hr$'500'[,'valid.loss.rate'], R=replicates, conf=alpha)
+
+# Are the two hop rates different?
+basic.hr.pvalue = pvalue(oneway_test(basic[,'valid.loss.rate']~factor(basic[,'hop.rate']),
+							distribution='approximate', conf.level=alpha))[1]
+@
 
 \subsection{Valid Loss Rate}
-\par The raw results for the loss of valid packets on each test is shown in Figure \ref{fig:basic_raw_data} and the means with \acp{CI} are displayed in Figure \ref{fig:basic_mean_ci}. \tbd{show normality/other assumptions hold?}
-
+\par The raw results for the loss of valid packets on each test are shown in Figure \ref{fig:basic_raw_data}. \tbd{how many replications each test has?}. Figure \ref{fig:basic_mean_ci} shows the mean and \acp{CI} of each test, using a \Sexpr{alpha*100}\% confidence level. Due to a lack of normality in the experimental results, these numbers are calculated via bootstrapping with \Sexpr{replicates} replicates.
 
 \begin{figure}
-\begin{minipage}[b]{0.5\linewidth}
+\caption{Basic Test Data}
+\begin{subfigure}[b]{0.5\linewidth}
 \centering
-\caption{Basic Tests: Raw Data}
+\caption{Raw Data}
 \label{fig:basic_raw_data}
 <<basic_raw_data, echo=FALSE>>=
 # Graph and generate stats on basic tests with test num vs loss rate 
+ylim=c(0, max(basic[,'valid.loss.rate'], na.rm=TRUE))
+
 plot(basic[,'test'], basic[,'valid.loss.rate'],
-	xlab="Test Number", ylab="Valid Packet Loss Rate, Proportion")
+	xlab="Test Number", xaxt='n',
+	ylab="Valid Packet Loss Rate, Percentage", ylim=ylim)
+axis(1, at=names(basic.boot), labels=names(basic.boot))
 @
-\end{minipage}
+\end{subfigure}
 \hspace{0.5cm}
-\begin{minipage}[b]{0.5\linewidth}
+\begin{subfigure}[b]{0.5\linewidth}
 \centering
-\caption{Basic Tests: Mean and \ac{CI}}
+\caption{Mean and \ac{CI}}
 \label{fig:basic_mean_ci}
 <<basic_mean_ci, echo=FALSE, warning=FALSE>>=
-# TBD, 3 short on some tests
-plotmeans(basic[,'valid.loss.rate']~basic[,'test'], p=alpha,
-		minbar=0, maxbar=1, connect=FALSE, mean.lab=TRUE,
-		xlab="Test Number", ylab="Valid Packet Loss Rate, Proportion")
+plot.new()
+plot.window(xlim=c(0, length(basic.boot)-1), ylim=ylim)
+title(main="", xlab="Test Number", ylab="Valid Packet Loss Rate, Percentage")
+axis(1, at=names(basic.boot), labels=names(basic.boot))
+axis(2)
+box()
+
+points(0:(length(basic.boot)-1), basic.boot.stats)
+plotCI(0:(length(basic.boot)-1), basic.boot.stats,
+	ui=sapply(basic.boot.ci[2,], function(x) min(x, 1)),
+	li=sapply(basic.boot.ci[1,], function(x) max(x, 0)),
+	add=TRUE, scol='blue')
+
+text(0:(length(basic.boot)-1) + .5, basic.boot.stats,
+	labels=sapply(basic.boot.stats, function(x) round(x, digits=4)))
 @
-\end{minipage}
+\end{subfigure}
 \end{figure}
 
 <<basic_calcs, echo=FALSE>>=
-basic_results = by(basic['valid.loss.rate'], basic['test'], function(x) t.test(x, conf.level=alpha))
-basic_overall = t.test(basic['valid.loss.rate'], conf.level=alpha)
-ci = basic_results['4']$conf.int * 100
-ci_overall = basic_overall$conf.int * 100
-
-# Split by hop rate and check if there is any different between the two
-basic_hr = split(basic, basic['hop.rate'])
-basic_hr_t = t.test(basic_hr$'50'['valid.loss.rate'], basic_hr$'500'['valid.loss.rate'], conf.level=alpha)
-ci_hr = basic_hr_t$conf.int * 100
 @
-\par These figures reveal a low packet loss rate across all test scenarios. At worst, tests 4 and 8---both tests with full \ac{TCP} and \ac{UDP} traffic between all possible hosts---lose between \Sexpr{ci[1]} and \Sexpr{ci[2]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, losses averaged \Sexpr{basic_overall$estimate*100}\%, with a \ac{CI} of $(\Sexpr{I(ci_overall)})$, again with \Sexpr{alpha*100}\% confidence.
+\par These figures reveal a low packet loss rate across all test scenarios. At worst, test 3---\ac{TCP} only with traffic to the external host---lost between \Sexpr{basic.boot.ci[1,4]}\% and \Sexpr{basic.boot.ci[2,4]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, valid packet loss averaged \Sexpr{basic.boot.overall.stat}\%, with a \ac{CI} of $(\Sexpr{I(basic.boot.overall.ci)})$, again with \Sexpr{alpha*100}\% confidence. These results confirm Chapter \ref{chp:methodology}'s hypothesis that \ac{ARG} causes packet loss less than \Sexpr{reasonable}\%.
 
-\par A two-sample t-test between the two hop rates used in the basic tests gives a p-value of \Sexpr{basic_hr_t$p.value}, convincing evidence that there is a statistically siginificant difference introduced by the different hop rates. However, the \ac{CI} for this difference is a mere $(\Sexpr{I(ci_hr)})$ at a \Sexpr{alpha*100}\% confidence level, minimal for the  This difference is explained in Section \ref{sec:results_hoprate_tests}. 
+\par A resampling of the data between the two hop rates used in the basic tests gives a p-value of \Sexpr{basic.hr.pvalue}, convincing evidence that there is a statistically siginificant difference introduced by the different hop rates. However, the results in Section \ref{sec:results_hoprate_tests} indicate this difference is due to the hop rate-latency interaction, which just barely exceeds the requirement for reliable communication (in this test, the hop interval is 50 ms with a latency of 20 ms).
+
+\tbd{ideally, tests would be rerun with a hop rate of 100 ms or something, to avoid that bad interaction}
+
+%However, the \ac{CI} for this difference is a mere $(\Sexpr{I(ci_hr)})$ at a \Sexpr{alpha*100}\% confidence level, fairly small for the purposes of network traffic. Additionally, the results in Section \ref{sec:results_hoprate_tests} indicate this difference is due to the hop rate-latency interaction, which just barely exceeds the requirement for reliable communication (in this test, the hop interval is 50 ms with a latency of 20 ms).
 
 \subsection{Invalid Loss Rate}
-\par Tests 5 through 8 include invalid traffic that \ac{ARG} should reject and hence should be ``lost.'' Figure \ref{fig:basic_invalid_loss} displays the proportion of invalid traffic rejected. Table \ref{tbl:basic_loss_reasons} displays each of the reasons packets were rejected during the runs.
+\par Tests 5 through 8 include invalid traffic that \ac{ARG} should reject and hence should be ``lost.'' Figure \ref{fig:basic_invalid_loss} displays the percentage of invalid traffic rejected. Table \ref{tbl:basic_loss_reasons} displays each of the reasons packets were rejected during the runs.
 
 \begin{figure}
 \caption{Invalid Traffic Loss Rate}
@@ -93,8 +168,8 @@ ci_hr = basic_hr_t$conf.int * 100
 # Show loss rate of invalid traffic for tests 5-8.
 invalid_runs = apply(basic, 1, function(x) x['test'] > 5)
 plotmeans(basic[invalid_runs, 'invalid.loss.rate']~basic[invalid_runs, 'test'], p=alpha,
-		minbar=0, maxbar=1, ylim=c(.999, 1),
-		xlab="Test Number", ylab="Mean Invalid Packet Loss Rate, Proportion")
+		minbar=0, maxbar=100, 
+		xlab="Test Number", ylab="Mean Invalid Packet Loss Rate, Percentage")
 @
 \end{figure}
 
@@ -148,7 +223,7 @@ create_rejection_table('basic_loss_reasons', basic[invalid_runs,])
 \par The maximum hop rate sequence of tests measures the change in packet loss rate at specific latencies as hop rate increases. For these tests, a fixed packet rate and Test 4 is always used. Section \ref{sec:exp_design} covers the specifics of these tests.
 
 \begin{figure}
-\caption{Loss Rate of Latency vs. Hop Rate \tbd{it would be nice to put some more hop rates in here... smooth out the curves}}
+\caption{Loss Rate of Latency vs. Hop Rate}
 \label{fig:hoprate_loss}
 \centering
 <<echo=FALSE>>=
@@ -176,8 +251,8 @@ for(lat in rownames(lat_hr_mean)) {
 
 # Plot. Each latency is separate, x is hop rate, y is loss
 plot.new()
-plot.window(xlim=c(1, ncol(lat_hr_mean)), ylim=c(0,max(lat_hr_mean, na.rm=TRUE)))
-title(main="Hop Interval vs. Loss Rate", xlab="Hop Interval (ms)", ylab="Valid Loss Rate, Proportion")
+plot.window(xlim=c(1, ncol(lat_hr_mean)), ylim=c(0, max(lat_hr_mean, na.rm=TRUE)))
+title(main="Hop Interval vs. Loss Rate", xlab="Hop Interval (ms)", ylab="Valid Loss Rate, Percentage")
 axis(1, at=1:ncol(lat_hr_mean), labels=colnames(lat_hr_mean))
 axis(2)
 box()
@@ -221,12 +296,12 @@ create_rejection_table('hoprate_loss_reasons', hoprate)
 \centering
 <<echo=FALSE>>=
 # Plot 
-max_y = .004
+max_y = .4
 
 packetrate = packetrate[order(packetrate[,'kbps']),]
 packetrate[,'mbps'] = packetrate[,'kbps']/1024
 plot(packetrate[,'mbps'], packetrate[,'valid.loss.rate'], ylim=c(0,max_y),
-	xlab="Throughput (Mbps)", ylab="Valid Packet Loss Rate, Proportion")
+	xlab="Throughput (Mbps)", ylab="Valid Packet Loss Rate, Percentage")
 lines(packetrate[,'mbps'], packetrate[,'valid.loss.rate'])
 @
 \end{minipage}
@@ -238,7 +313,7 @@ lines(packetrate[,'mbps'], packetrate[,'valid.loss.rate'])
 <<echo=FALSE>>=
 packetrate = packetrate[order(packetrate[,'pps']),]
 plot(packetrate[,'pps'], packetrate[,'valid.loss.rate'], ylim=c(0,max_y),
-	xlab="Packet Rate (pps)", ylab="Valid Packet Loss Rate, Proportion")
+	xlab="Packet Rate (pps)", ylab="Valid Packet Loss Rate, Percentage")
 lines(packetrate[,'pps'], packetrate[,'valid.loss.rate'])
 @
 \end{minipage}
@@ -247,18 +322,18 @@ lines(packetrate[,'pps'], packetrate[,'valid.loss.rate'])
 <<pr_calcs, echo=FALSE>>=
 basic_results = by(basic['valid.loss.rate'], basic['test'], function(x) t.test(x, conf.level=alpha))
 basic_overall = t.test(basic['valid.loss.rate'], conf.level=alpha)
-ci = basic_results['4']$conf.int * 100
-ci_overall = basic_overall$conf.int * 100
+ci = basic_results['4']$conf.int
+ci_overall = basic_overall$conf.int
 
 # Split by hop rate and check if there is any different between the two
 basic_hr = split(basic, basic['hop.rate'])
 basic_hr_t = t.test(basic_hr$'50'['valid.loss.rate'], basic_hr$'500'['valid.loss.rate'], conf.level=alpha)
-ci_hr = basic_hr_t$conf.int * 100
+ci_hr = basic_hr_t$conf.int
 @
 
 \par Figure \ref{fig:pr_bps_loss} depicts the results from this test when looking at bit-wise throughput, while Figure \ref{fig:pr_pps_loss} compares the packet rate. \tbd{cluster, run anova to determine if there's a difference in groups?} Visually, both plots reveals little variation directly attributable to packet rate. \tbd{Clustering the data and performing an \ac{ANOVA} reveales...}
 
-\par Unfortunately, many of the network cards in the test equipment are limited to 10 Mbps, making it difficult to test higher speeds on the current network. Regardless, the results of these tests are limited to just the implementation of \ac{ARG} and imply only a minimally possible throughput. Despite these limitations, \ac{ARG} performs well with reasonably rapid traffic, giving no reason to believe it is not capable of higher rates.
+\par The results of these tests are limited to just the implementation of \ac{ARG} and imply only a minimally possible throughput. Despite these limitations, \ac{ARG} performs well with reasonably rapid traffic, giving no reason to believe it is not capable of higher rates.
 
 \section{Fuzzing Test}
 \label{sec:results_fuzzer_tests}
