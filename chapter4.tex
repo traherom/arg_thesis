@@ -20,7 +20,7 @@
 
 %\par The working hypothesis for this research is, as speculated by Sandia, a \ac{DYNAT} system allows for quick identification of unexpected (and potentially malicious) packets entering a network. There are few identifiers within the scope of \ac{DYNAT} by which outgoing packets could be filtered. Given that, no filtering is done for outbound packets and hence no change in behavior is observed when compared to the control network. 
 
-\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop rate appropriate for the network latency. In addition, this thesis hypothesizes that the max hop rate sustainable with reasonable loss is twice the network latency, where reasonable loss is defined as less than 2\% \tbd{2\% figure from MIT wifi? Trying to find source... it's on an article about TCP-NC, but not in the actual paper.}. The other two questions under test are informational in nature as the results apply only to the specific implementation under test, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 10 \ac{Mbps} of traffic. \tbd{need why for each hypothesis?}
+\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop rate appropriate for the network latency. In addition, this thesis hypothesizes that packet loss rates become reasonable when the hop rate matches or exceeds the network latency, where reasonable loss is defined as less than 2\% \tbd{2\% figure from MIT wifi? Trying to find source... it's on an article about TCP-NC, but not in the actual paper.}. The other two questions under test are informational in nature as the results apply only to the specific implementation under test, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 10 \ac{Mbps} of traffic. \tbd{need why for each hypothesis?}
 
 \subsection{Approach}
 \label{sec:approach}
@@ -47,29 +47,28 @@
 
 \par The potential output of the Director is shown below, broken into separate sections based on incoming or outgoing packets. Other services do not directly offer outcomes relevant to this research.
 
-\tbd{order/mark as success or not}
 \begin{itemize}
 \item Director - Incoming
 	\begin{itemize}
+	\item Rewritten and forwarded - Packet is from non-\ac{ARG} network and is rewritten via \ac{NAT} table before forwarding.
+	\item Unwrapped and forwarded - Packet is from \ac{ARG} network and passed the above tests. Contents are extracted and forwarded internally.
+
 	\item Incorrect source \ac{IP} - Packet is coming from an \ac{ARG} network but does not have the what the local gateway believes is the current source IP for the other gateway.
 	\item Incorrect destination \ac{IP} - Packet is coming from an \ac{ARG} network but does not have the current local gateway \ac{IP} as the destination.
 	\item Incorrect message size - The message length does not match the message type.
 	\item Incorrect sequence number - The message's sequence number was not monotonically increasing. 
 	\item Unable to verify signature/\ac{HMAC} - Packet signature invalid/nonexistent (if coming from an \ac{ARG} network).
-	\item Unwrapped and forwarded - Packet is from \ac{ARG} network and passed the above tests. Contents are extracted and forwarded internally.
-
 	\item No \ac{NAT} bucket/entry - Packet is coming from a non-\ac{ARG} network but does not have a valid entry in the \ac{NAT} table.
-	\item Rewritten and forwarded - Packet is from non-\ac{ARG} network and is rewritten via \ac{NAT} table before forwarding.
 
 	\item Misc - Some operating system levels may occur, resulting in rare errors in sending or receiving packets.
 	\end{itemize}
 
 \item Director - Outgoing
 	\begin{itemize}
+	\item Rewritten and forwarded - Packet is destined for non-\ac{ARG} network. An entry is made/retrieved from the \ac{NAT} table and used to rewrite packet.
+
 	\item Gateway not connected - Packet was intended for an ARG network the gateway is aware of but not yet connected to.
 	\item Wrapped and forwarded - Packet is destined for an \ac{ARG} network. Wrapped and placed on the external network.
-
-	\item Rewritten and forwarded - Packet is destined for non-\ac{ARG} network. An entry is made/retrieved from the \ac{NAT} table and used to rewrite packet.
 
 	\item Misc - Some operating system levels may occur, resulting in rare errors in sending or receiving packets.
 	\end{itemize}
@@ -105,7 +104,7 @@
 \label{sec:parameters}
 \par As a network application, \ac{ARG} is affected by both the machine it runs on and the network it commicates over. \ac{ARG}'s local performance is most affected by processor and memory speeds, with encryption potentially consuming a fair amount of processor time and memory speeds impacting virtually all aspects of operation.
 
-\par The primary physical network parameter that affects \ac{ARG} is latency. To ensure that two \ac{ARG} gateways are able to communicate reliably, packets sent from one gateway to the other must arrive before the \acp{IP} used in the send are no longer current. If hops occur too frequently then a high one-way latency will cause sent packets to frequently arrive after the receiving gateway has hopped to a different \ac{IP}. \tbd{Would this be an appropriate place to discuss impact of test setup (ethernet vs internet) on latency? No. Do this is analysis.}
+\par The primary physical network parameter that affects \ac{ARG} is latency. To ensure that two \ac{ARG} gateways are able to communicate reliably, packets sent from one gateway to the other must arrive before the \acp{IP} used in the send are no longer current. If hops occur too frequently then a high one-way latency will cause sent packets to frequently arrive after the receiving gateway has hopped to a different \ac{IP}. 
 
 \par The primary configuration setting for \ac{ARG} is the hop rate. \ac{ARG} allows the time between hops to be customized from several times a second to minutes apart with millisecond precision. Each gateway may be configured to hop at different rates, but for the sake of this thesis the hop rates are always identical in a given run.
 
@@ -176,48 +175,48 @@
 \centering
 \begin{subfigure}[b]{0.3\linewidth}
 	\centering
-	\caption{Test 0}
 	\includegraphics[width=1.0\linewidth]{test_traffic_0}
+	\caption{Test 0}
 \end{subfigure}
 \begin{subfigure}[b]{0.3\linewidth}
 	\centering
-	\caption{Test 1}
 	\includegraphics[width=1.0\linewidth]{test_traffic_1}
+	\caption{Test 1}
 \end{subfigure}
 \begin{subfigure}[b]{0.3\linewidth}
 	\centering
-	\caption{Test 2}
 	\includegraphics[width=1.0\linewidth]{test_traffic_2}
+	\caption{Test 2}
 \end{subfigure}
 \begin{subfigure}[b]{0.3\linewidth}
 	\centering
-	\caption{Test 3}
 	\includegraphics[width=1.0\linewidth]{test_traffic_3}
+	\caption{Test 3}
 \end{subfigure}
 \begin{subfigure}[b]{0.3\linewidth}
 	\centering
-	\caption{Test 4}
 	\includegraphics[width=1.0\linewidth]{test_traffic_4}
+	\caption{Test 4}
 \end{subfigure}
 \begin{subfigure}[b]{0.3\linewidth}
 	\centering
-	\caption{Test 5}
 	\includegraphics[width=1.0\linewidth]{test_traffic_5}
+	\caption{Test 5}
 \end{subfigure}
 \begin{subfigure}[b]{0.3\linewidth}
 	\centering
-	\caption{Test 6}
 	\includegraphics[width=1.0\linewidth]{test_traffic_6}
+	\caption{Test 6}
 \end{subfigure}
 \begin{subfigure}[b]{0.3\linewidth}
 	\centering
-	\caption{Test 7}
 	\includegraphics[width=1.0\linewidth]{test_traffic_7}
+	\caption{Test 7}
 \end{subfigure}
 \begin{subfigure}[b]{0.3\linewidth}
 	\centering
-	\caption{Test 8}
 	\includegraphics[width=1.0\linewidth]{test_traffic_8}
+	\caption{Test 8}
 \end{subfigure}
 \end{figure}
 
