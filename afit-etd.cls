@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
-\ProvidesClass{afit-etd}[2012/05/08 version 1.3 Air Force Institute of
+\ProvidesClass{afit-etd}[2012/05/31 version 1.5 Air Force Institute of
 Technology Electronic Thesis and Dissertation Class]
 
 % This is a full rewrite of the AFIT class file to clean up the code and 
@@ -12,14 +12,19 @@ Technology Electronic Thesis and Dissertation Class]
 % According to the documentation, the previous templates were maintained by 
 % Mark Roth and others, Joel Young, and Maj Todd Hale.
 %
-% Send bug reports to Michael.Stepaniak@us.af.mil
+% Send bug reports to the author at: Michael.Stepaniak@us.af.mil
 %
 % Changes: v1.1: fully incorporated the SF298 and the acronym package
 %                brought into compliance with the 2011 AFIT Style Guide
-%          v1.2: chapter numbers changed roman numerals
+%          v1.2: chapter numbers changed to roman numerals
 %                chapter title fixed for use with natbib and a single appendix
 %                added space after chapters in TOC
-%          v1.3: removed SF298 from the report document type
+%          v1.3: removed SF298 generation from the report document type
+%                requires totpages.sty (needed to calculate SF298 page count)
+%                changes cover page to page number 0
+%          v1.4: added \boxtowidth to support headers on List of Symbols, etc
+%                added provision to shrink abstract font size on SF298
+%          v1.5: fixed the code for the SF298 responsible person block
 
 
 % define some macros that allow the class to pass options to the underlying
@@ -52,6 +57,7 @@ Technology Electronic Thesis and Dissertation Class]
 
 \RequirePackage {url}       % intelligent line breaks for URLs and DOIs
 \RequirePackage {graphicx}  % standard package for including graphics
+\RequirePackage {totpages}  % required to calculate page count on SF298
 \RequirePackage {refcount}  % used to extract the page numbers from TotPages
 \RequirePackage {ifpdf}     % provides for testing for pdfLaTeX
 \RequirePackage[noconfig,floatlongboxes]{sf298} % produces the SF 298 page
@@ -151,14 +157,12 @@ Technology Electronic Thesis and Dissertation Class]
   \PerformingOrg{Air Force Institute of Technology\\Graduate School of Engineering and Management (AFIT/EN)\\2950 Hobson Way\\WPAFB, OH 45433-7765}
   \POReportNumber{\afit@designator} 
   \DistributionStatement{\afit@distribution}
-  \SupplementaryNotes{This work is declared a work of the U.S. Government and is not subject to copyright protection in the United States. \sf@AddlSupplementaryNotes}
-  \Abstract{\sf@abstract}
+  \SupplementaryNotes{This work is declared a work of the U.S. Government and
+    is not subject to copyright protection in the United
+    States. \sf@AddlSupplementaryNotes}
+  \newcommand\AbstractSize\relax
+  \Abstract{\AbstractSize\sf@abstract}
   \NumberPages{\getrefnumber{TotPages}}
-  \newcommand*\afit@advisor{\@empty}
-  \@for\@comem:=\afit@committee\do{%
-    \ifx\afit@advisor\@empty\renewcommand\afit@advisor{\@comem}\fi
-  }%
-  \ResponsiblePerson {\afit@advisor (\afit@deptsymbol)}
 
   \afit@vita
   \if@isAFITreport\else\MakeRptDocPage\fi
@@ -234,7 +238,6 @@ Technology Electronic Thesis and Dissertation Class]
 \newif\if@isAFITreport
 
 \newcommand*\department[1]  {\newcommand*\afit@department{#1}}
-\newcommand*\deptsymbol[1]  {\newcommand*\afit@deptsymbol{#1}}
 \newcommand*\school[1]      {\newcommand*\afit@school{#1}}
 
 \newcommand*\dean[1]          {\newcommand*\afit@dean{#1}}
@@ -386,6 +389,7 @@ Technology Electronic Thesis and Dissertation Class]
 }
   
 \newcommand\afit@cover{%
+  \setcounter{page}{0}%
   \thispagestyle{empty}%
   \begingroup
   \singlespace
@@ -438,7 +442,7 @@ Technology Electronic Thesis and Dissertation Class]
       {\singlespace\afit@distribution}%
     \end{center}%
   \endgroup
-  \newpage\setcounter{page}{1}\thispagestyle{empty}%
+  \newpage\thispagestyle{empty}%
 }
 
 \newcommand\afit@disclaimer{ \afit@centeredpage{The views expressed in
@@ -466,7 +470,7 @@ Technology Electronic Thesis and Dissertation Class]
     Presented to the Faculty\par
     \ifx\afit@doctype\afit@dissertation\else\afit@department\par\fi
     \afit@school\par
-    Air Force Insitute of Technology\par
+    Air Force Institute of Technology\par
     Air University\par
     Air Education and Training Command\par
     in Partial Fulfillment of the Requirements for the\par
@@ -627,11 +631,13 @@ Technology Electronic Thesis and Dissertation Class]
     \@makelist
   \fi
 }
-  
-\newcommand\addlistof[3]{
+
+\newcommand\boxtowidth[2]{\settowidth\@tempdima{#1}\makebox[\@tempdima][l]{#2}}
+
+\newcommand\addlistof[3]{%
   \refstepcounter{listcnt}%
   \expandafter\gdef\csname @listof\thelistcnt\endcsname{%
-    \afit@listof{List of #1}{#2}{}{#3}%
+    \afit@listof{List of #1}{#2}{\relax}{#3}%
   }%
 }
 

@@ -105,7 +105,7 @@
 }
 
 \department {Department of Electrical and Computer Engineering}
-\deptsymbol {ENG}
+%\deptsymbol {ENG}
 
 \school     {Graduate School of Engineering and Management}
 \dean       {M. U. Thomas} % only used for PhD dissertations
@@ -173,6 +173,18 @@
 %% an optional width in square brackets, as in  "\listofsymbols[.3in]".  
 %% Both of these lists will be listed in the order that they appear in the text.
 
+\newenvironment{changemargin}[1]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\topmargin}{#1}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#1}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}%
+}%
+\item[]}{\end{list}}
+
 \begin{document}
 
 % The acronym package can be used to add a list of acronyms.  Because
@@ -182,11 +194,9 @@
 \listofacronyms{
 	\input{acronyms.tex}
 }
-%\listofabbreviations[5em]
 
 % The following line is required to generate the prefatory pages
 \makePrefatoryPages 
-\tbd{when you're crazy bored, fix acronyms/abbrevations to produce the listofacronyms style page}
 
 \acresetall
 
