@@ -15,46 +15,10 @@
 
 \begin{landscape}
 \begin{table}
-\caption{\ac{IP} Packet Structure \tbd{margins on this page...}}
+\caption{\ac{IP} Packet Structure}
 \label{tbl:packet_structure}
 \centering
-\begin{tabular}{|c||c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c|}
-\hline
-	\multicolumn{33}{|c|}{\textbf{Packet Structure (32 bits wide)}}\\
-\hline
-	& 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 & 26 & 27 & 28 & 29 & 30 & 31\\
-\hline
-\hline
-	\multirow{6}{*}{\rotatebox{90}{\textbf{IPv4}}}
-		& \multicolumn{4}{|c|}{Version} & \multicolumn{4}{|c|}{Header Len} & \multicolumn{8}{|c|}{TOS} & \multicolumn{16}{|c|}{Len}\\
-		\cline{2-33}
-		& \multicolumn{16}{|c|}{ID} & \multicolumn{3}{|c|}{Frag Flags} & \multicolumn{13}{|c|}{Fragment Offset}\\
-		\cline{2-33}
-		& \multicolumn{8}{|c|}{TTL} & \multicolumn{8}{|c|}{Protocol} & \multicolumn{16}{|c|}{Header Checksum}\\
-		\cline{2-33}
-		& \multicolumn{32}{|c|}{Source IP}\\
-		\cline{2-33}
-		& \multicolumn{32}{|c|}{Destination IP}\\
-		\cline{2-33}
-		& \multicolumn{32}{|c|}{Options (optional, specified by header len)}\\
-\hline
-\hline
-	\multirow{10}{*}{\rotatebox{90}{\textbf{IPv6}}}
-		& \multicolumn{4}{|c|}{Version} & \multicolumn{4}{|c|}{Priority} & \multicolumn{24}{|c|}{Flow label}\\
-		\cline{2-33}
-		& \multicolumn{16}{|c|}{Payload len} & \multicolumn{8}{|c|}{Next header} & \multicolumn{8}{|c|}{Hop limit}\\
-		\cline{2-33}
-		& \multicolumn{32}{|c|}{\multirow{4}{*}{Source address}}\\
-		& \multicolumn{32}{|c|}{}\\
-		& \multicolumn{32}{|c|}{}\\
-		& \multicolumn{32}{|c|}{}\\
-		\cline{2-33}
-		& \multicolumn{32}{|c|}{\multirow{4}{*}{Destination address}}\\
-		& \multicolumn{32}{|c|}{}\\
-		& \multicolumn{32}{|c|}{}\\
-		& \multicolumn{32}{|c|}{}\\
-\hline
-\end{tabular}
+\includegraphics[clip,trim=.3in 5in 0 0]{packet_structure}
 \end{table}
 \end{landscape}
 
@@ -113,7 +77,7 @@
 
 \par In the future, when the router receives an outgoing packet (from the interal host to the exteral), it begins by consulting its table to find a match based on the first four values in the table. Assuming it finds a corresponding entry, the router changes the source IP of the packet to the exteral IP assigned to it by the \ac{ISP} and the source port to the external port given in the table. When the router receives a packet from the Internet, it checks for a match in the table based on the remote IP, remote port, and external port. If it finds one, it alters the packet's destination information to the internal IP and port.
 
-\par This system serves two purposes. First, as the number of systems on the Internet has increased, \ac{IPv4} addresses have become a precious resource, with their 32-bit length limiting the number of possible addresses to around four billion. \ac{NAT} allows an organization to only own a single address yet serve many systems behind it. Second, \ac{NAT} inherently acts a simple stateful firewall. In order for an outside system to send packets to an internal host, the internal host must have initiated the connection and allowed the router to create the table entry.
+\par This system serves two purposes. First, as the number of systems on the Internet has increased, \ac{IPv4} addresses have become a precious resource, with their 32-bit length limiting the number of possible addresses to around four billion. \ac{NAT} allows an organization to only own a single address yet serve many systems behind it. Second, \ac{NAT} inherently acts a simple stateful firewall \cite{DynAddrMalProp}. In order for an outside system to send packets to an internal host, the internal host must have initiated the connection and allowed the router to create the table entry.
 
 \subsection{Ethernet and \acf{ARP}}
 \label{sec:eth_routing}
@@ -132,16 +96,18 @@
 
 \section{IP Hopping in Detail}
 \label{sec:hopping}
-\par Address hopping is a simple concept at a high level: take the basic identifiers of a network and mutate them in a way that only authorized systems can follow. Doing so makes it difficult for an adversary to correlate sniffed traffic with individual machines and even more difficult to probe into the network to enumerate hosts. In trying to actually implement such a system, however, several issues arise. 
+\par Address hopping is a simple concept at a high level: take the basic identifiers of a network and mutate them in a way that only authorized systems can follow. Doing so makes it difficult for an adversary to correlate sniffed traffic with individual machines and even more difficult to probe into the network to enumerate hosts.
 
-\par The network illustrated in Figure \ref{fig:exnetwork} is used to aid the following discussion. There are two main networks \textit{A} and \textit{B} that are assigned the displayed IP ranges, are connected by the Internet, and have an interest in communicating freely with one-another. Each of these has a few friendly end nodes (\textit{A1}, \textit{A2}, etc) behind a main router (\textit{AR} and \textit{BR}). Additionally, network \textit{B} has a potentially rogue client inside it named \textit{M1}. Outside of those two networks is the friendly \textit{C2} node, who has an interest in at least occasionally communicating with nodes inside \textit{A}/\textit{B}, and malicious \textit{M2}, who wants access to said networks. The details of the routes between them and \textit{A} and \textit{B} are inconsequential.
+\par \tbd{cite Defeating Adversary thesis, calls it "greatest potential"}
+
+\par In trying to actually implement such a system, however, several issues arise.  The network illustrated in Figure \ref{fig:exnetwork} is used to aid the following discussion. There are two main networks \textit{A} and \textit{B} that are assigned the displayed IP ranges, are connected by the Internet, and have an interest in communicating freely with one-another. Each of these has a few friendly end nodes (\textit{A1}, \textit{A2}, etc) behind a main router (\textit{AR} and \textit{BR}). Additionally, network \textit{B} has a potentially rogue client inside it named \textit{M1}. Outside of those two networks is the friendly \textit{C2} node, who has an interest in at least occasionally communicating with nodes inside \textit{A}/\textit{B}, and malicious \textit{M2}, who wants access to said networks. The details of the routes between them and \textit{A} and \textit{B} are inconsequential.
 
 \par Note that for the sake of this discussion non-routable \ac{IPv4} addresses are largely used. This is done merely for convenience and readability, the discussions apply to \ac{IPv6} as well unless otherwise noted.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.75\textwidth]{exnetwork}
-	\caption{Example network layout \tbd{include IP addresses}}
+	\caption{Example network layout}
 	\label{fig:exnetwork}
 \end{figure}
 
@@ -213,7 +179,7 @@ Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb
 
 \subsection{Authentication}
 \label{sec:authentication}
-\par Authenticating that a given sequence of bytes actually comes from whom they say they do can be done through either a \ac{HMAC} \cite{rfc2104} or a digital signature \cite{rfc3447}. These alorithms are based an symmetric and asymmetric encryption, respectively, and therefore share the same strengths and weaknesses. Again, the exact details of the math and operation behind these algorithms is irrelevant for the purposes of this thesis. 
+\par Authenticating that a given sequence of bytes actually comes from whom they say they do can be done through either a \ac{HMAC} \cite{rfc2104} or a digital signature \cite{rfc3447}. These alorithms are based an symmetric and asymmetric encryption, respectively, and therefore share the same strengths and weaknesses. Both algorithms are widely used today in network traffic protections schemes like \ac{IPSec} and \ac{SSL} \tbd{cite}. Again, the exact details of the math and operation behind these algorithms is irrelevant for the purposes of this thesis. 
 
 \par Both algorithms essentially work by encrypting a hash of the data being sent and verifying that hash on the receiving side. In the case of \ac{HMAC}, both ends have the same shared private key, so they each do the \ac{HMAC} process independently and the receiver ensures their calculated HMAC matches the one sent with the message. If it does, the receiver knows the message is unchanged and comes from someone with the correct shared key.
 
