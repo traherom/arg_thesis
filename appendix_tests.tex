@@ -1,12 +1,19 @@
 \chapter{\ac{ARG} Testing}
 \label{chp:testseq}
-\par This appendix covers the precise setup of the test environment and the steps used to run a test. 
+\par This appendix covers the steps used to run a test. The events shown below occur, in order, for each test. The script that executes them includes additional safety measures, such as ensuring none of the components are already running (and killing them if they are), but these are not included.
 
+\begin{comment}
 \section{Network Setup}
-\par 
+\par As Section \ref{sec:evaluation_technique} discusses, tests are run on a seven-node network, laid out as illustrated in Figure \ref{fig:argnetwork_app}.
+\begin{figure}
+	\centering
+	\caption{ARG Network Layout Overview}
+	\label{fig:argnetwork_app}
+	\includegraphics[width=0.75\textwidth]{thesis_network}
+\end{figure}
 
 \section{Test Sequence}
-\par For each test, the events shown below occur, in order. The script that executes them includes additional safety measures, such as ensuring none of the components are already running (and killing them if they are), but these are not included.
+\end{comment}
 
 \begin{enumerate}
 \item Set time on all hosts to be the as similar as possible (used for post-processing only).
