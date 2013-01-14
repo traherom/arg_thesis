@@ -11,8 +11,8 @@
 
 \begin{enumerate}
 \item Does \ac{ARG} classify traffic correctly? What percentage of false positives (valid packets blocked) and false negatives (invalid traffic allowed through) does it introduce?
-\item What is the max packet rate \ac{ARG} can handle?
-\item What is the max hop rate---the frequency with which \ac{ARG} changes \acp{IP}---that is supportable? How does latency affect this?
+\item What is the max packet rate and throughput \ac{ARG} can handle?
+\item What is the max hop rate---the frequency with which \ac{ARG} changes \acp{IP}---that still allows for reliable communication? How does latency affect this?
 \item Is \ac{ARG} stable when presented with corrupt, malformed, or replayed packets?
 \end{enumerate}
 
@@ -225,8 +225,8 @@
 	\item Basic tests
 	\par This sequence of tests validates that \ac{ARG} classifies traffic correctly by running every traffic flow against \ac{ARG}. Latency is set to 20 milliseconds for all tests and traffic generators produce packets around every 0.3 seconds (actual traffic rate is higher due to responses and \ac{TCP} acknowledgement packets). To determine if hop rate has an large impact on certain types of traffic, a slow hop rate (500 ms) and one close to double the latency (50 ms).
 
-	\item Max packet rate
-	\par This sequence gives an indication of what packet rate \ac{ARG} is capable of handling. Packet rate goes through all levels shown in Table \ref{tbl:factors}. Hop rate changes between 500 ms and 50 ms to see if the additional \ac{IP} calculation load impacts the maximum rate. Test 4 is used in all runs to exercise all possible valid traffic flows. Latency is set to 20 ms.
+	\item Max Throughput
+	\par This sequence gives an indication of what throughput and packet rate \ac{ARG} is capable of handling. Packet rate goes through all levels shown in Table \ref{tbl:factors}, which leads to roughly corresponding increases in the throughput the gateways must handle. Hop rate changes between 500 ms and 50 ms to see if the additional \ac{IP} calculation load impacts the maximum rate. Test 4 is used in all runs to exercise all possible valid traffic flows. Latency is set to 20 ms.
 
 	\item Max hop rate
 	\par This sequence determines the maximum hopping rate at various latencies. Hop rate and latency go through the levels shown in Table \ref{tbl:factors} in a full factorial fashion (every latency-hop rate combination). Packet rate is fixed at 0.3 seconds and Test 4 is used throughout.

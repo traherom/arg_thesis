@@ -22,6 +22,9 @@
 \subsection{IPv6 support}
 \par \ac{IPv6} support is slowly becoming an absolute requirement for any network system. For a \ac{IP} hopping system, \ac{IPv6} offers the benefit of a greatly increased address space, allowing systems to hop in a much broader range of addresses. \ac{ARG} is entirely \ac{IPv4} in its operation and cannot transport \ac{IPv6} packets to external hosts or to other gateways.
 
+\subsection{Fragmentation Support}
+\par \tbd{tbd}
+
 \subsection{More extensive malicous testing}
 \par Due to time constraints, a full battery of robust malicious tests could not be performed against \ac{ARG}. As demonstrated by the basic fuzz testing, \ac{ARG} handles errors without dying, but may lose additional packets. The reasons behind this potential issue needs more exploration to determine the root cause and what should be done to fix it. More extensive work in both undirected (i.e., fuzz testing) and directed attacks is needed. For example, malicious hosts might attempt to falsly connect to a gateway or perform replay attacks in a more intelligent manner.  
 

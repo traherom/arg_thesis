@@ -1,0 +1,48 @@
+\documentclass{article}
+
+\usepackage[margin=.1in,landscape]{geometry}
+\usepackage{multirow}
+\usepackage{rotating}
+
+\begin{document}
+
+\begin{tabular}{|c||c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c|}
+\hline
+	\multicolumn{33}{|c|}{\textbf{Packet Structure (32 bits wide)}}\\
+\hline
+	& 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 & 20 & 21 & 22 & 23 & 24 & 25 & 26 & 27 & 28 & 29 & 30 & 31\\
+\hline
+\hline
+	\multirow{6}{*}{\rotatebox{90}{\textbf{IPv4}}}
+		& \multicolumn{4}{|c|}{Version} & \multicolumn{4}{|c|}{Header Len} & \multicolumn{8}{|c|}{TOS} & \multicolumn{16}{|c|}{Len}\\
+		\cline{2-33}
+		& \multicolumn{16}{|c|}{ID} & \multicolumn{3}{|c|}{Frag Flags} & \multicolumn{13}{|c|}{Fragment Offset}\\
+		\cline{2-33}
+		& \multicolumn{8}{|c|}{TTL} & \multicolumn{8}{|c|}{Protocol} & \multicolumn{16}{|c|}{Header Checksum}\\
+		\cline{2-33}
+		& \multicolumn{32}{|c|}{Source IP}\\
+		\cline{2-33}
+		& \multicolumn{32}{|c|}{Destination IP}\\
+		\cline{2-33}
+		& \multicolumn{32}{|c|}{Options (optional, specified by header len)}\\
+\hline
+\hline
+	\multirow{10}{*}{\rotatebox{90}{\textbf{IPv6}}}
+		& \multicolumn{4}{|c|}{Version} & \multicolumn{4}{|c|}{Priority} & \multicolumn{24}{|c|}{Flow label}\\
+		\cline{2-33}
+		& \multicolumn{16}{|c|}{Payload len} & \multicolumn{8}{|c|}{Next header} & \multicolumn{8}{|c|}{Hop limit}\\
+		\cline{2-33}
+		& \multicolumn{32}{|c|}{\multirow{4}{*}{Source address}}\\
+		& \multicolumn{32}{|c|}{}\\
+		& \multicolumn{32}{|c|}{}\\
+		& \multicolumn{32}{|c|}{}\\
+		\cline{2-33}
+		& \multicolumn{32}{|c|}{\multirow{4}{*}{Destination address}}\\
+		& \multicolumn{32}{|c|}{}\\
+		& \multicolumn{32}{|c|}{}\\
+		& \multicolumn{32}{|c|}{}\\
+\hline
+\end{tabular}
+
+\end{document}
+
