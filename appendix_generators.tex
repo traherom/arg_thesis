@@ -1,7 +1,7 @@
 \chapter{Traffic Generators}
 \label{chp:generators}
 
-\par This appendix covers the required environment for the two traffic generators and their usage. Section \ref{sec:gen_env} lists the required utilites to run the generators. Section \ref{sec:gen_usage} discusses usage of each generator and the available command line parameters.
+\par This appendix covers the required environment for the two traffic generators and their usage. Section \ref{sec:gen_env} lists the required utilities to run the generators. Section \ref{sec:gen_usage} discusses usage of each generator and the available command line parameters.
 
 \section{Environment}
 \label{sec:gen_env}
@@ -18,7 +18,7 @@
 
 \par In Ubuntu:
 \begin{lstlisting}[language=bash]
-sudo apt-get install python-libpcap python-scapy
+$ sudo apt-get install python-libpcap python-scapy
 \end{lstlisting}
 
 \section{Usage}
@@ -78,7 +78,7 @@ Parameter & Description & Possible Values & Default\\
 \end{table}
 
 \subsection{Malicious Traffic Generator}
-\par \texttt{malicious\_traffic.py} generates malicious ARG traffic by replaying \ac{ARG} protocol traffic with randomly choosen modifications. The possible modications are shown below. Each may be choosen with a 10\% probability.
+\par \texttt{malicious\_traffic.py} generates malicious ARG traffic by replaying \ac{ARG} protocol traffic with randomly chosen modifications. The possible modifications are shown below. Each may be chosen with a 10\% probability.
 {\singlespace
 \begin{itemize}
 \item Zero \ac{ARG} signature/\ac{HMAC}
@@ -91,11 +91,7 @@ Parameter & Description & Possible Values & Default\\
 \end{itemize}
 }
 
-\begin{lstlisting}
-usage: malicious_traffic.py [-o OUTPUT]
-\end{lstlisting}
-
-\par The \texttt{--output} option here is the same as \texttt{gen\_traffic.py}'s and is covered in Table \ref{tbl:gen_traffic_param}. This is the only option supported by the malicious traffic generator.
+\par The only option available for \texttt{malicious\_traffic.py} is \texttt{--output} option. This has the same effect as \texttt{gen\_traffic.py}'s and is covered in Table \ref{tbl:gen_traffic_param}.
 
 \subsubsection{Limitations}
 \par Due to the design of the test network, with a switch connecting the hosts, it is difficult for this tool to reliably sniff traffic (it does not attempt to \ac{ARP} spoof or otherwise redirect traffic flow). To compensate for this the malicious generators are run on the gateways themselves, allowing them to see all of the traffic passing the gateway. A more realistic solution would be to use a true hub (the test network's switch did not allow this configuration) or sniff on a spanning port and send via a separate port.
