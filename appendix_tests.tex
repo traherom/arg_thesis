@@ -18,7 +18,21 @@
 \begin{enumerate}
 \item Set time on all hosts to be the as similar as possible (used for post-processing only).
 \item Set artificial network latency on external interfaces of gates.
-\item Start \texttt{tcpdump} on each host. Gateways have two instances started, one for each interface. \tbd{tcpdump filters?}
+\item Start \texttt{tcpdump} on each host. Gateways have two instances started, one for each interface. The exact commands run, with filters, appear in Table \ref{tbl:test_tcpdump_calls}.
+\begin{table}
+\caption{Test run \texttt{tcpdump} calls}
+\label{tbl:test_tcpdump_calls}
+\centering
+\begin{tabular}{l|l}
+Host & Command\\
+\hline
+Gateway & \texttt{sudo tcpdump -i eth2 -w gateX-inner.pcap -n ip and not arp}\\
+	& \texttt{sudo tcpdump -i eth1 -w gateX-outer.pcap -n ip and not arp}\\
+\hline
+Prot/Ext & \texttt{sudo tcpdump -i eth1 -w clientX.pcap -n ip and not arp}
+\end{tabular}
+\end{table}
+
 \item Set \ac{ARP} cache size on gateways and external host to allow for 65536 entries. This is needed at high hop rates only because everything is on the same network segment.
 \item Push configuration files for \ac{ARG}. \texttt{ProtA1} and \texttt{ProtC1} each know about \texttt{ProtB1}, but not about each other. \texttt{ProtB1} knows about both.
 \item Start \ac{ARG} on the gateways. 
@@ -27,7 +41,7 @@
 \item Stop traffic generators.
 \item Stop \ac{ARG}.
 \item Stop traffic collectors (\texttt{tcpdump}).
-\item Retreive log and pcap files from every host into a directory.
+\item Retrieve log and pcap files from every host into a directory.
 \end{enumerate}
 
 \par After the logs are collected together, the run is processed by a separate script, \texttt{process\_run.py}. See Appendix \ref{chp:processor} for details on its use. 
