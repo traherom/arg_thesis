@@ -1,7 +1,7 @@
 \chapter{\ac{ARG} Building and Configuration}
 \label{chp:argconf}
 
-\par This appendix documents everthing needed to use \ac{ARG}. Section \ref{sec:arg_env} covers the build environment needed to build \ac{ARG} from source. Section \ref{sec:arg_cmd} documents calling \ac{ARG} and creating the necessary configuration files.
+\par This appendix documents everything needed to use \ac{ARG}. Section \ref{sec:arg_env} covers the build environment needed to build \ac{ARG} from source. Section \ref{sec:arg_cmd} documents calling \ac{ARG} and creating the necessary configuration files.
 
 \section{Building}
 \label{sec:arg_env}
@@ -24,14 +24,14 @@
 
 \par In Ubuntu:
 \begin{lstlisting}
-sudo apt-get install automake autoconf build-essential libtool libpcap-dev libpolarssl-dev
+$ sudo apt-get install automake autoconf build-essential libtool libpcap-dev libpolarssl-dev
 \end{lstlisting}
 
 \subsection{Compilation}
 \par From the \ac{ARG} source directory:
 \begin{lstlisting}[language=bash]
-./autogen.sh
-make
+$ ./autogen.sh
+$ make
 \end{lstlisting}
 
 \par This should produce two executables, \texttt{arg} and \texttt{gen\_gate\_config}.
@@ -40,8 +40,8 @@ make
 \label{sec:arg_cmd}
 \subsection{Command Line}
 \par \ac{ARG} must be run as root. Usage is straight forward:
-\begin{lstlisting}
-# ./arg <conf file>
+\begin{lstlisting}[numbers=none] 
+$ sudo ./arg <conf file>
 \end{lstlisting}
 
 \par A path to a configuration file is required. The path should point to the main configuration file, with supporting files in the same directory as the main one. See Section \ref{sec:arg_conf_files} for more details.
@@ -51,21 +51,19 @@ make
 \subsection{Configuration Files}
 \label{sec:arg_conf_files}
 \par \ac{ARG} requires at least three separate configuration files on start up, plus one for every gateway it should have startup knowledge about. The main configuration file may be called anything and contains four lines:
-\lstinputlisting[caption=main.conf]{../arg/conf/main-gateA.conf}
+\lstinputlisting[caption=main.conf]{confexample/main-gate.conf}
 
 \par In order, these are: gate name, internal network interface, external network interface, and hop rate. Hop rate \textit{must} be given in milliseconds.
 
 \par In the same directory as the main configuration file must be two files giving details on the local gateway called \texttt{<gatename>.pub} and \texttt{<gatename>.priv}. The private file gives the full private key of a gateway, while the public file contains the public key, the base \ac{IP} address of the gate, and the corresponding netmask. Examples of each are given in Listings \ref{lst:ex_pub} and \ref{lst:ex_priv}.
-\lstinputlisting[caption=gateA.pub, label=lst:ex_pub, breakatwhitespace=false]{../arg/conf/gateA.pub}
-\lstinputlisting[caption=gateA.priv, label=lst:ex_priv, breakatwhitespace=false]{../arg/conf/gateA.priv}
-\tbd{get these to wrap}
+\lstinputlisting[caption=gate.pub, numbers=none, label=lst:ex_pub, breakatwhitespace=false]{confexample/gate.pub}
+\lstinputlisting[caption=gate.priv, numbers=none, label=lst:ex_priv, breakatwhitespace=false]{confexample/gate.priv}
 
 \par These files can be produced quickly through the included \texttt{gen\_gate\_config} utility. This tool is built alongside \texttt{arg}, see Section \ref{sec:arg_env}. Usage is:
 
 \begin{lstlisting}
 $ ./gen_gate_config <name> <base ip> <mask>
 \end{lstlisting}
-%$ fix syntax highlighting
 
 \par This will produce a \texttt{<name>.pub} and \texttt{<name>.priv} file with the information given and a random public and private key.
 
