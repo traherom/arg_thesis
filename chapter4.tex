@@ -1,7 +1,7 @@
 \chapter{Methodology}
 \label{chp:methodology}
 
-\par This chapter discusses the methodology used to measure the effectiveness of \ac{ARG} at correctly classifying invalid and valid traffic, the maximum supportable hop rate at various network latencies, the maximum packet rate \ac{ARG} can handle, and the overall stability of the system under test. Section \ref{sec:problem_def} discusses the problem this research seeks to answer. Section \ref{sec:boundaries} defines the \ac{SUT} and Section \ref{sec:services} goes into detail on the possible outcomes of the \ac{CUT}. Section \ref{sec:workload} covers the workload presented to the \ac{SUT}, Section \ref{sec:metrics} covers the metrics collected, and Section \ref{sec:parameters} covers the configurable parameters of the \ac{SUT}. Section \ref{sec:factors} brings the previous sections together, giving a comprehesive list of the factors varied for each test. Section \ref{sec:exp_design} details the actual tests and the purpose of each.
+\par This chapter discusses the methodology used to measure the effectiveness of \ac{ARG} at correctly classifying invalid and valid traffic, the maximum supportable hop rate at various network latencies, the maximum packet rate \ac{ARG} can handle, and the overall stability of the system under test. Section \ref{sec:problem_def} discusses the problem this research seeks to answer. Section \ref{sec:boundaries} defines the \ac{SUT} and Section \ref{sec:services} goes into detail on the possible outcomes of the \ac{CUT}. Section \ref{sec:workload} covers the workload presented to the \ac{SUT}, Section \ref{sec:metrics} covers the metrics collected, and Section \ref{sec:parameters} covers the configurable parameters of the \ac{SUT}. Section \ref{sec:factors} brings the previous sections together, giving a comprehensive list of the factors varied for each test. Section \ref{sec:exp_design} details the actual tests and the purpose of each.
 
 \section{Problem Definition}
 \label{sec:problem_def}
@@ -102,7 +102,7 @@
 
 \section{System Parameters}
 \label{sec:parameters}
-\par As a network application, \ac{ARG} is affected by both the machine it runs on and the network it commicates over. \ac{ARG}'s local performance is most affected by processor and memory speeds, with encryption potentially consuming a fair amount of processor time and memory speeds impacting virtually all aspects of operation.
+\par As a network application, \ac{ARG} is affected by both the machine it runs on and the network it communicates over. \ac{ARG}'s local performance is most affected by processor and memory speeds, with encryption potentially consuming a fair amount of processor time and memory speeds impacting virtually all aspects of operation.
 
 \par The primary physical network parameter that affects \ac{ARG} is latency. To ensure that two \ac{ARG} gateways are able to communicate reliably, packets sent from one gateway to the other must arrive before the \acp{IP} used in the send are no longer current. If hops occur too frequently then a high one-way latency will cause sent packets to frequently arrive after the receiving gateway has hopped to a different \ac{IP}. 
 
@@ -235,7 +235,7 @@
 	\par This sequence is not tested rigorously for traffic flow success and failure, but ensures that \ac{ARG} remains stable despite malformed traffic. Test 8 is used, with the addition of fuzzers on each gateway that replay and/or alter traffic they see. Hop rate varies between 500 ms and 50 ms, latency is fixed at 20 ms, and packets are sent at 0.3 second intervals.
 \end{itemize}
 
-\par A 99\% confidence interval is used for all experiments. Experiments are each run for five minutes, sufficient time for the system to stablize (pilot studies show that \ac{ARG} fully connects in under 10 seconds on the test network). Wide variation is possible in the actual traffic seen in a single run, so 20 \tbd{make sure they all actually have 20. I suspect not at the moment} replications are used for each experiment.
+\par A 99\% confidence interval is used for all experiments. Experiments are each run for five minutes, sufficient time for the system to stabilize (pilot studies show that \ac{ARG} fully connects in under 10 seconds on the test network). Wide variation is possible in the actual traffic seen in a single run, so 20 \tbd{make sure they all actually have 20. I suspect not at the moment} replications are used for each experiment.
 
 \section{Summary}
 \label{sec:method_summary}

@@ -164,7 +164,7 @@ axis(1, at=names(basic.boot), labels=names(basic.boot))
 ylab = seq(0, max(ylim), .5)
 axis(2, at=ylab, labels=paste(ylab, '%', sep=''))
 @
-\caption{Raw Data}
+\caption{Valid packet loss, basic tests raw data}
 \label{fig:basic_raw_data}
 \end{figure}
 
@@ -191,13 +191,13 @@ plotCI(0:(length(basic.boot)-1), basic.boot.stats,
 #text(0:(length(basic.boot)-1) + .5, basic.boot.stats,
 #	labels=sapply(basic.boot.stats, function(x) round(x, digits=4)))
 @
-\caption{Mean and \ac{CI}}
+\caption{Loss rate, basic test means and \acp{CI}}
 \label{fig:basic_mean_ci}
 \end{figure}
 
 \par These figures reveal a low packet loss across all test scenarios. At worst, Test 3---TCP traffic between \ac{ARG} protected clients only---lost between \Sexpr{basic.boot.ci[1,4]}\% and \Sexpr{basic.boot.ci[2,4]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, valid packet loss averaged \Sexpr{basic.boot.overall.stat}\%, with a \ac{CI} of $(\Sexpr{I(basic.boot.overall.ci)})$, again with \Sexpr{alpha*100}\% confidence. These results confirm Chapter \ref{chp:methodology}'s hypothesis that \ac{ARG} causes packet loss less than \Sexpr{reasonable}\%, at least under normal conditions.
 
-\par Figure \ref{fig:basic_raw_data} displays two outliers on Test 3 and an occasional outlier in Test 5, 6, and 7. Examining the data reveals the dropped packets exceeded the maximum size of a packet \ac{ARG} can pass between gateways. As Chapter \ref{chp:implementation} covers, \ac{ARG} wraps packets between gateways in its own headers, increasing the size of the packet. Ethernet II has a default maximum transmission unit of 1500 bytes, so \ac{ARG} drops packets that pass this limit after being wrapped (\ac{ARG} is unable to fragment packets). In fact, the maximum packet size issue is the most common reason for packet rejection in the basic set of tests (in tests with only valid traffic), as shown in Table \ref{tbl:basic_loss_reasons_valid}. While test traffic is controlled for size, the test traffic generators fail to account for \ac{TCP} options, which can increase the size of the packet beyond the limit.
+\par Figure \ref{fig:basic_raw_data} displays two outliers on Test 3 and an occasional outlier in Test 5, 6, and 7. Examining the data reveals the dropped packets exceeded the maximum size of a packet \ac{ARG} can pass between gateways. As Chapter \ref{chp:implementation} covers, \ac{ARG} wraps packets between gateways in its own headers, increasing the size of the packet. Ethernet II has a default maximum transmission unit of 1500 bytes, so \ac{ARG} drops packets that pass this limit after being wrapped (\ac{ARG} is unable to fragment packets or inform the sender that fragmentation is needed). In fact, the maximum packet size issue is the most common reason for packet rejection in the basic set of tests (in tests with only valid traffic), as shown in Table \ref{tbl:basic_loss_reasons_valid}. While test traffic is controlled for size, the test traffic generators fail to account for \ac{TCP} options, which can increase the size of the packet beyond the limit.
 
 <<echo=FALSE, results='asis'>>=
 valid_runs = apply(basic, 1, function(x) x['test'] < 5)
@@ -574,7 +574,7 @@ create_rejection_table('fuzzer_loss_reasons', 'Fuzzer Packet Reject Reasons', fu
 \par When \ac{ARG} operates on a network with a one-way latency less than 15 milliseconds, hops may occur every 50 to 75 milliseconds and still maintain a viable communication channel (losses are less than \Sexpr{reasonable}\%). Beyond this point, packets begin flowing smoothly when the time between hops exceeds four times the latency. However, there is reason to believe hops could be faster in a real-world deployment, due to test network factors. See Section \ref{sec:results_hoprate_tests} for details on this. This is a sigificant contribution because previous research focuses on address changes on the order of minutes or hours, rather than multiple times a second. \tbd{cite}
 
 \item Is \ac{ARG} stable when presented with corrupt, malformed, or replayed packets?
-\par \ac{ARG} is stable in the face of bad traffic. Long-running fuzz tests do not cause \ac{ARG} to crash, nor do they permanently break traffic flow. However, \tbd{need data}
+\par \ac{ARG} is stable in the face of bad traffic. Long-running fuzz tests do not cause \ac{ARG} to crash, nor do they permanently break traffic flow. However, malformed traffic does appear to have an impact on valid packet loss, based on a visual inspection. The cause of this needs exploration to determine the correct fix.
 \end{enumerate}
 
 \section{Summary}

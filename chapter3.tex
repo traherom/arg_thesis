@@ -5,7 +5,7 @@
 
 \section{Requirements}
 \label{sec:arg_requirements}
-\par \ac{ARG} focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization: locations throughout the world, high availablity and reliability requirements, and security over any network through which its data travels. 
+\par \ac{ARG} focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization: locations throughout the world, high availability and reliability requirements, and security over any network through which its data travels. 
 
 \par ARG worries primarily about protecting communication outside of military-controlled networks and preventing external entities from probing internally. The protection includes privacy, as it helps hide information from adversaries by obfuscating sender and receiver information \cite{NetworkBasedPrivacy}. This means that the implementation described is intended to be employed for all traffic traveling between bases, but is unconcerned with internal base traffic. Internal network defense remains the purview of traditional defenses. Base networks, in this case, include both those on permanent installations and those in deployed, forward locations. 
 
@@ -53,7 +53,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \includegraphics[width=1.0\textwidth,clip=true,trim=0 0 0 0]{flow_director}
 \end{figure}
 
-\par In the case of \ac{ARP} requests on either interface, the director replies with the gateway's \ac{MAC} address. This feature of \ac{ARG} allows its use without any changes to the network it is placed in, as hosts continue to send to the ``same'' gateway IP as before and \ac{ARG} pretends to fullfill that role. 
+\par In the case of \ac{ARP} requests on either interface, the director replies with the gateway's \ac{MAC} address. This feature of \ac{ARG} allows its use without any changes to the network it is placed in, as hosts continue to send to the ``same'' gateway IP as before and \ac{ARG} pretends to fulfill that role. 
 
 \par For outgoing packets---packets that are sent by the protected network that are intended to leave the network---, the director checks the destination \ac{IP} of the packet. If the IP is unknown, it is passed to the \ac{NAT} module. If the IP is within another \ac{ARG} network the director knows of, the packet is handed off to the hopper module to be wrapped and transmitted.
 
@@ -77,7 +77,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 	IP Range (IP and mask) & Configuration file \\
 	\ac{RSA} Public Key & Configuration file \\
 	Hop Interval & Transferred \\
-	Symmentric Key & Transferred \\
+	Symmetric Key & Transferred \\
 	Hop Key & Transferred \\
 	Time Base & Calculated \\
 \end{tabular}
@@ -85,7 +85,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 
 \par An administrative thread is started at the same time. This thread attempts to connect to each gateway in its list periodically and, if it does not hear from a given gateway for several minutes, marks gateways as disconnected. In addition, it fairly frequently sends time synchronization requests to connected gateways, especially if it sees a large percentage of packets being rejected by \ac{IP} address. 
 
-\par Beyond the administative thread, actions occur in the hopper only when the director passes off packets to it. Outgoing packets are always wrapped, encrypted, and signed, as covered under the ``route packet'' process in Section \ref{sec:arg_protocol_route}. Incoming packets go through the validation process shown in Figure \ref{fig:arg_hopper_in_validation} before being handled. Note that \ac{IP} checking is done in the Director before control reaches the Hopper. After validation exact handling depends on the packet type, but is generally covered in Section \ref{sec:arg_protocol} as part of the protocol discussion.
+\par Beyond the administrative thread, actions occur in the hopper only when the director passes off packets to it. Outgoing packets are always wrapped, encrypted, and signed, as covered under the ``route packet'' process in Section \ref{sec:arg_protocol_route}. Incoming packets go through the validation process shown in Figure \ref{fig:arg_hopper_in_validation} before being handled. Note that \ac{IP} checking is done in the Director before control reaches the Hopper. After validation exact handling depends on the packet type, but is generally covered in Section \ref{sec:arg_protocol} as part of the protocol discussion.
 
 \begin{figure}
 \caption{\ac{ARG} Incoming Packet Validation}
@@ -113,7 +113,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \end{tabular}
 \end{table}
 
-\par The traditional \ac{NAT} processing and logic is supplemented with this additional information. When a packet goes out, the table is checked and the packet has its source IP and port changed to the external values. If this is the first packet in a connection, the external IP is filled from the current IP of the gateway. When an incoming packet is encountered, the exteral IP and port are both checked to determine the correct internal host. The additon of the external IP to the table allows connections to survive across hops; many connections last longer than \ac{ARG}'s intended hop rate and severing connections frequently is unacceptable. 
+\par The traditional \ac{NAT} processing and logic is supplemented with this additional information. When a packet goes out, the table is checked and the packet has its source IP and port changed to the external values. If this is the first packet in a connection, the external IP is filled from the current IP of the gateway. When an incoming packet is encountered, the external IP and port are both checked to determine the correct internal host. The addition of the external IP to the table allows connections to survive across hops; many connections last longer than \ac{ARG}'s intended hop rate and severing connections frequently is unacceptable. 
 
 \section{Protocol}
 \label{sec:arg_protocol}
