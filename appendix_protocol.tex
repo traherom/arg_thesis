@@ -1,0 +1,124 @@
+\chapter{\ac{ARG} Protocol}
+\label{chp:protocol}
+\par This appendix details the format of each \ac{ARG} message type. Section \ref{sec:arg_protocol_formats} presents the structure of each message type. Section \ref{sec:arg_protocol_exchanges} gives the steps of each exchange type and their effect on the gateway's state.
+
+\section{Message Formats}
+\label{sec:arg_protocol_formats}
+\par The base header for the \ac{ARG} protocol is given in Table \ref{tbl:arg_protocol_types}. Four possible payloads are delivered under this header: \texttt{WRAPPED}, \texttt{PING}, \texttt{CONN\_REQ}/\texttt{CONN\_RESP}, and \texttt{TRUST\_DATA}. The format for each is shown in their own section below.
+
+\subsection{\texttt{WRAPPED}}
+\par Use: Transfer packets between \ac{ARG}-protected networks.
+
+\par This message type contains no additional information. After the original packet is encrypted, it is used as the payload to the \ac{ARG} header as-is.
+
+\subsection{\texttt{PING}}
+\par Use: Time synchronization between two gateways. See Section \ref{sec:arg_time_sync}.
+
+\begin{table}[H]
+\caption{Structure of \ac{ARG} \texttt{PING} message, 4 bytes wide}
+\label{tbl:arg_ping_struct}
+\centering
+\begin{tabular}{*{4}{|p{2cm}}|}
+\hline
+\textbf{1} & \textbf{2} & \textbf{3} & \textbf{4}\\
+\hline
+\hline
+\multicolumn{4}{|c|}{Request ID}\\
+\hline
+\multicolumn{4}{|c|}{Response ID}\\
+\hline
+\multicolumn{4}{|c|}{Time Offset}\\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{\texttt{CONN\_REQ}/\texttt{CONN\_RESP}}
+\par Use: Connect to other gateways.
+
+\par Note that these message types are formatted identically. The only difference is the type number used, as this allows gateways to determine when it is a request for new data or just a response to a previous request (or a spurious supply of information, possibly because of a re-keying).
+
+\begin{table}[H]
+\caption{Structure of \ac{ARG} \texttt{CONN\_REQ} and \texttt{CONN\_REQ} messages, 4 bytes wide}
+\label{tbl:arg_conn_data_struct}
+\centering
+\begin{tabular}{*{4}{|p{2cm}}|}
+\hline
+\textbf{1} & \textbf{2} & \textbf{3} & \textbf{4}\\
+\hline
+\hline
+\multicolumn{4}{|c|}{Symmetric Key (32 bytes)}\\
+\hline
+\multicolumn{4}{|c|}{\ac{IV} (32 bytes)}\\
+\hline
+\multicolumn{4}{|c|}{Hop Key (16 bytes)}\\
+\hline
+\multicolumn{4}{|c|}{Hop Interval}\\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{\texttt{TRUST\_DATA}}
+\par Use: Allow on-the-fly addition of new gateways.
+
+\begin{table}[H]
+\caption{Structure of \ac{ARG} \texttt{TRUST\_DATA} message, 4 bytes wide}
+\label{tbl:arg_trust_struct}
+\centering
+\begin{tabular}{*{4}{|p{2cm}}|}
+\hline
+\textbf{1} & \textbf{2} & \textbf{3} & \textbf{4}\\
+\hline
+\hline
+\multicolumn{4}{|c|}{\multirow{2}{*}{Gate Name}}\\
+\multicolumn{4}{|c|}{}\\
+\cline{3-4}
+\multicolumn{2}{|c|}{} & Base \acs{IP} & Mask\\
+\hline
+N & E & \multicolumn{2}{|c|}{unused}\\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Protocol Exchanges}
+\label{sec:arg_protocol_exchanges}
+\par The steps for each exchange are given in the sections below. In the following descriptions, local is the current gateway and remote is another gateway with which it is communicating. The steps assume that local is the initiator of a given exchange.
+
+\subsection{Connect process}
+\begin{enumerate}
+	\item Local sends \texttt{CONN\_REQ} containing its hop key, hop interval, and symmetric key. 
+	\item After validating the packet, remote saves the connection data.
+	\item Remote sends \texttt{CONN\_RESP} acknowledgment back, containing its own hop key, hop interval, and symmetric key. 
+	\item Local receives data and saves it.
+	\item Local marks the remote gateway as having connection data and, if time sync data is available, remote is marked as connected. 
+\end{enumerate}
+
+\subsection{Time sync}
+\label{sec:arg_time_sync}
+\begin{enumerate}
+	\item Local sends \texttt{PING} containing random 4-byte unsigned int in the request field (see Table \ref{tbl:arg_ping_struct}), \texttt{null} (0) in response, and its time offset, which is the different between the current time and its base time. It notes the time it sends this packet. 
+	\item Local notes the time it sent the request
+	\item Remote validates the message and responds with a new \texttt{PING}, giving a new random request integer (if a follow up request is desired), the received response int set to the request int, and its own time offset.
+	\item Local ensures received response int matches the request int it sent.
+	\item Local determines the connection latency from the send time, then remote's time base is calculated based on half of this. That is,
+	$$\text{remote time base} = \text{received time offset} - \frac{\text{latency}}{2}$$
+	This value is saved and used in \ac{IP} calculations for the remote gateway in the future.
+
+	\item Local marks the remote gateway as having time sync data available and, if connection data is available, remote is marked as connected. 
+\end{enumerate}
+
+\subsection{Trust Data Exchange}
+\begin{enumerate}
+	\item For each gateway it knows about, local sends a \texttt{TRUST\_DATA} packet to remote, containing the gateway name, base \ac{IP}, \ac{IP} mask, and public key.
+	\item Remote validates the message, then adds the data in each \texttt{TRUST\_DATA} packet to their list of gateways (if they don't already have it). At this point the new gateway appears just like one read in from a configuration file.
+	\item After some period of time, remote attempts to connect to the new gateway, just as they would any other gateway they had not yet successfully contacted.
+ \end{enumerate}
+
+\subsection{Route packet}
+\label{sec:arg_protocol_route}
+\begin{enumerate}
+	\item Local takes outbound packet and encrypts with with remote symmetric key.
+	\item Local sends WRAPPED message to remote current IP with the encrypted packet included. An \ac{HMAC} of the packet is included in the header.
+	\item Remote receives and validates the message.
+	\item Remote sends the original, decrypted packet into the internal network.
+\end{enumerate}
+

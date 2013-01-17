@@ -1,15 +1,15 @@
 \chapter{Implementation}
 \label{chp:implementation}
 
-\par The research this thesis presents relies on a custom-developed \ac{IP} address hopping solution. This chapter covers many of the details of this system, from high-level architecture to the network protocol. Section \ref{sec:arg_requirements} covers the requirements this system strives to meet. Section \ref{sec:arg_impl_overview} gives an architecture overview, while Section \ref{sec:arg_components} covers the details of each component in the system. Section \ref{sec:arg_protocol} details the network protocol used by the system to coordinate gateways.
+\par The research this thesis presents relies on a custom \ac{IP} address hopping solution. This chapter covers many of the details of this system, from high-level architecture to the network protocol. Section \ref{sec:arg_requirements} covers the requirements this system strives to meet. Section \ref{sec:arg_impl_overview} gives an architecture overview, while Section \ref{sec:arg_components} covers the details of each component in the system. Section \ref{sec:arg_protocol} details the network protocol used by the system to coordinate gateways.
 
 \section{Requirements}
 \label{sec:arg_requirements}
-\par \ac{ARG} focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization: locations throughout the world, high availability and reliability requirements, and security over any network through which its data travels. 
+\par \ac{ARG} focuses on the needs of military networks. These are essentially the needs of any geographically-diverse organization: locations throughout the world, high availability and reliability requirements, and security over any network through which its data travels \cite{DialInNetworking}.
 
 \par ARG worries primarily about protecting communication outside of military-controlled networks and preventing external entities from probing internally. The protection includes privacy, as it helps hide information from adversaries by obfuscating sender and receiver information \cite{NetworkBasedPrivacy}. This means that the implementation described is intended to be employed for all traffic traveling between bases, but is unconcerned with internal base traffic. Internal network defense remains the purview of traditional defenses. Base networks, in this case, include both those on permanent installations and those in deployed, forward locations. 
 
-\par ARG must operate over the commercial Internet. As mentioned in Section \ref{sec:related_research} \tbd{contra isn't actually covered}, some proposals for network address space randomization require changes to the Internet's existing routing infrastructure, protocol-wise \cite{CONTRA}. Deploying such a solution may be possible and beneficial in the long run, but a solution that could be deployed today without participation from outside entities is more feasible. This is especially true for forward locations, where traffic is more likely to utilize infrastructure outside the military's control.
+\par ARG must operate over the commercial Internet. Some proposals for network address space randomization require changes to the Internet's existing routing infrastructure and protocols \cite{CONTRA}. Deploying such a solution may be possible and beneficial in the long run, but a solution that could be deployed today without participation from outside entities is more feasible. This is especially true for forward locations, where traffic is more likely to utilize infrastructure outside the military's control.
 
 \par Base networks can generate huge volumes of traffic, so ARG must scale well. Due to the importance of networks to command and control, ARG's implementation must not introduce significant latency under any foreseeable load. Likewise, there can never be a brief period where all connections drop. At a minimum, given the number of nodes inside the network, dropped connections would result in a massive amount of wasted bandwidth as they were reestablished and the data retransmitted.
 
@@ -125,7 +125,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \centering
 \begin{tabular}{*{4}{|p{2cm}}|}
 	\hline
-	1 & 2 & 3 & 4\\
+	\textbf{1} & \textbf{2} & \textbf{3} & \textbf{4}\\
 	\hline
 	\hline
 	version & type & \multicolumn{2}{c|}{length}\\
@@ -139,13 +139,13 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \end{tabular}
 \end{table}
 
-\par For this research, the protocol version field is set to 1 at all times. The type field tells the receiving gateway how to process the data contained in the message. Possible values are shown in Table \ref{tbl:arg_protocol_types}. \tbd{More details on the format of each message/type is given below. Too much?} Length is the network-order size in bytes of the data from the version to the end of the data; given the size of the message header, the minimum for this is 136. The sequence number is a monotonically increasing unsigned integer value used to prevent replay attacks.
+\par For this research, the protocol version field is set to 1 at all times. The type field tells the receiving gateway how to process the data contained in the message. Possible values are shown in Table \ref{tbl:arg_protocol_types}. More details on the format of each message type are given in Appendix \ref{chp:protocol}. Length is the network-order size in bytes of the data from the version to the end of the data; given the size of the message header, the minimum for this is 136. The sequence number is a monotonically increasing unsigned integer value used to prevent replay attacks.
 
 \begin{table}
 \caption{\ac{ARG} Message Types}
 \label{tbl:arg_protocol_types}
 \begin{tabular}{l|c|l}
-Mnemonic & Value & Description\\
+\textbf{Mnemonic} & \textbf{Value} & \textbf{Description}\\
 \hline
 \texttt{WRAPPED} & 1 & Encapsulated packet from protected client to protected client\\
 \texttt{PING} & 2 & Time synchronization message\\
@@ -162,7 +162,7 @@ Mnemonic & Value & Description\\
 \label{tbl:arg_protocol_security}
 \centering
 \begin{tabular}{l|l|l|l}
-Type & Encryption & Signing & \ac{IP}s checked?\\
+\textbf{Type} & \textbf{Encryption} & \textbf{Signing} & \textbf{\acp{IP} checked?}\\
 \hline
 \texttt{WRAPPED} & AES, remote key & HMAC, local key & Yes\\
 \texttt{PING} & RSA, remote public key & Signature, local private key & No\\
@@ -172,40 +172,5 @@ Type & Encryption & Signing & \ac{IP}s checked?\\
 \end{tabular}
 \end{table}
 
-\par There are four basic exchanges that happen between \ac{ARG} gateways: connect, time sync, trust data exchange, and packet transfer. In order for gateways to begin exchanging packets between the networks they are protecting (via the ``route packet'' process), they must first fully connect by completing the connect and time sync processes. The trust data exchange step is optional, although it allows gateways to connect to others without configuration files. The steps for each are given in the sections below. In the following descriptions, local is the current gateway and remote is another gateway with which it is communicating. The steps assume that local is the initiator of a given exchange.
-
-\subsection{Connect process}
-\begin{enumerate}
-	\item Local sends \texttt{CONN\_REQ} containing its hop key, hop interval, and symmetric key. 
-	\item After validating the packet, remote saves the connection data.
-	\item Remote sends \texttt{CONN\_RESP} acknowledgement back, containing its own hop key, hop interval, and symmetric key. 
-	\item Local receives data and saves it.
-	\item Local marks the remote gateway as having connection data and, if time sync data is available, remote is marked as connected. 
-\end{enumerate}
-
-\subsection{Time sync}
-\begin{enumerate}
-	\item Local sends \texttt{PING} containing random 4-byte unsigned int in the request field (see argpingdata struct below), \texttt{null} (0) in response, and its time offset, which is the different between the current time and its base time. It notes the time it sends this packet. \tbd{this one in particular relies on seeing the structure. Should I just go ahead and throw them all in here?}
-	\item Local notes the time it sent the request
-	\item Remote validates the message and responds with a new \texttt{PING}, giving a new random request integer (if a follow up request is desired), the received response int set to the request int, and its own time offset.
-	\item Local ensures received response int matches the request int it sent.
-	\item Local determines the connection latency from the send time, then remote's time base is calculated based on half of this. That is, $\text{remote time base} = \text{received time offset} - \frac{\text{latency}}{2}$. This value is saved and used in \ac{IP} calculations for the remote gateway in the future.
-	\item Local marks the remote gateway as having time sync data available and, if connection data is available, remote is marked as connected. 
-\end{enumerate}
-
-\subsection{Trust Data Exchange}
-\begin{enumerate}
-	\item For each gateway it knows about, local sends a \texttt{TRUST\_DATA} packet to remote, containing the gateway name, base \ac{IP}, \ac{IP} mask, and public key.
-	\item Remote validates the message, then adds the data in each \texttt{TRUST\_DATA} packet to their list of gateways (if they don't already have it). At this point the new gateway appears just like one read in from a configuration file.
-	\item After some period of time, remote attempts to connect to the new gateway, just as they would any other gateway they had not yet successfully contacted.
- \end{enumerate}
-
-\subsection{Route packet}
-\label{sec:arg_protocol_route}
-\begin{enumerate}
-	\item Local takes outbound packet and encrypts with with remote symmetric key.
-	\item Local sends WRAPPED message to remote current IP with the encrypted packet included. An \ac{HMAC} of the packet is included in the header.
-	\item Remote receives and validates the message.
-	\item Remote sends the original, decrypted packet into the internal network.
-\end{enumerate}
+\par There are four basic exchanges that happen between \ac{ARG} gateways: connect, time sync, trust data exchange, and packet transfer. In order for gateways to begin exchanging packets between the networks they are protecting (via the ``route packet'' process), they must first fully connect by completing the connect and time sync processes. The trust data exchange step is optional, although it allows gateways to connect to others without configuration files. The precise requests, receives, and verifications for each exchange are given in Appendix \ref{chp:protocol}.
 
