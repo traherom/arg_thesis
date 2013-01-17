@@ -140,7 +140,7 @@
 	\par Each test spawns a number of traffic generators at different points in the test network. The packet delay shown here is used as a wait between each packet sent. Lower delays result in more frequent sends and force the gateways to deal with more packets per second.
 
 \item Traffic direction and type
-	\par \ac{ARG} is designed to handle \ac{TCP}, \ac{UDP}, and \ac{ICMP} traffic. All tests use equal amounts of \ac{TCP} and \ac{UDP} traffic, but some vary the direction. Rather than duplicating the description here, Section \ref{sec:} gives a full description of the various tests.
+	\par \ac{ARG} is designed to handle \ac{TCP}, \ac{UDP}, and \ac{ICMP} traffic. All tests use equal amounts of \ac{TCP} and \ac{UDP} traffic, but some vary the direction. Rather than duplicating the description here, Section \ref{sec:exp_design} gives a full description of the various tests.
 \end{itemize}
 
 \section{Evaluation Technique}
@@ -160,14 +160,13 @@
 
 \par All traffic beyond what is described above is ``invalid.'' For example, \texttt{Ext1} is not allowed to send traffic in to the protected clients or the gateways without them first initiating the connection. Malformed traffic sent by any host is also considered invalid. In either case, invalid traffic should be stopped at the earliest possible opportunity (i.e., the gateway rejects the packet and keeps it from reaching the internal host) and the system must remain stable.
 
-\par To collect data, each system runs the traffic collection program \texttt{tcpdump} to capture the traffic sent and received into \ac{PCAP} files. Traffic generators are then spawned as appropriate on each system in the network, each of which logs their sends and receives. After a given trial, the \ac{PCAP} files and traffic generator logs are collated and processed with custom scripts to determine the metrics described in Section \ref{sec:metrics}. More details on the traffic generators and test run sequence can be found in Appendixes \ref{chp:generators} and \ref{chp:executer}.
+\par To collect data, each system runs the traffic collection program \texttt{tcpdump} to capture the traffic sent and received into \ac{PCAP} files. Traffic generators are then spawned as appropriate on each system in the network, each of which logs their sends and receives. After a given trial, the \ac{PCAP} files and traffic generator logs are collated and processed with custom scripts to determine the metrics described in Section \ref{sec:metrics}. More details on the traffic generators and test run sequence can be found in Appendixes \ref{chp:generators} and \ref{chp:testseq}.
 
 \par All trials run on physical network of seven servers. Each server runs Ubuntu 12.04.1 Server Edition with four gigabytes of \ac{RAM} and a \tbd{CPU} \ac{CPU}. A single switch with \ac{VLAN}s configured connects each system at 100 \ac{Mbps}.
 
 \section{Experimental Design}
 \label{sec:exp_design}
 \par Based on the factors given in Section \ref{sec:factors} and the goals of this research (as laid out in Section \ref{sec:goals}), there are eight traffic flows of interest. Each consists of different types of traffic and flow destinations. There are most easily visualized in Figure \ref{fig:testnum_flows}.
-
 
 \begin{figure}
 \caption{Experiment Traffic Flows}
@@ -235,7 +234,7 @@
 	\par This sequence is not tested rigorously for traffic flow success and failure, but ensures that \ac{ARG} remains stable despite malformed traffic. Test 8 is used, with the addition of fuzzers on each gateway that replay and/or alter traffic they see. Hop rate varies between 500 ms and 50 ms, latency is fixed at 20 ms, and packets are sent at 0.3 second intervals.
 \end{itemize}
 
-\par A 99\% confidence interval is used for all experiments. Experiments are each run for five minutes, sufficient time for the system to stabilize (pilot studies show that \ac{ARG} fully connects in under 10 seconds on the test network). Wide variation is possible in the actual traffic seen in a single run, so 20 \tbd{make sure they all actually have 20. I suspect not at the moment} replications are used for each experiment.
+\par A 99\% confidence interval is used for all experiments. Experiments are each run for five minutes, sufficient time for the system to stabilize (pilot studies show that \ac{ARG} fully connects in under 10 seconds on the test network). Wide variation is possible in the actual traffic seen in a single run, so a minimum of 10 replications are used for each experiment.
 
 \section{Summary}
 \label{sec:method_summary}

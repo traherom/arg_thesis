@@ -1,7 +1,7 @@
 \chapter{Results Processor}
 \label{chp:processor}
 
-\par After every test run, a custom utility processes the pcap and log files into a single database and extracts statistics from there. This appendix documents the usage of this tool and its operation. Section \ref{sec:proc_env} covers the required packages to process runs. Section \ref{sec:usage} covers usage of the results processor. Section \ref{sec:proc_operation} documents the operation of the processor.
+\par After every test run, a custom utility processes the pcap and log files into a single database and extracts statistics from there. This appendix documents the usage of this tool and its operation. Section \ref{sec:proc_env} covers the required packages to process runs. Section \ref{sec:proc_usage} covers usage of the results processor. Section \ref{sec:proc_operation} documents the operation of the processor.
 
 \section{Environment}
 \label{sec:proc_env}
@@ -64,7 +64,6 @@ Parameter & Short & Default\\
 \par The most common use case, when the caller wants to process the run data in the current directory and leave a database there:
 \begin{lstlisting}
 ~/results/basic-t0-l20-hr500ms-2012-11-24-08:54:21$ process_run.py -db run.db
-\tbd{output...}
 \end{lstlisting}
 
 \par If a run takes several seconds to enter a steady state, it may be beneficial to ignore the first 30 seconds of the run. In addition, this example does its work from a different directory but leaves the results in the same location as the previous example:
