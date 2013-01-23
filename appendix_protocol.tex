@@ -15,7 +15,7 @@
 \par Use: Time synchronization between two gateways. See Section \ref{sec:arg_time_sync}.
 
 \begin{table}[H]
-\caption{Structure of \ac{ARG} \texttt{PING} message, 4 bytes wide}
+\caption{Structure of \ac{ARG} \texttt{PING} message, 4 bytes wide \tbd{this table sucks}}
 \label{tbl:arg_ping_struct}
 \centering
 \begin{tabular}{*{4}{|p{2cm}}|}
@@ -35,10 +35,10 @@
 \subsection{\texttt{CONN\_REQ}/\texttt{CONN\_RESP}}
 \par Use: Connect to other gateways.
 
-\par Note that these message types are formatted identically. The only difference is the type number used, as this allows gateways to determine when it is a request for new data or just a response to a previous request (or a spurious supply of information, possibly because of a re-keying).
+\par Note that these message types are formatted identically. The only difference is the type number used, as this allows gateways to determine when it is a request for new data or just a response to a previous request.
 
 \begin{table}[H]
-\caption{Structure of \ac{ARG} \texttt{CONN\_REQ} and \texttt{CONN\_REQ} messages, 4 bytes wide}
+\caption{Structure of \ac{ARG} \texttt{CONN\_REQ} and \texttt{CONN\_REQ} messages, 4 bytes wide \tbd{grey lines}}
 \label{tbl:arg_conn_data_struct}
 \centering
 \begin{tabular}{*{4}{|p{2cm}}|}
@@ -81,34 +81,36 @@ N & E & \multicolumn{2}{|c|}{unused}\\
 
 \section{Protocol Exchanges}
 \label{sec:arg_protocol_exchanges}
-\par The steps for each exchange are given in the sections below. In the following descriptions, local is the current gateway and remote is another gateway with which it is communicating. The steps assume that local is the initiator of a given exchange.
+\par The steps for each exchange are given in the sections below. In the following descriptions, local is the initiating gateway in a given exchange and remote is another gateway with which it is communicating.
 
 \subsection{Connect process}
 \begin{enumerate}
 	\item Local sends \texttt{CONN\_REQ} containing its hop key, hop interval, and symmetric key. 
-	\item After validating the packet, remote saves the connection data.
+	\item After validating the packet, remote saves the connection data. If time synchronization data is available for local, then remote marks it as connected. If it is not available, remote schedules a time synchronization request.
 	\item Remote sends \texttt{CONN\_RESP} acknowledgment back, containing its own hop key, hop interval, and symmetric key. 
-	\item Local receives data and saves it.
-	\item Local marks the remote gateway as having connection data and, if time sync data is available, remote is marked as connected. 
+	\item Local receives, validates, and saves the data from remote.
+	\item Local marks the remote gateway as having connection data and marks remote as connected or schedules a time sync, as appropriate.
 \end{enumerate}
 
-\subsection{Time sync}
+\subsection{Time synchronization}
 \label{sec:arg_time_sync}
 \begin{enumerate}
-	\item Local sends \texttt{PING} containing random 4-byte unsigned int in the request field (see Table \ref{tbl:arg_ping_struct}), \texttt{null} (0) in response, and its time offset, which is the different between the current time and its base time. It notes the time it sends this packet. 
+	\item Local sends \texttt{PING} containing random 4-byte unsigned integer in the \texttt{Request ID} field (see Table \ref{tbl:arg_ping_struct}), \texttt{null} (0) in \texttt{Response ID}, and its time offset in \texttt{Time Offset}, which is the different between the current time and its base time. 
 	\item Local notes the time it sent the request
-	\item Remote validates the message and responds with a new \texttt{PING}, giving a new random request integer (if a follow up request is desired), the received response int set to the request int, and its own time offset.
+	\item Remote validates the message and responds with a new \texttt{PING}, giving a new random request integer, the received response int (from local) set to the request int, and its own time offset.
 	\item Local ensures received response int matches the request int it sent.
 	\item Local determines the connection latency from the send time, then remote's time base is calculated based on half of this. That is,
 	$$\text{remote time base} = \text{received time offset} - \frac{\text{latency}}{2}$$
 	This value is saved and used in \ac{IP} calculations for the remote gateway in the future.
 
-	\item Local marks the remote gateway as having time sync data available and, if connection data is available, remote is marked as connected. 
+	\item Local marks the remote gateway as having time sync data available and, if connection data is available, remote is marked as connected. If connection data is not available, local schedules a connect process.
+	\item Local sends a response to remote, with \texttt{Request ID} set to 0, \texttt{Response ID} set to the value remote sent in its request, and time offset set as appropriate.
+	\item Remote receives and validates the final response, saves off the data, and marks local as connected if appropriate (or schedules a connection data request if needed).
 \end{enumerate}
 
 \subsection{Trust Data Exchange}
 \begin{enumerate}
-	\item For each gateway it knows about, local sends a \texttt{TRUST\_DATA} packet to remote, containing the gateway name, base \ac{IP}, \ac{IP} mask, and public key.
+	\item For each gateway it knows about, local sends a \texttt{TRUST\_DATA} packet to remote, containing the gateway name, base \ac{IP}, \ac{IP} mask, and public key to the remote gateway. Each packet covers one gateway, with no data about the local or remote gateways included.
 	\item Remote validates the message, then adds the data in each \texttt{TRUST\_DATA} packet to their list of gateways (if they don't already have it). At this point the new gateway appears just like one read in from a configuration file.
 	\item After some period of time, remote attempts to connect to the new gateway, just as they would any other gateway they had not yet successfully contacted.
  \end{enumerate}
@@ -116,7 +118,8 @@ N & E & \multicolumn{2}{|c|}{unused}\\
 \subsection{Route packet}
 \label{sec:arg_protocol_route}
 \begin{enumerate}
-	\item Local takes outbound packet and encrypts with with remote symmetric key.
+	\item Local receives a packet on its internal interface.
+	\item Local takes the outbound packet and encrypts with with remote symmetric key. Local determines the destination gateway based on \ac{IP} range.
 	\item Local sends WRAPPED message to remote current IP with the encrypted packet included. An \ac{HMAC} of the packet is included in the header.
 	\item Remote receives and validates the message.
 	\item Remote sends the original, decrypted packet into the internal network.

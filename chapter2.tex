@@ -1,6 +1,6 @@
 \chapter{Background}
 \label{chp:background}
-\par This chapter provides an introduction to the technology behind \ac{IP} hopping and many of the previous efforts in this area. Section \ref{sec:routing} describes how routing at various points in a network works. Section \ref{sec:hopping} covers IP address space randomization---referred to as ``\ac{IP} hopping'' in this thesis---and the two possible approaches. Sections \ref{sec:data_security} and \ref{sec:totp} provide descriptions of two critical systems behind the implementation presented in this thesis, encryption and \ac{TOTP}. Finally, Section \ref{sec:related_research} examines previous efforts in \ac{IP} address hopping.
+\par This chapter provides an introduction to the technology behind \ac{IP} hopping and many of the previous efforts in this area. Section \ref{sec:routing} describes how routing works at various points in a network. Section \ref{sec:hopping} covers IP address space randomization---referred to as ``\ac{IP} hopping'' in this thesis---and the two possible approaches. Sections \ref{sec:data_security} and \ref{sec:totp} provide descriptions of two critical systems behind the implementation presented in this thesis, encryption and \ac{TOTP}. Finally, Section \ref{sec:related_research} examines previous efforts in \ac{IP} address hopping.
 
 \section{Network Routing}
 \label{sec:routing}
@@ -9,18 +9,7 @@
 \label{sec:ip_routing}
 \par This thesis assumes that the reader has a familiarity with how \ac{IP} works. However, several aspects of this protocol are critical to the functioning of the system described later and are detailed here. 
 
-\par Packets on the public Internet use \ac{IP} formatted-packets to communicate their source and destination. Two versions of this protocol exist, \ac{IPv4} and \ac{IPv6}, each with their own standardized header format. Table \ref{tbl:packet_structure} shows each of these headers.
-
-\par \ac{IP} packets are routed from system to system based on the destination \ac{IP} contained in their header. \ac{IPv4} uses 32-bit addresses to uniquely identify each system on the public Internet. These addresses are typically represented in a ``dotted quad'' format: for example, 74.125.228.36. \ac{IPv6} uses 128-bit address, typically represented in hexadecimal separated by colons (i.e. a3d3:2d42::8c24).
-
-\begin{landscape}
-\begin{table}
-\caption{\ac{IP} Packet Structure}
-\label{tbl:packet_structure}
-\centering
-\includegraphics[clip,trim=.3in 5in 0 0]{packet_structure}
-\end{table}
-\end{landscape}
+\par \ac{IP} packets are routed from system to system based on the destination \ac{IP} contained in their header. Appendix \ref{chp:ip_packet} displays the format for both \ac{IPv4} and \ac{IPv6} packets. \ac{IPv4} uses 32-bit addresses to uniquely identify each system on the public Internet. These addresses are typically represented in a ``dotted quad'' format: for example, 74.125.228.36. \ac{IPv6} uses 128-bit address, typically represented in hexadecimal separated by colons, along the lines of fe80::baf6:b1ff:fe1b:b4a1.
 
 \par Regardless of which version is in use, high-level routing remains conceptually the same. Routers maintain a table of \ac{IP} addresses, masks, and the interfaces associated with each. When a packet is received, the router consults this table and decides what interface to send the packet out on based on the most specific entry. For example, in the network shown in Figure \ref{fig:routing_example_network} the laptop with \ac{IP} 10.5.0.25 wants to send a packet to 172.100.10.3. When 10.5.0.25 sends its packet, the following sequence of events occurs:
 
@@ -39,7 +28,7 @@
 	\label{tbl:routing_example_routera_table}
 	\centering
 	\begin{tabular}{r|c|c|c}
-	 & \ac{IP} & Mask & Interface\\
+	 & \textbf{\ac{IP}} & \textbf{Mask} & \textbf{Interface}\\
 	\hline
 	1 & 10.5.0.25 & 255.255.0.0 & Port 1\\
 	2 & 172.100.10.0 & 255.255.255.0 & Port 2\\
@@ -57,7 +46,7 @@
 
 \subsection{Network Address Translation}
 \label{sec:nat}
-\par \ac{NAT} is a core technology behind many modern home and corporate networks, allowing many systems to connect to the Internet yet appear to come from a single external \ac{IP} address. A typical home network, for instance, might have the external IP address 184.58.31.151 assigned to it by the \ac{ISP} yet have five systems---laptops, desktops, phones---inside with \acp{IP} like 192.168.0.103, 192.168.0.50, and 192.168.0.1. As these systems send requests out, the router changes the source IP (and port) for packets to the external IP address. As responses come back from the Internet, the router does the opposite, changing the destination of the packets from the external IP to the internal IP of the original requester.
+\par \ac{NAT} is a core technology behind many modern home and corporate networks, allowing many systems to connect to the Internet yet appear to come from a single external \ac{IP} address. A typical home network, for instance, might have the external IP address 184.58.31.151 assigned to it by their \ac{ISP} yet have five systems---laptops, desktops, phones---inside with \acp{IP} like 192.168.0.103, 192.168.0.50, and 192.168.0.1. As these systems send requests out, the router changes the source IP (and port) for packets to the external IP address. As responses come back from the Internet, the router does the opposite, changing the destination of the packets from the external IP to the internal IP of the original requester.
 
 \par To do this, routers must maintain a \ac{NAT} table. This table consists of the source and destination information as well as a new port number, allowing the router to consistently transform traffic in both directions. For example, a router might have a table like the one shown in Table \ref{tab:nat_example}.
 
@@ -66,7 +55,7 @@
 \label{tab:nat_example}
 \centering
 \begin{tabular}{r|ccccc}
-  & Int IP & Int Port & Remote IP & Remote Port & Ext Port\\
+  & \textbf{Int IP}  & \textbf{Int Port}  & \textbf{Remote IP}  & \textbf{Remote Port}  & \textbf{Ext Port} \\
 \hline
 1 & 192.168.0.103 & 3547 & 74.125.225.69 & 443 & 50003\\
 2 & 192.168.0.103 & 8751 & 207.109.73.34 & 80 & 42630\\
@@ -74,15 +63,15 @@
 \end{tabular}
 \end{table}
 
-\par This small table shows three different connections in progress. The router created each entry the first time the internal system sent out a packet to the remote (Internet) one, for each set of internal and remote IPs and ports. In addition, the router assigns an external port for each connection to allow it to determine to whom incoming packets are destined.
+\par This small table shows three different connections in progress. The router created each entry the first time the internal system sent out a packet to the remote (Internet) one, for each set of internal and remote \acp{IP} and ports. In addition, the router assigns an external port for each connection to allow it to determine to whom incoming packets are destined.
 
-\par In the future, when the router receives an outgoing packet (from the internal host to the external), it begins by consulting its table to find a match based on the first four values in the table. Assuming it finds a corresponding entry, the router changes the source IP of the packet to the external IP assigned to it by the \ac{ISP} and the source port to the external port given in the table. When the router receives a packet from the Internet, it checks for a match in the table based on the remote IP, remote port, and external port. If it finds one, it alters the packet's destination information to the internal IP and port.
+\par In the future, when the router receives an outgoing packet (from the internal host to the external), it begins by consulting its table to find a match based on the first four values in the table. Based on the table entry, the router changes the source \ac{IP} of the packet to the external IP assigned to it by the \ac{ISP} and the source port to the external port given in the table (if it doesn't find one, it creates a new one). When the router receives a packet from the Internet, it checks for a match in the table based on the remote IP, remote port, and external port. If it finds one, it alters the packet's destination information to the internal IP and port.
 
-\par This system serves two purposes. First, as the number of systems on the Internet has increased, \ac{IPv4} addresses have become a precious resource, with their 32-bit length limiting the number of possible addresses to around four billion. \ac{NAT} allows an organization to only own a single address yet serve many systems behind it. Second, \ac{NAT} inherently acts a simple stateful firewall \cite{DynAddrMalProp}. In order for an outside system to send packets to an internal host, the internal host must initiate the connection, allowing the router to create the table entry.
+\par This system serves two purposes. First, as the number of systems on the Internet has increased, \ac{IPv4} addresses have become a limited resource, with their 32-bit length limiting the number of possible addresses to around four billion. \ac{NAT} allows an organization to only own a single address yet serve many systems behind it. Second, \ac{NAT} inherently acts a simple stateful firewall \cite{DynAddrMalProp}. In order for an outside system to send packets to an internal host, the internal host must initiate the connection, allowing the router to create the table entry.
 
 \subsection{Ethernet and \acf{ARP}}
 \label{sec:eth_routing}
-\par Many local networks use Ethernet for the last leg of network travel to actual hosts. In a flat network, where local machines are connected together via a switch or hub, \ac{IP} routing is not typically used. Instead, packets are directed to the correct recipient via physical identifiers known as \ac{MAC} addresses. Packets sent on an Ethernet network are wrapped in an Ethernet frame, which specifies the \ac{MAC} addressees of the sender and receiver.
+\par Many local networks use Ethernet for the first and last leg of network travel to actual hosts. In a flat network, where local machines are connected together via a switch or hub, \ac{IP} routing is not typically used. Instead, packets are directed to the correct recipient via physical identifiers known as \ac{MAC} addresses. Packets sent on an Ethernet network are wrapped in an Ethernet frame, which specifies the \ac{MAC} addresses of the sender and receiver.
 
 \par When a packet is first created, however, the host system only knows the destination \ac{IP}. Before the packet can be sent out, the sender must determine the destination \ac{MAC} address. This is done through a \ac{ARP} request, a process illustrated in Figure \ref{fig:arp_example}.
 
@@ -95,13 +84,15 @@
 
 \par As shown, the sender first asks on the network who has the destination \ac{IP}. Every host on the network hears the request, but only the one with that \ac{IP} responds, sending back an \ac{ARP} response with their \ac{MAC} address to the requester. With the destination \ac{MAC} now in hand, the original sender can construct the Ethernet frame for their \ac{IP} packet and send the data on its way. The sender caches the physical address of the other machine for a short time to avoid repeating the \ac{ARP} request too frequently.
 
+\par To send packets beyond the local network, hosts use a gateway system, usually a router. They transfer the packet to the gateway via Ethernet, then the gateway directs the packet further. Ethernet and \ac{ARP} is not used directly by local hosts to reach hosts beyond the gateway.
+
 \section{IP Hopping in Detail}
 \label{sec:hopping}
-\par Address hopping is a simple concept at a high level: take the basic identifiers of a network and mutate them in a way that only authorized systems can follow. Doing so makes it difficult for an adversary to correlate sniffed traffic with individual machines and even more difficult to probe into the network to enumerate hosts. Other methods of dynamic network reconfiguration exist, but address hopping may have the greatest potential for obstructing network reconnaissance efforts \cite{DefeatingAdversaryNIE}.
+\par Address hopping is a simple concept at a high level: take the basic identifiers of a network and mutate them in a way that only authorized systems understand and continue to use for communication. Doing so makes it difficult for an adversary to correlate sniffed traffic with individual machines and even more difficult to probe into the network to enumerate hosts. Other methods of dynamic network reconfiguration exist, but address hopping may have the greatest potential for obstructing network reconnaissance efforts \cite{DefeatingAdversaryNIE}.
 
-\par In trying to actually implement such a system, however, several issues arise.  The network illustrated in Figure \ref{fig:exnetwork} is used to aid the following discussion. There are two main networks \textit{A} and \textit{B} that are assigned the displayed IP ranges, are connected by the Internet, and have an interest in communicating freely with one-another. Each of these has a few friendly end nodes (\textit{A1}, \textit{A2}, etc) behind a main router (\textit{AR} and \textit{BR}). Additionally, network \textit{B} has a potentially rogue client inside it named \textit{M1}. Outside of those two networks is the friendly \textit{C2} node, who has an interest in at least occasionally communicating with nodes inside networks \textit{A}/\textit{B}, and malicious \textit{M2}, who wants access to said networks. The details of the routes between them and \textit{A} and \textit{B} are inconsequential.
+\par In trying to actually implement such a system, however, several issues arise.  The network illustrated in Figure \ref{fig:exnetwork} is used to aid the following discussion. There are two main networks \textit{A} and \textit{B} that are assigned the displayed IP ranges, \tbd{reword: are connected by the Internet, and have an interest in communicating freely with one-another}. Each of these has a few friendly end nodes (\textit{A1}, \textit{A2}, \textit{B1}, etc.) behind a main router (\textit{AR} and \textit{BR}). Additionally, network \textit{B} has a potentially rogue client inside it named \textit{M1}. Outside of those two networks is the friendly \textit{C2} node, who has an interest in at least occasionally communicating with nodes inside networks \textit{A} and \textit{B}, and malicious \textit{M2}, who wants access to said networks. The details of the routes between them and \textit{A} and \textit{B} are inconsequential.
 
-\par Note that for the sake of this discussion non-routable \ac{IPv4} addresses are used. This is done merely for convenience and readability, everything applies to \ac{IPv6} as well unless otherwise noted.
+\par Note that for the sake of this discussion non-routable \ac{IPv4} addresses are used. This is done merely for convenience and readability, everything applies to \ac{IPv6} as well, unless otherwise noted.
 
 \begin{figure}
 	\centering
@@ -117,7 +108,7 @@
 
 \par First, how do the nodes keep track of one another? If every node knows about all the others, then scalability might become an issue, as every client presumably has to maintain some amount of data on fellow hopping clients to determine where each one is at any given time. It may be possible to devise a scheme where this flaw is mitigated by having all clients hop using the same secret and they each know just the broad IP ranges where fellow hoppers reside (i.e., the \textit{AR} nodes know that 10.2.2.0/24 is a network they talk to with hopping), but this accentuates the next question: how do clients choose their hops?
 
-\par Each node must know some secret from which \ac{IP} addresses are generated, hopefully in a manner which appears random to outsiders yet is predictable for those with the secret (the ``hopping pattern''). There may be only one of these secrets, which every node in the protected network knows---that is, the nodes in both A and B, hereafter collectively referred to as the ``hopping network.'' This does have the potential flaw of revealing too much information to an eavesdropper though: with a large number of nodes all following a hopping pattern based on the same key, it may be easier to deduce the secret.
+\par Each node must know some secret from which \ac{IP} addresses are generated, hopefully in a manner which appears random to outsiders yet is predictable for those with the secret. The secret combined with the algorithm used to generate \ac{IP} addresses results in what this thesis refers to as a ``hopping pattern.'' There may be only one of these secrets, which every node in the protected network knows---that is, the nodes in both A and B, hereafter collectively referred to as the ``hopping network.'' This does have the potential flaw of revealing too much information to an eavesdropper though: with a large number of nodes all following a hopping pattern based on the same key, it may be easier to deduce the secret.
 
 \par Giving each node a separate secret would solve this issue. However, each client now has to maintain even more information on every other client. For a small number of nodes this is not a problem, but if the intention is to scale to thousands or tens of thousands of clients problems with processing and key distribution may arise.  
 
@@ -131,13 +122,13 @@
 
 \par Of course, with enough coordination between nodes everyone could share the same address space. A fair amount of work would need to be put into an algorithm and protocol to synchronize everyone's changes, but this is not insurmountable. This does break most special cases in firewalls unless the firewall is either made aware of the \ac{IP} hopping system or hosts that need special rules do not change addresses at all.
 
-\par Despite these negatives end point hopping does have advantages. First, scalability issues lie more in storage space and key lookup speed than actual computation, as every node only has to perform packet transformations for their own ingress and egress packets. Although not discussed yet, it is likely that any IP hopping scheme will also incorporate packet encryption, so distributing this load may be beneficial. Second, end point hopping protects clients from probing no matter where the adversary is in the network. For example, as long as \textit{M1} in our example network lacks the hopping key, they have no more of an advantage in scanning any of the \textit{A} or \textit{B} nodes than \textit{M2}, who is outside the network. Finally, end point hopping comes with the ability for individual nodes such as \textit{C1} to connect to the main hopping network, without requiring any additional work or software development.
+\par Despite these negatives end point hopping does have advantages. First, scalability issues lie more in storage space and key lookup speed than actual computation, as every node only has to perform packet transformations for their own ingress and egress packets. Although not discussed yet, it is likely that any IP hopping scheme will also incorporate packet encryption, so distributing this load may be beneficial. Second, end point hopping protects clients from probing no matter where the adversary is in the network. For example, as long as \textit{M1} in our example network lacks the hopping key, they have no more of an advantage in scanning any of the \textit{A} or \textit{B} nodes than \textit{M2}, who is outside the network. Finally, end point hopping comes with the ability for individual nodes such as \textit{C1} to easily connect to the main hopping network without the need to develop new software or deploy extra hardware. This is in distinct contrast to gateway-based hopping, which by definition uses a separate system to handle hopping, as Section \ref{sec:gateway_hopping} discusses.
 
 \subsection{Gateway hopping}
 \label{sec:gateway_hopping}
 \par The alternative to end point hopping is to move the hopping to network gateways. In such a scheme, networks are placed behind gateways that alter all traffic passing through them appropriately. What ``appropriately'' means varies with every implementation, but in one way or another, a gateway outside of the actual end points alters the IP traffic to make it appear as though the systems inside are changing IP addresses. Referring back to the example network in Figure \ref{fig:exnetwork}, gateways \textit{AR} and \textit{BR} would be in charge of these packet transformations, altering traffic from the clients inside their networks (e.g., \textit{A1}, \textit{A2}, etc.) to outside hosts. The secrets at the end point level before are now stored at the gateway, with each gateway getting its own unique set of keys; the gateways typically lack precise knowledge of the end points they protect.
 
-\par Nodes inside the network may or may not have knowledge of the hopping. In most instances the hopping occurs with no modification of the end points and is largely transparent \cite{TAO}. This need to only deploy a small number of systems, rather than altering every system, gives gateway-based hopping an advantage over end point-based on larger networks. Applying software and/or hardware changes to every system is costly in terms of both time and manpower. Even more significantly, legacy systems running older operating systems might need custom solutions, increasing the cost of deployment.
+\par Nodes inside the network may or may not have knowledge of the hopping. In most instances the hopping occurs with no modification of the end points and is largely transparent \cite{TAO}. The need to only deploy a small number of gateway systems, rather than altering every client system, gives gateway-based hopping an advantage over end point-based on larger networks. Applying software and/or hardware changes to every system is costly in terms of both time and manpower. Even more significantly, legacy systems running older operating systems might need custom solutions, increasing the cost of deployment.
 
 \par The most common observable side effect of gateway hopping (beyond the latency associated with the additional processing) is \ac{TCP} connection dropping. Because TCP depends on IP addresses and ports numbers to identify on-going connections, any alterations to this information would traditionally kill the connection \cite{NASR}. This is a problem also faced by end point hopping schemes, but is more easily corrected because the individual machines know the state of connections and can correct appropriately. With gateway hopping, however, the situation may require more significant state tracking and packet inspection at the gateway.
 
@@ -157,7 +148,7 @@
 \label{tbl:hashing_example}
 \centering
 \begin{tabular}{r|l|l}
-	& Input & Output (SHA-1)\\
+	& \textbf{Input}  & \textbf{Output (SHA-1)} \\
 \hline
 Original & The quick brown fox jumped & c950af1b07223c7d8590538189b3bcd9f4e08c6c\\
 Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb3941b1bb075a97f56
@@ -178,7 +169,7 @@ Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb
 
 \subsection{Authentication}
 \label{sec:authentication}
-\par Authenticating that a given sequence of bytes actually comes from whom they say they do can be done through either a \ac{HMAC} \cite{rfc2104} or a digital signature \cite{rfc3447}. These algorithms are based on symmetric and asymmetric encryption, respectively, and therefore share the same strengths and weaknesses. Both algorithms are widely used today in protocols like \ac{IPsec} \cite{rfc2404} and user-level data like email.
+\par Authenticating that a given sequence of bytes actually comes from whom they say they do can be done through either a \ac{HMAC} \cite{rfc2104} or a digital signature \cite{rfc3447}. These algorithms are based on symmetric and asymmetric encryption, respectively, and therefore share the same strengths and weaknesses. Both algorithms are widely used today in protocols like \ac{IPsec} \cite{rfc2404} and user-level data like email \cite{rfc5751}.
 
 \par \ac{HMAC} works through a series of multiple hashes with the data and an encryption key. Both sender and receiver have the same shared private key, allowing them each to do the \ac{HMAC} process independently. The sender includes their computation of the \ac{HMAC} with the original data, then the receiver calculates their own HMAC and ensures it matches the one sent with the message. If it does, the receiver knows the message is unchanged and comes from someone with the correct shared key.
 
@@ -203,7 +194,7 @@ Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb
 \section{Previous Implementations}
 \label{sec:related_research}
 \subsubsection{BBN's \acf{DYNAT}}
-\par BBN Technologies' 2001 paper entitled ``Dynamic Approaches to Thwart Adversary Intelligence Gathering'' tests the hypothesis that ``dynamic modification of defense structure improves system assurance'' \cite{BBNDYNAT}. In the paper they discuss they lay out a custom address space randomization solution called \ac{DYNAT}.
+\par BBN Technologies' 2001 paper entitled ``Dynamic Approaches to Thwart Adversary Intelligence Gathering'' tests the hypothesis that ``dynamic modification of defense structure improves system assurance'' \cite{BBNDYNAT}. In the paper they lay out a custom address space randomization solution called \ac{DYNAT}.
 
 \par A series of red-team experiments tests against their \ac{DYNAT} were used to test if the addition of \ac{IP} hopping decreases an adversary's ability to map the network. The experimentation confirm BBN's hypothesis: DYNAT does increase system assurance because the adversary's work greatly increases in comparison to static networks. Even when the red team receives intimate knowledge of the DYNAT's operation, the adversary could not identify a critical server in an enclave with DYNAT active.
 
@@ -219,7 +210,7 @@ Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb
 \par The Sandia report also provides significant insight into the interaction of a \ac{DYNAT} with \ac{IPsec} and strongly suggests a combination of the two. First, the encryption from \ac{IPsec} avoids the ineffectiveness of address space randomization if the packets can be trivially sniffed for information, as BBN's work reveals \cite{BBNDYNAT}. Second, a \ac{DYNAT} strengthens \ac{IPsec}, as the hopping gateway can quickly reject invalid packets based on invalid source and destination identifiers, rather than forcing IPsec to perform expensive \ac{HMAC} computations and/or encryption. However, the report also warns that the use of IPsec with a hopping gateway can reduce some aspects of \ac{DYNAT}'s access control because more identifiers are encrypted and unusable.
 
 \subsubsection{\acf{APOD}}
-\par BBN continued work in the dynamic network address translation field and proposed another IP hopping implementation in 2003 as part of the \ac{DARPA} \ac{APOD} project \cite{APOD}. This system is a refinement of their previous \ac{DYNAT}, featuring a \ac{NAT} gateway sitting either on the server host itself or on a gateway into the network.
+\par BBN continued work in the dynamic network address translation field and proposed another IP hopping implementation in 2003 as part of the \ac{DARPA} \acf{APOD} project \cite{APOD}. This system is a refinement of their previous \ac{DYNAT}, featuring a \ac{NAT} gateway sitting either on the server host itself or on a gateway into the network.
 
 \par The primary differences between APOD and the previous DYNAT relates to implementation. Whereas the BBN DYNAT is a very specialized solution, \ac{APOD} employs standard \ac{COTS} utilities, such as Linux's iptables, to perform much of its work. This paper proposes the use of a \ac{NAT} gateway on the networks of both the client and the server, rather than a gateway only at the server side and/or specialized software on each end point.
 

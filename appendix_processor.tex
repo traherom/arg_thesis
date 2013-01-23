@@ -23,7 +23,7 @@ sudo apt-get install python-libpcap python-scapy
 
 \section{Usage}
 \label{sec:proc_usage}
-\par \texttt{process\_run.py} supports a variety of parameters, all of which are optional. The full parameter list and defaults are given in Table \ref{tbl:process_run_param} along with their defaults. Full descriptions of each are given in the list below.
+\par \texttt{process\_run.py} supports a variety of parameters, all of which are optional. The full parameter list and defaults are given in Table \ref{tbl:process_run_param}. Full descriptions of each are given in the list below.
 
 \begin{table}
 \caption{\texttt{process\_run.py} Parameters}
@@ -49,19 +49,19 @@ Parameter & Short & Default\\
 \begin{itemize}
 \item \texttt{--help} - Display usage message.
 \item \texttt{--logdir}, \texttt{-l} - Path of directory with log and pcap files.
-\item \texttt{--database}, \texttt{-db} - Path of database to database of processed run data. Will be created if needed, otherwise existing data will be used. If the database is only partially processed, \texttt{process\_run.py} will complete it. If not given, defaults to an entirely in-memory database.
+\item \texttt{--database}, \texttt{-db} - Path to database of processed run data. Will be created if needed, otherwise existing data will be used. If the database is only partially processed, \texttt{process\_run.py} will complete it. If not given, defaults to an entirely in-memory database.
 \item \texttt{--empty-database} - If given, all existing data in database is removed.
 \item \texttt{--skip-processing} - Do not attempt to process data, only produce results. If the database is incomplete, nothing will happen.
 \item \texttt{--skip-stats} - Do not calculate statistics after processing run data.
 \item \texttt{--offset} - Number of seconds to ignore at the beginning and end of a run.
 \item \texttt{--start-offset} - Number of seconds to ignore at beginning of run. Overrides value of \texttt{--offset}.
 \item \texttt{--end-offset} - Number of seconds to ignore at end of run. Overrides value of \texttt{--offset}.
-\item \texttt{--show-cycles} - If processing errors occur and the processor is unable to determine the correct receive for a each packet send, show cycles may reveal the problem packet(s). Mostly obsolete.
+\item \texttt{--show-cycles} - If processing errors occur and the processor generates loops in the packet chains (i.e., following the next hop for each packet eventually would lead back around), show cycles may reveal the problem packet(s). Mostly obsolete.
 \item \texttt{--finish-indicator} - File to create after processing is complete. Intended for automation.
 \end{itemize}
 
 \subsection{Example}
-\par The most common use case, when the caller wants to process the run data in the current directory and leave a database there:
+\par The most common use case, when the caller wants to process the run data in the current directory and create a database named \texttt{run.db} with the results:
 \begin{lstlisting}
 ~/results/basic-t0-l20-hr500ms-2012-11-24-08:54:21$ process_run.py -db run.db
 \end{lstlisting}
@@ -74,6 +74,8 @@ Parameter & Short & Default\\
 \section{Processor Execution}
 \label{sec:proc_operation}
 \par Run processing follows the steps below. It makes assumptions about the test network to determine where packets are headed and what hosts actually send and receive them, so logs must come from a network set up as documented in Figure \ref{fig:argnetwork}.
+
+\tbd{charles wants me to rewrite this}
 
 \begin{enumerate}
 \item Create database.

@@ -4,28 +4,28 @@
 
 \section{Research Conclusions}
 \label{sec:research_conclusions}
-\par This research has found that \ac{IP} hopping is a suitable method of blocking unexpected external traffic while having a minimal false-positive rate. This can be done in a way completely transparent to the internal and external hosts; the tool developed here works with no configuration changes to other hosts.
+\par This research has found that \ac{IP} hopping is a suitable method of blocking unexpected external traffic while maintaining a minimal false-positive rate. This can be done in a way completely transparent to the internal and external hosts; the tool developed here works with no configuration changes to any host other than the gateway.
 
-\par In addition, \ac{ARG} proves rapid \ac{IP} changes are possible, with network latency as the primary limiter. Tests demonstrate that---under this implemention---\acp{IP} may change around 15 times per second (changes every 50 to 75 milliseconds) and still allow for reliable communication. 
+\par In addition, \ac{ARG} proves rapid \ac{IP} address changes are possible, with network latency as the primary limiter. Tests demonstrate that---under this implementation---\ac{IP} addresses may change around 15 times per second (changes every 50 to 75 milliseconds) and still allow for reliable communication. 
 
-\ac{ARG} also demonstrates good throughput, a critical aspect of deployability to a real network. Test rates reach four \ac{Mbps} with no indication that \ac{ARG} is unable to handle much greater rates. Running a fuzzer against \ac{ARG} found that while gateways themselves remain stable in the face of malformed traffic, it may have an impact on connectivity and valid packet loss.
+\ac{ARG} also demonstrates good throughput, a critical aspect of usability to a real network. Test rates reach four \ac{Mbps} with no indication that \ac{ARG} is unable to handle much greater rates. Running a fuzzer against \ac{ARG} found that while gateways themselves remain stable in the face of malformed traffic, it may have an impact on connectivity and valid packet loss.
 
 \section{Research Impact}
 \label{sec:research_impact}
 \par This thesis presents a new \ac{IP} address hopping tool that combines features of previous efforts in this area. Through a gateway-based solution, \ac{ARG} avoids requiring changes to existing network architecture or any clients inside. \ac{ARG} applies \ac{IP} address changes to all packets entering and leaving the network and packets between \ac{ARG}-protected networks include full encryption and authentication.
 
-\par Of primary importance to this field of research is the demonstration that \ac{IP} changes may occur multiple times per second. Previous research focuses on changes on the participation order of minutes or hours and may kill on-going connections when address changes occur. \ac{ARG}'s design allows for connections to persist across hops without participation of either end of the stream, ultimately allowing for much more frequent address changes and a potential amplification of the benefits of address space randomization.
+\par Of primary importance to this field of research is the demonstration that \ac{IP} address changes may occur multiple times per second. Previous research focuses on changes on the participation order of minutes or hours and may kill on-going connections when address changes occur. \ac{ARG}'s design allows for connections to persist across hops without participation of either end of the stream, ultimately allowing for much more frequent address changes and a potential amplification of the benefits of address space randomization.
 
 \section{Future Work}
 \label{sec:future_work}
 \subsection{IPv6 support}
-\par \ac{IPv6} support is slowly becoming an absolute requirement for any network system. For a \ac{IP} hopping system, \ac{IPv6} offers the benefit of a greatly increased address space, allowing systems to hop in a much broader range of addresses. \ac{ARG} is entirely \ac{IPv4} in its operation and cannot transport \ac{IPv6} packets to external hosts or to other gateways.
+\par \ac{IPv6} support is slowly becoming an requirement for any network system. For a \ac{IP} hopping system, \ac{IPv6} offers the benefit of a greatly increased address space, allowing systems to hop in a much broader range of addresses. \ac{ARG} is entirely \ac{IPv4} in its current implementation and cannot transport \ac{IPv6} packets to external hosts or to other gateways.
 
 \subsection{Fragmentation Support}
 \par \ac{ARG} currently has no support for fragmenting packets as they pass through the system or of notifying the sender that fragmentation is needed. Packets to and from external hosts pose no problem, as the original sender will handle this themselves. However, packets between gateways/\ac{ARG}-protected networks have additional data added, potentially exceeding the maximum transmission unit of the network. In this case, \ac{ARG} has no way to recover and the packet is permanently dropped without notice. A more complete implementation should notify the sender that fragmentation is needed.
 
 \subsection{More extensive malicious testing}
-\par Due to time constraints, a full battery of robust malicious tests could not be performed against \ac{ARG}. As demonstrated by the basic fuzz testing, \ac{ARG} handles errors without dying, but may lose additional packets. The reasons behind this potential issue needs more exploration to determine the root cause and what should be done to fix it. More extensive work in both undirected (i.e., fuzz testing) and directed attacks is needed. For example, malicious hosts might attempt to falsely connect to a gateway or perform replay attacks in a more intelligent manner.  
+\par Due to time constraints, a full battery of robust malicious tests could not be performed against \ac{ARG}. As demonstrated by the basic fuzz testing, \ac{ARG} handles errors without becoming unstable, but may lose additional packets. The reasons behind this potential issue needs more exploration to determine the root cause and what should be done to fix it. More extensive work in both undirected (i.e., fuzz testing) and directed attacks is needed. For example, malicious hosts might attempt to falsely connect to a gateway or perform replay attacks in a more intelligent manner.  
 
 %\subsection{Red teaming}
 %\par In conjunction with the previous suggestion, 
@@ -34,7 +34,7 @@
 \par \ac{ARG} currently blindly opens holes in the \ac{NAT} when it sees outbound packets and closes them after seeing no activity in a fixed amount of time. A transport layer examination would allow more fine-grained \ac{NAT} work, by watching for actual connection establishment and teardown packets. 
 
 \subsection{Integration with other defenses}
-\par Network defenses often perform better when working in tandem. \ac{ARG} has the potential to detect certain types of probes into the network. If this information could be passed off to an \ac{IDS}, it might alert an operator or take other defense actions on the network. In an even more active approach, \ac{ARG} might work with a honeypot to present a fake view of the network to an attacker. By examine what systems an attacker probes, it might be possible to determine the identity of the adversary, their goals, and their intended target in the network, all valuable information to those defending the network.
+\par Network defenses often perform better when working in tandem. \ac{ARG} has the potential to detect certain types of probes into the network. If this information could be passed off to an \ac{IDS}, it might alert an operator or take other defense actions on the network. In an even more active approach, \ac{ARG} might work with a honeypot to present a fake view of the network to an attacker. By examining what systems an attacker probes, it might be possible to determine the identity of the adversary, their goals, and their intended target in the network, all valuable information to those defending the network.
 
 \section{Summary}
 \par This chapter reviews the work and findings of this thesis. The impact of the research is discussed and recommendations for future work are given.
