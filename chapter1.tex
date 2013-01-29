@@ -9,7 +9,7 @@
 \section{Goals and Limitations}
 \par This thesis proposes an IP address hopping system called \ac{ARG}. It incorporates many of the features of previous address-hopping schemes, with an eye on the specific needs of the military. In this context each of the existing systems presents drawbacks that \ac{ARG} attempts to avoid. Additionally, the design of ARG is intended to allow its future integration with a traditional IDS and honeypot, potentially gaining additional insight into an attacker's behavior.
 
-\par The geographically diverse military network demands high availability and reliability, security over any outside network, and the ability to utilize the commercial Internet when necessary for transport. In light of these and other requirements, this thesis examines several questions with regards to \ac{IP} hopping and \ac{ARG}.
+\par The geographically diverse military network demands high availability, reliability, and security over any network. Additionally, \ac{ARG} must support transport over the commercial Internet. In light of these and other requirements, this thesis examines several questions with regards to \ac{IP} hopping and \ac{ARG}.
 \begin{itemize}
 	\item Does \ac{ARG} classify traffic correctly? What percentage of false positives (valid packets blocked) and false negatives (invalid traffic allowed through) does it introduce?
 	\item What is the maximum packet rate \ac{ARG} can handle?
@@ -17,7 +17,7 @@
 	\item Is \ac{ARG} stable when presented with corrupt, malformed, and/or replayed packets?
 \end{itemize}
 
-\par The limitations on the answers to each of these questions varies. If \ac{ARG} shows an acceptable level of classification accuracy, it will demonstrate the viability of (in this regard) similar systems. Likewise, the maximum supportable hop rate from \ac{ARG} demonstrates that at least that rate is possible. On the other hand, if \ac{ARG} does not support a fast packet rate it only reveals flaws in its own design, not of others. \tbd{not sure about this paragraph. Needed? Leave until analysis?}
+%\par The limitations on the answers to each of these questions varies. If \ac{ARG} shows an acceptable level of classification accuracy, it will demonstrate the viability of (in this regard) similar systems. Likewise, the maximum supportable hop rate from \ac{ARG} demonstrates that at least that rate is possible. On the other hand, if \ac{ARG} does not support a fast packet rate it only reveals flaws in its own design, not of others. \tbd{not sure about this paragraph. Needed? Leave until analysis?}
 
 %\par \ac{ARG} is a prototype system. While every effort has been put in to implement a protocol suitable for real-world use, \tbd{do we want this?}
 

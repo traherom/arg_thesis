@@ -26,6 +26,9 @@ $ sudo apt-get install python-libpcap python-scapy
 \subsection{Normal Traffic Generator}
 \par \texttt{gen\_traffic.py} generates random \ac{TCP} and \ac{UDP} packets with the given characteristics and rates. Table \ref{tbl:gen_traffic_param} shows all the available options and the defaults where applicable. The generator can be stopped by pressing \texttt{Ctrl-c} or sending it \texttt{SIGTERM} via \texttt{kill}.
 
+\subsection{Validation}
+\par Validation is done manually on this tool by capturing the generated traffic on both the sending and receiving hosts. Full packet logging may be done by the generator directly (raw packets bytes were dumped), so a simple comparison between the sent traffic, the traffic it believes it generated, and the assigned settings ensure all parts of the tool operate as expected.
+
 \subsubsection{Examples}
 \par Send \ac{UDP} traffic to 192.168.1.5:2000 twice a second:
 \begin{lstlisting}
@@ -92,6 +95,9 @@ Parameter & Description & Possible Values & Default\\
 }
 
 \par The only option available for \texttt{malicious\_traffic.py} is \texttt{--output} option. This has the same effect as \texttt{gen\_traffic.py}'s and is covered in Table \ref{tbl:gen_traffic_param}.
+
+\subsubsection{Validation}
+\par Validation is done manually on this tool by capturing the generated traffic on both the sending and receiving hosts. The generator logs the modification(s) it makes to each packet, so a comparison between the received packet and the replayed packet quickly confirms each modification works as expected. Modifications are checked individually and in combination.
 
 \subsubsection{Limitations}
 \par Due to the design of the test network, with a switch connecting the hosts, it is difficult for this tool to reliably sniff traffic (it does not attempt to \ac{ARP} spoof or otherwise redirect traffic flow). To compensate for this the malicious generators are run on the gateways themselves, allowing them to see all of the traffic passing the gateway. A more realistic solution would be to use a true hub (the test network's switch did not allow this configuration) or sniff on a spanning port and send via a separate port.

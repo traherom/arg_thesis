@@ -20,7 +20,7 @@
 
 %\par The working hypothesis for this research is, as speculated by Sandia, a \ac{DYNAT} system allows for quick identification of unexpected (and potentially malicious) packets entering a network. There are few identifiers within the scope of \ac{DYNAT} by which outgoing packets could be filtered. Given that, no filtering is done for outbound packets and hence no change in behavior is observed when compared to the control network. 
 
-\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop rate appropriate for the network latency. In addition, this thesis hypothesizes that packet loss rates become reasonable when the hop rate matches or exceeds the network latency, where reasonable loss is defined as less than 2\% \tbd{2\% figure from MIT wifi? Trying to find source... it's on an article about TCP-NC, but not in the actual paper.}. The other two questions under test are informational in nature as the results apply only to the specific implementation under test, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 10 \ac{Mbps} of traffic. 
+\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop rate appropriate for the network latency. In addition, this thesis hypothesizes that packet loss become acceptable when the hop rate matches or exceeds the network latency, where acceptable loss is defined as less than 2\% \tbd{2\% figure from MIT wifi? Trying to find source... it's on an article about TCP-NC, but not in the actual paper.}. The other two questions under test are informational in nature as the results apply only to the specific implementation under test, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 10 \ac{Mbps} of traffic. 
 
 \subsection{Approach}
 \label{sec:approach}
@@ -76,9 +76,9 @@
 
 \section{Workload}
 \label{sec:workload}
-\par Workload to the system is the traffic flowing through the \ac{ARG} gateways. Standard network traffic parameters like packet rate, packet size, number of simultaneous ongoing connections, and lifetime of connections play a role. However, it is important to note that the network performance itself is not a large concern of this research. Packet rate, for example, does provide useful information about the performance of \ac{ARG} itself, but the numbers apply \textit{only} to this specific implementation. \ac{ARG}'s development does not focus on performance in this first iteration, so there are many possible areas for improvement. Previous research has shown that similar solutions have minimal impact on performance \cite{NAH}. 
+\par Workload to the system is the traffic flowing through the \ac{ARG} gateways. Standard network traffic parameters like packet rate, packet size, number of simultaneous ongoing connections, and lifetime of connections play a role. However, it is important to note that the network performance itself is not a large concern of this research. Packet rate, for example, does provide useful information about the performance of \ac{ARG} itself, but the numbers apply only to this specific implementation. \ac{ARG}'s development does not focus on performance in this first iteration, so there are many possible areas for improvement. Previous research has shown that similar solutions have minimal impact on performance \cite{NAH}. 
 
-\par Two parameters are more specific to \ac{ARG}. First, the proportion of traffic between protected networks verses traffic to external hosts varies the validation methods \ac{ARG} uses for each packet. Traffic flows that focus on between protected network connections rely on current \ac{IP} synchronization and signatures, while traffic that originates externally exercises the \ac{NAT} table.
+\par Two parameters are more specific to \ac{ARG}. First, the proportion of traffic between protected networks verses traffic to external hosts varies the validation methods \ac{ARG} uses for each packet. Traffic flows that focus on connections between protected networks rely on current \ac{IP} synchronization and signatures, while traffic that originates externally exercises the \ac{NAT} table.
 
 \par Second, the proportion of valid and invalid traffic---traffic that should or should not be permitted through \ac{ARG}---is a workload parameter. The reasons behind each packet's invalidity is also important: most of the possible outcomes from \ac{ARG} depend on \textit{why} a packet is invalid. The possible failure points here are incorrect external \acp{IP}, invalid packet signatures, and no entry in the \ac{NAT} table.
 
@@ -156,63 +156,63 @@
 	\includegraphics[width=0.75\textwidth]{thesis_network}
 \end{figure}
 
-\par If everything works correctly, protected clients behind the gateways (\texttt{ProtA1}, \texttt{ProtB1}, and \texttt{ProtC1}) may communicate freely. The protected clients may also talk out to the external host (\texttt{Ext1}), and the external hosts must then---once that connection is established---be able to talk back into the network. There is additional administrative traffic directly between the gateways (\texttt{GateA}, \texttt{GateB}, and \texttt{GateC}). These three basic traffic flows are ``valid'' traffic.
+\par Protected clients behind the gateways (\texttt{ProtA1}, \texttt{ProtB1}, and \texttt{ProtC1}) may communicate freely. The protected clients may also talk out to the external host (\texttt{Ext1}), and the external hosts must then---once that connection is established---be able to talk back into the network. There is additional administrative traffic directly between the gateways (\texttt{GateA}, \texttt{GateB}, and \texttt{GateC}). These three basic traffic flows are ``valid'' traffic.
 
 \par All traffic beyond what is described above is ``invalid.'' For example, \texttt{Ext1} is not allowed to send traffic in to the protected clients or the gateways without them first initiating the connection. Malformed traffic sent by any host is also considered invalid. In either case, invalid traffic should be stopped at the earliest possible opportunity (i.e., the gateway rejects the packet and keeps it from reaching the internal host) and the system must remain stable.
 
-\par To collect data, each system runs the traffic collection program \texttt{tcpdump} to capture the traffic sent and received into \ac{PCAP} files. Traffic generators are then spawned as appropriate on each system in the network, each of which logs their sends and receives. After a given trial, the \ac{PCAP} files and traffic generator logs are collated and processed with custom scripts to determine the metrics described in Section \ref{sec:metrics}. More details on the traffic generators and test run sequence can be found in Appendixes \ref{chp:generators} and \ref{chp:testseq}.
+\par To collect data, each system runs the traffic collection program \texttt{tcpdump} to capture the traffic sent and received into \ac{PCAP} files. Traffic generators are then spawned as appropriate on each system in the network, each of which logs their sends and receives. After a given trial, the \ac{PCAP} files and traffic generator logs are collated and processed with custom scripts to determine the metrics described in Section \ref{sec:metrics}. More details on the traffic generators and test run sequence can be found in Appendixes \ref{chp:testseq} and \ref{chp:generators}.
 
-\par All trials run on physical network of seven servers. Each server runs Ubuntu 12.04.1 Server Edition with four gigabytes of \ac{RAM} and a \tbd{CPU} \ac{CPU}. A single switch with four \acp{VLAN} connects each system at 100 \ac{Mbps}.
+\par All trials run on physical network of seven servers. Each server runs Ubuntu 12.04.1 Server Edition with four gigabytes of \ac{RAM} and a \tbd{CPU} gigahertz quad-core Intel Xeon. A single switch with four \acp{VLAN} connects each system at 100 \ac{Mbps}.
 
 \section{Experimental Design}
 \label{sec:exp_design}
 \par Based on the factors given in Section \ref{sec:factors} and the goals of this research (as laid out in Section \ref{sec:goals}), there are eight traffic flows of interest. Each consists of different types of traffic and flow destinations. These are most easily visualized in Figure \ref{fig:testnum_flows}.
 
 \begin{figure}
-\caption[Experiment Traffic Flows]{Experiment Traffic Flows. Black is valid traffic, red is invalid.}
+\caption[Experiment Traffic Flows]{Experiment Traffic Flows. Black is valid traffic, red is invalid. \tbd{Perhaps make two wide.}}
 \label{fig:testnum_flows}
 \centering
-\begin{subfigure}[b]{0.3\linewidth}
+\begin{subfigure}[b]{0.328\linewidth}
 	\centering
 	\includegraphics[width=1.0\linewidth]{test_traffic_0}
 	\caption{Test 0}
 \end{subfigure}
-\begin{subfigure}[b]{0.3\linewidth}
+\begin{subfigure}[b]{0.328\linewidth}
 	\centering
 	\includegraphics[width=1.0\linewidth]{test_traffic_1}
 	\caption{Test 1}
 \end{subfigure}
-\begin{subfigure}[b]{0.3\linewidth}
+\begin{subfigure}[b]{0.328\linewidth}
 	\centering
 	\includegraphics[width=1.0\linewidth]{test_traffic_2}
 	\caption{Test 2}
 \end{subfigure}
-\begin{subfigure}[b]{0.3\linewidth}
+\begin{subfigure}[b]{0.328\linewidth}
 	\centering
 	\includegraphics[width=1.0\linewidth]{test_traffic_3}
 	\caption{Test 3}
 \end{subfigure}
-\begin{subfigure}[b]{0.3\linewidth}
+\begin{subfigure}[b]{0.328\linewidth}
 	\centering
 	\includegraphics[width=1.0\linewidth]{test_traffic_4}
 	\caption{Test 4}
 \end{subfigure}
-\begin{subfigure}[b]{0.3\linewidth}
+\begin{subfigure}[b]{0.328\linewidth}
 	\centering
 	\includegraphics[width=1.0\linewidth]{test_traffic_5}
 	\caption{Test 5}
 \end{subfigure}
-\begin{subfigure}[b]{0.3\linewidth}
+\begin{subfigure}[b]{0.328\linewidth}
 	\centering
 	\includegraphics[width=1.0\linewidth]{test_traffic_6}
 	\caption{Test 6}
 \end{subfigure}
-\begin{subfigure}[b]{0.3\linewidth}
+\begin{subfigure}[b]{0.328\linewidth}
 	\centering
 	\includegraphics[width=1.0\linewidth]{test_traffic_7}
 	\caption{Test 7}
 \end{subfigure}
-\begin{subfigure}[b]{0.3\linewidth}
+\begin{subfigure}[b]{0.328\linewidth}
 	\centering
 	\includegraphics[width=1.0\linewidth]{test_traffic_8}
 	\caption{Test 8}
@@ -222,7 +222,7 @@
 \par These possible traffic flows are used in four sets of experiments, given below. Each experiment set answers a different research goal.
 \begin{itemize}
 	\item Basic tests
-	\par This sequence of tests validates that \ac{ARG} classifies traffic correctly by running every test shown in Figure \ref{testnum_flows} against \ac{ARG}. Latency is set to 20 \ac{ms} for all tests and traffic generators produce packets around every 0.3 seconds (actual traffic rate is higher due to responses and \ac{TCP} acknowledgment packets). To determine if hop rate has an large impact on certain types of traffic, every test runs twice, once with a slow hop rate (500 ms) and one close to double the latency (50 ms).
+	\par This sequence of tests verifies that \ac{ARG} classifies traffic correctly by running every test shown in Figure \ref{fig:testnum_flows} against \ac{ARG}. Latency is set to 20 milliseconds for all tests and traffic generators produce packets around every 0.3 seconds (actual traffic rate is higher due to responses and \ac{TCP} acknowledgment packets). To determine if hop rate has an large impact on certain types of traffic, every test runs twice, once with a slow hop rate (500 ms) and one close to double the latency (50 ms).
 
 	\item Max Throughput
 	\par This sequence gives an indication of what throughput and packet rate \ac{ARG} is capable of handling. Packet delay goes through all levels shown in Table \ref{tbl:factors}, which leads to roughly corresponding increases in the throughput the gateways must handle. Hop rate changes between 500 ms and 50 ms to see if the additional \ac{IP} calculation load impacts the maximum rate. Test 4 is used in all runs to exercise all possible valid traffic flows. Latency is set to 20 ms.
@@ -238,15 +238,5 @@
 
 \section{Summary}
 \label{sec:method_summary}
-\par This chapter discusses the methodology and goals of this research. It then defines the \ac{SUT} and its relevant factors. Finally, the test network setup and the exact tests run against it are covered, along with what metrics are collected and analyzed.
-
-\begin{comment}
-\tbd{don't need this section? Edit if we do}
-
-\par This research determines if \ac{DYNAT}---the use of a gateway with a rapidly changing external \ac{IP} address---can effectively determine whether traffic should be allowed into a network. Several previous research efforts in this area already proved that \ac{DYNAT} made it more difficult to gain knowledge of a network \cite{BBNDYNAT} and that performance could be minimally impacted \cite{NAH}. 
-
-\par A test network composed of two \ac{DYNAT}-protected networks and a few external hosts is used to explore this question. The custom \ac{DYNAT} solution used here, known as \ac{ARG}, allows the tuning of important system parameters. For the sake of this research, the primary factor is the hop rate. Levels used for experimentation include multiple times a second hops, several times a minute, and no hopping at all. Outside of \ac{ARG} itself, most hosts on the network run traffic generation scripts to simulate network activity. These scripts allow for the adjustment of packet rate, proportion of ``valid'' or ``invalid'' traffic produced, and how much traffic flows between the protected networks verses to the external hosts.
-
-\par All hosts run the packet capture utilities, allowing custom analysis tools to run through each host's logs and pull out the desired metrics. For the research question posed above, the metrics include the overall rejection/acceptance rate of packets, incorrect classification of packets, and why packets are typically rejected. The factors and levels discussed in Section \ref{sec:factors} and the 10 replications result in 810 total experiments.
-\end{comment}
+\par This chapter discusses the methodology and goals of this research. It then defines the \ac{SUT} and its relevant factors. Finally, the test network setup and the exact tests run against it are covered, along with what metrics are collected and analyzed. 
 

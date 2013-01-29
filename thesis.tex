@@ -34,6 +34,7 @@
 \usepackage{enumerate}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{colortbl}
 
 \usepackage{float}
  
@@ -43,6 +44,10 @@
 \restylefloat{figure}
 
 \usepackage{pdflscape}
+
+% Warning! This must be included after everything else! The afit-cls class attempts to
+% include this, but it's far too early
+\usepackage[bookmarks, breaklinks, colorlinks, linkcolor=black, urlcolor=black, citecolor=black]{hyperref}
 
 \lstloadlanguages{Python, C, bash}
 \lstset{

@@ -67,8 +67,8 @@ Technology Electronic Thesis and Dissertation Class]
 
 \AtEndOfClass{%
   \ifpdf
-    \RequirePackage[bookmarks, breaklinks, colorlinks,%
-                    linkcolor=black, urlcolor=black, citecolor=black]{hyperref}%
+    %\RequirePackage[bookmarks, breaklinks, colorlinks,%
+    %                linkcolor=black, urlcolor=black, citecolor=black]{hyperref}%
   \else                    
     \RequirePackage[bookmarks, colorlinks,%
                     linkcolor=black, urlcolor=black,

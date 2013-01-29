@@ -13,7 +13,7 @@ options(scipen=10)
 
 <<echo=FALSE>>=
 alpha=.95
-reasonable=2
+acceptable=2
 replicates=1000
 
 # Bring in CSV file and break out into each test, excluding the results.dir and
@@ -28,7 +28,7 @@ results[,loss_cols] = results[,loss_cols] * 100
 # Tests were 0-indexed. Make them 1-indexed for readability
 #results[,'test'] = results[,'test'] + 1
 
-# Convert ms values to integeres
+# Convert ms values to integers
 results[,'hop.rate'] = as.integer(sapply(results[,'gatea.hop.rate'], function(x) {
 		x = as.character(x);
 		substr(x, 1, nchar(x)-2);
@@ -51,7 +51,7 @@ fuzzer = results$fuzzer
 
 \section{Basic Tests}
 \label{sec:results_basic_tests}
-\par The first set of tests run tests the basic functioning of \ac{ARG}, as discussed in Section \ref{sec:exp_design}. These tests are intended to validate the basic functionality of \ac{ARG} and demonstrate the accuracy of classification under various circumstances, so the packet delay is set to a high value of 0.3 seconds, resulting in a slow packet rate. Hop rates vary between 50 milliseconds and 500 milliseconds, with round-trip latency fixed at 20 milliseconds.
+\par The first set of tests run tests the basic functioning of \ac{ARG}, as discussed in Section \ref{sec:exp_design}. These tests are intended to verify the basic functionality of \ac{ARG} and determine if it classifies traffic correctly, per the expected traffic flow. Given that the stressing the system is not a goal of this test, packet delay is set to a high value of 0.3 seconds, resulting in a slow packet rate. Hop rates vary between 50 milliseconds and 500 milliseconds, with round-trip latency fixed at 20 milliseconds.
 
 <<echo=FALSE>>=
 bootstrap_stats = function (data, idx) {
@@ -195,7 +195,7 @@ plotCI(0:(length(basic.boot)-1), basic.boot.stats,
 \label{fig:basic_mean_ci}
 \end{figure}
 
-\par These figures reveal a low packet loss across all test scenarios. At worst, Test 3---TCP traffic between \ac{ARG} protected clients only---lost between \Sexpr{basic.boot.ci[1,4]}\% and \Sexpr{basic.boot.ci[2,4]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, valid packet loss averaged \Sexpr{basic.boot.overall.stat}\%, with a \ac{CI} of $(\Sexpr{I(basic.boot.overall.ci)})$, again with \Sexpr{alpha*100}\% confidence. These results confirm Chapter \ref{chp:methodology}'s hypothesis that \ac{ARG} causes packet loss less than \Sexpr{reasonable}\%, at least under normal conditions.
+\par These figures reveal a low packet loss across all test scenarios. At worst, Test 3---TCP traffic between \ac{ARG} protected clients only---lost between \Sexpr{basic.boot.ci[1,4]}\% and \Sexpr{basic.boot.ci[2,4]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, valid packet loss averaged \Sexpr{basic.boot.overall.stat}\%, with a \ac{CI} of $(\Sexpr{I(basic.boot.overall.ci)})$, again with \Sexpr{alpha*100}\% confidence. These results confirm Chapter \ref{chp:methodology}'s hypothesis that \ac{ARG} causes packet loss less than \Sexpr{acceptable}\%, at least under normal conditions.
 
 \par Figure \ref{fig:basic_raw_data} displays two outliers on Test 3 and an occasional outlier in Test 5, 6, and 7. Examining the data reveals the dropped packets exceeded the maximum size of a packet \ac{ARG} can pass between gateways. As Chapter \ref{chp:implementation} covers, \ac{ARG} wraps packets between gateways in its own headers, increasing the size of the packet. Ethernet II has a default maximum transmission unit of 1500 bytes, so \ac{ARG} drops packets that pass this limit after being wrapped (\ac{ARG} is unable to fragment packets or inform the sender that fragmentation is needed, as Section \ref{sec:future_work} mentions). In fact, the maximum packet size issue is the most common reason for packet rejection in the basic set of tests (in tests with only valid traffic), as shown in Table \ref{tbl:basic_loss_reasons_valid}. While test traffic is controlled for size, the test traffic generators fail to account for \ac{TCP} options, which can increase the size of the packet beyond the limit.
 
@@ -213,10 +213,28 @@ create_rejection_table('basic_loss_reasons_valid', 'Basic Tests 1-4 Packet Rejec
 
 \FloatBarrier
 \subsection{Invalid Loss Rate}
-\par Tests 5 through 8 include invalid traffic that \ac{ARG} should reject and hence should be ``lost.'' Figure \ref{fig:basic_invalid_loss} displays the percentage of invalid traffic rejected (with 95\% \acp{CI}), clearly revealing \ac{ARG} has an extremely low false negative rate. As shown, over the course of nearly 30 repetitions only one test appears to have allowed a single packet through. %\Sexpr{alpha*100}\% \ac{CI} are theoretically displayed, but all showed 100\% invalid packet loss.
+\par Tests 5 through 8 include invalid traffic that \ac{ARG} should reject and hence should be ``lost.'' Table \ref{tbl:basic_invalid_loss} displays the percentage of invalid traffic rejected (with 95\% \acp{CI}), clearly revealing \ac{ARG} has an extremely low false negative rate. As shown, over the course of nearly 30 repetitions only one test appears to have allowed a single packet through. %\Sexpr{alpha*100}\% \ac{CI} are theoretically displayed, but all showed 100\% invalid packet loss.
 
+<<echo=FALSE, results='hide'>>=
+# Calculate overall average
+basic.inv.boot.overall = boot(data=basic[,'invalid.loss.rate'], statistic=bootstrap_stats, R=replicates)
+basic.inv.boot.overall.stat = basic.inv.boot.overall$t0
+basic.inv.boot.overall.ci = boot.ci(basic.inv.boot.overall, conf=alpha, type='basic')$basic[4:5]
+
+# Calculate mean for each test number
+basic.inv.boot = by(basic[,'invalid.loss.rate'], basic[,'test'], function(x) {
+		boot(data=x, statistic=bootstrap_stats, R=replicates)
+	})
+basic.inv.boot.stats = sapply(basic.inv.boot, function(x) x$t0)
+basic.inv.boot.ci = sapply(basic.inv.boot, function(x) {
+	ci = boot.ci(x, conf=alpha, type='basic')$basic
+	return(ci[4:5])
+	})
+@
+
+\begin{comment}
 \begin{figure}
-\caption{Invalid Traffic Loss Rate}
+\caption{Invalid Traffic Packet Loss}
 \label{fig:basic_invalid_loss}
 \centering
 <<basic_invalid_loss, out.width=".75\\textwidth", echo=FALSE, warning=FALSE>>=
@@ -231,15 +249,58 @@ ylab = seq(0, max(ylim), .01)
 axis(2, at=ylab, labels=paste(ylab, '%', sep=''))
 @
 \end{figure}
+\end{comment}
 
-\par Test 8 shows a small deviation from the expected 100\% packet rejection, as 1 of 746 packets made it through, but further examination of this number shows a rare post-processing problem. If two identical packets are sent at the same time, the test run processor leaves the second one unmarked, which is interpreted later as successfully received. The problem lies with the log analyzer, not \ac{ARG} itself, which did in fact reject every packet. This result offers convincing evidence that \ac{ARG} effectively blocks unexpected inbound traffic, but it gives no indication of its suitablity against more focused attacks. 
+\begin{table}
+\caption{Invalid Traffic Packet Loss}
+\label{tbl:basic_invalid_loss}
+\centering
+\begin{tabular}{l|c|c|c}
+\textbf{Test} & \textbf{Mean} & \textbf{\ac{CI}} & \textbf{Replications}\\
+\hline
+<<results='asis', echo=FALSE>>=
+invalid_runs = !valid_runs
+invalid_tests = c(5:8)
+for(test in invalid_tests) {
+	cat('Test ')
+	cat(test)
+	cat(' & ')
+
+	# Mean
+	cat(basic.inv.boot.stats[test+1])
+	cat('\\% & ')
+
+	# CI
+	ci = unlist(basic.inv.boot.ci[test+1])
+	if(!is.null(ci)) {
+		cat('(')
+		cat(ci[1])
+		cat('\\%, ')
+		cat(ci[1])
+		cat('\\%)')
+	} else {
+		cat('(100\\%, 100)')
+	}
+
+	# Replications
+	cat(' & ')
+	cat(sum(basic[,'test'] == test))
+
+	if(test < max(invalid_tests))
+		cat('\\\\\n')
+}
+@
+\end{tabular}
+\end{table}
+
+\par Test 8 shows a small deviation from the expected 100\% packet rejection, as 1 of 746 packets made it through, but further examination of this number shows a rare post-processing problem. If two identical packets are sent at the same time, the test run processor leaves the second one unmarked, which is interpreted later as successfully received. The problem lies with the log analyzer, not \ac{ARG} itself, which did in fact reject every packet. This result offers convincing evidence that \ac{ARG} effectively blocks unexpected inbound traffic, but it gives no indication of its suitability against more focused attacks. 
 
 <<echo=FALSE, results='asis'>>=
 # Get the total for each possible rejection reason for the invalid tests only
 create_rejection_table('basic_loss_reasons_invalid', 'Basic Tests 5-8 Packet Rejection Reasons', basic[invalid_runs,])
 @
 
-\par Additionally, Table \ref{tbl:basic_loss_reasons_invalid} illustrates that packets are rejected via the \ac{NAT} table quite frequently. This operation costs the gateway minimal processing time, as it can reject after a single hashtable lookup. The less time wasted on invalid packets the better, as it lowers the possibility of a \ac{DOS} attack; if all bandwith is consumed there is still a problem, but that is beyond the control of \ac{ARG}. Section \ref{sec:basic_valid_packet_loss} discusses the meaning of the remainder of this table.
+\par Additionally, Table \ref{tbl:basic_loss_reasons_invalid} illustrates that packets are rejected via the \ac{NAT} table quite frequently. This operation costs the gateway minimal processing time, as it can reject after a single hash table lookup. Fast decisions on packets lower the possibility of an effective \ac{DOS} attack, as the \ac{CPU} can continue to transform valid traffic. Section \ref{sec:basic_valid_packet_loss} discusses the meaning of the remainder of this table.
 
 \FloatBarrier
 \section{Maximum Hop Rate}
@@ -294,12 +355,12 @@ plot_latency_hoprate = function(hoprate, loss_rate_col, title='', xlim=NULL, yli
 	title(main=title, xlab="Hop Interval (ms)", ylab="Packet Loss")
 
 	axis(1, at=1:ncol(lat_hr_mean), labels=colnames(lat_hr_mean), cex.axis=0.75)
-	yaxis = c(reasonable, seq(from=min(ylim), to=max(ylim), by=yby))
+	yaxis = c(acceptable, seq(from=min(ylim), to=max(ylim), by=yby))
 	axis(2, at=yaxis, labels=paste(yaxis, '%', sep=''))
 
 	box()
 
-	abline(h=reasonable, lty=5, col="purple")
+	abline(h=acceptable, lty=5, col="purple")
 
 	type=1
 	for(lat in rownames(lat_hr_mean)) {
@@ -312,7 +373,7 @@ plot_latency_hoprate = function(hoprate, loss_rate_col, title='', xlim=NULL, yli
 			xpd=TRUE,
 			x=xlim[2] + .6,
 			y=mean(ylim) + (ylim[2] - ylim[1])/5,
-			legend=c(paste(rownames(lat_hr_mean), "ms"), paste('Reasonable\nLoss: ', reasonable, '%', sep='')),
+			legend=c(paste(rownames(lat_hr_mean), "ms"), paste('Acceptable\nLoss: ', acceptable, '%', sep='')),
 			lty=c(1:(type-1), 5),
 			col=c(1:(type-1), "purple"),
 			pch=c(0:(type-2), NA)
@@ -344,13 +405,13 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.udptcp.interarg', ylim=c(0, 5
 @
 \end{figure}
 
-\par Figure \ref{fig:hrlat_udptcp_inter_full} displays the results of the hop rate tests, separated by network latency. Figure \ref{fig:hrlat_udptcp_inter_zoomed} displays the same numbers, but with a much tighter Y scale to reveal differences at large hop intervals. The numbers shown here only include packets sent between \ac{ARG}-protected clients, traffic to the external host and administrative packets between gateways are not included. The values given are the bootstrapped means over \Sexpr{round(repetitions)} test repetitions with \Sexpr{replicates} replicates used in the bootstrap. \tbd{not true right now, they're plain means}. The highest standard deviation in any of the hop rate-latency groups is \Sexpr{worst_sd}, implying the potential for significant (but still potentially acceptable) variation in network performance. %implying some variation in each hop rate-latency grouping but still relatively predictable losses.
+\par Figure \ref{fig:hrlat_udptcp_inter_full} displays the results of the hop rate tests, separated by network latency. Figure \ref{fig:hrlat_udptcp_inter_zoomed} displays the same numbers, but with a much tighter Y scale to reveal differences at large hop intervals. The numbers shown here only include packets sent between \ac{ARG}-protected clients, traffic to the external host and administrative packets between gateways are not included (packets to external hosts are considered separately later). The highest standard deviation in any of the hop rate-latency groups is \Sexpr{worst_sd}, implying the potential for significant (but still potentially acceptable) variation in network performance. %implying some variation in each hop rate-latency grouping but still relatively predictable losses.
 
-\par Interestingly, the zero millisecond latency trials exhibit a noticably different decline than the others, with zero milliseconds giving a relatively steady decline in loss rate and the others remaining relatively flat before a rapid drop. The 30 millisecond latency curve gives a hint the shapes may not be as different as it appears, as it shows two or three mid-way data points on the way down to reasonable packet loss. With tests against more hop rates, these curves would likely show a more gradual (although still rapid) decline. 
+\par Interestingly, the zero millisecond latency trials exhibit a noticeably different decline than the others, with zero milliseconds giving a relatively steady decline in loss rate and the others remaining relatively flat before a rapid drop. The 30 millisecond latency curve gives a hint the shapes may not be as different as it appears, as it shows two or three mid-way data points on the way down to acceptable packet loss. With tests against more hop rates, these curves would likely show a more gradual (although still rapid) decline. 
 
-\par Chapter \ref{chp:methodology} hypothesizes that packet loss reaches reasonable levels when the hop rate is equal to (or exceeds) the one-way network latency. Theoretically, this time frame should allow a packet to cross the network from one gateway to another before the receiver changes \acp{IP} twice, even if the packet is sent just before the receiver hops the first time (as mentioned in Chapter \ref{chp:implementation}, gateways accept packets at the current and previous \ac{IP}). Any faster hop rate results in a period of time before each hop that guarrantees sent packets arrive too late.  Figure \ref{fig:hrlat_udptcp_inter_zoomed}, however, shows that loss drops below \Sexpr{reasonable}\% when hop rate is around four times the latency. This difference from the anticipated behavior is likely the result of the test environment.
+\par Chapter \ref{chp:methodology} hypothesizes that packet loss reaches acceptable levels when the hop rate is equal to (or exceeds) the one-way network latency. Theoretically, this time frame should allow a packet to cross the network from one gateway to another before the receiver changes \acp{IP} twice, even if the packet is sent just before the receiver hops the first time (as mentioned in Chapter \ref{chp:implementation}, gateways accept packets at the current and previous \ac{IP}). Any faster hop rate results in a period of time before each hop that guarantees sent packets arrive too late.  Figure \ref{fig:hrlat_udptcp_inter_zoomed}, however, shows that loss drops below \Sexpr{acceptable}\% when hop rate is around four times the latency. This difference from the anticipated behavior is likely the result of the test environment.
 
-\par As Section \ref{sec:eth_routing} discusses, Ethernet uses \ac{ARP} requests and responses to determine the source and destination for packets on the local network. In the test environment, the gateways and the external host are all on the same local network and hence must work with all the extra Ethernet frames that entails, when compared to operation across the Internet.  On a normal Ethernet segment with minimal latency (the zero millisecond test), the \ac{ARP} process takes minimal time and has little impact on operation. To speed the process even further, \ac{ARP} data is cached, so when a system wants to send to the same \ac{IP} again, it references the ARP cache table and does not have to go through the request-response process again. With fast hop rates, however, gateways frequently need to send to different \ac{IP} addresses and therefore must send and receive the requisite \acp{ARP} very frequently (generally, once every hop). When the network latency is not zero, these additional frames can cause significant delays. Figure \ref{fig:triple_arp_issue} illustrates what happens when a time synchronization between gateways occurs with a five millisecond one-way latency.
+\par As Section \ref{sec:eth_routing} discusses, Ethernet uses \ac{ARP} requests and responses to determine the source and destination for packets on the local network. In the test environment, the gateways and the external host are all on the same local network. This results in extra Ethernet \ac{ARP} requests and responses to determine the destination of packets. On a normal Ethernet segment with minimal latency (the zero millisecond test), the \ac{ARP} process takes minimal time and has little impact on operation. To speed the process even further, \ac{ARP} data is cached, so when a system wants to send to the same \ac{IP} again, it references the ARP cache table and does not have to go through the request-response process again. With fast hop rates, however, gateways frequently need to send to different \ac{IP} addresses and therefore must send and receive the requisite \acp{ARP} very frequently (generally, once every hop). When the network latency is not zero, these additional frames can cause significant delays. Figure \ref{fig:triple_arp_issue} illustrates what happens when a time synchronization between gateways occurs with a five millisecond one-way latency.
 
 \begin{figure}
 \caption{Time Synchronization, Including \ac{ARP}s}
@@ -368,11 +429,11 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.udptcp.interarg', ylim=c(0, 5
 \end{subfigure}
 \end{figure}
 
-\par If there were no need for these ARP requests (or they were negligible), then the entire time sync process would complete in 10 milliseconds. Because of the \acp{ARP}, however, it takes 30 milliseconds. The time base for the other gateway is still (usually) calculated correctly, because the latency of that particular packet is taken into account. Later packets may take a wide variety of latencies, however, because they may not require any \acp{ARP}, only one direction might require it, or both directions may need it. For a 5 millisecond one-way latency, this only leads to variantions of 5, 10, or 15 milliseconds, a tolerable amount of variation. By the time tests get to 250 milliseconds latencies, one-way latencies easily range from 250 to 750 milliseconds, with \ac{RTT} of around 1500 milliseconds. At faster hop rates, the triple latency problem is encountered more frequently, as the ARP cache must be refreshed more often. This degree of variation is difficult to compensate for, leading to siginificant packet loss until hop rates exceed three times the set latency.
+\par If there were no need for these ARP requests (or they were negligible), then the entire time sync process would complete in 10 milliseconds. Because of the \acp{ARP}, however, it takes 30 milliseconds. The time base for the other gateway is still (usually) calculated correctly, because the latency of that particular packet is taken into account. Later packets may take a wide variety of latencies, however, because they may not require any \acp{ARP}, only one direction might require it, or both directions may need it. For a 5 millisecond one-way latency, this only leads to variations of 5, 10, or 15 milliseconds, a tolerable amount of variation. By the time tests get to 250 milliseconds latencies, one-way latencies easily range from 250 to 750 milliseconds, with \ac{RTT} of around 1500 milliseconds. At faster hop rates, the triple-latency problem is encountered more frequently, as the ARP cache must be refreshed more often. This degree of variation is difficult to compensate for, leading to significant packet loss until hop rates exceed three times the set latency.
 
-\par Desite having no latency, the zero millisecond test exhibits high loss until around 75 milliseconds hops, similar to when the 15 millisecond latency test indicates a usable connection. This may indicate a maximum supportable hop rate of around 50-75 milliseconds, at least without the sender calculating \acp{IP} with respect to latency (i.e., send packets with \acp{IP} that will be current when they arrive at the receiver). Previous research into address space randomization and \ac{IP} hopping have limited themselves to hopping on the order of minutes or hours \tbd{cite}.
+\par Despite having no latency, the zero millisecond test exhibits high loss until around 75 milliseconds hops, similar to when the 15 millisecond latency test indicates a usable connection. This may indicate a maximum supportable hop rate of around 50-75 milliseconds under the current implementation. It may be possible for the sender of a packet to calculate ``future'' \ac{IP} addresses to use for each packet sent, so that the addresses are current when they arrive at the destination. This is an area for future research, as Section \ref{sec:future_work} discusses. Previous research into address space randomization and \ac{IP} hopping have limited themselves to hopping on the order of minutes or hours.
 
-\par \ac{ARG} appears to have little additional impact on \ac{TCP}, when compared to \ac{UDP}. Figure \ref{fig:hrlat_tcp_inter} displays losses associated with only \ac{TCP} packets travelling between gateways. Compared to Figure \ref{fig:hrlat_udptcp_inter_full} (which includes UDP and TCP packets), trends appear similar. \tbd{resample between tcp-only and full interarg? I don't care any more.}
+\par \ac{ARG} appears to have little additional impact on \ac{TCP}, when compared to \ac{UDP}. Figure \ref{fig:hrlat_tcp_inter} displays losses associated with only \ac{TCP} packets travelling between gateways. Compared to Figure \ref{fig:hrlat_udptcp_inter_full} (which includes UDP and TCP packets), trends appear similar. 
 
 \begin{figure}
 \caption{Loss Rate, TCP Packets Only}
@@ -520,7 +581,7 @@ plot(t)
 @
 \end{figure}
 
-\par On this graph, numbers along the side correspond to the cluster numbers shown in Table \ref{tbl:pr_clusters} and Figure \ref{fig:pr_raw_data}. Six means stand out as being distinctly different: 1-4, 2-4, 3-4, 4-5, 4-6, and 4-7. Cluster 4 is statistically different from all other clusters, with \Sexpr{alpha*100}\% confidence. However, the other data gives reason to believe that throughput was not the cause of loss increase and variation. No changing trend is seen in any of the surrounding throughputs' losses (either up or down) and faster throughputs (Clusters 5 through 7) show loss comparable to the slower throughputs (Clusters 1 through 3). While the precise cause of the increased loss in some of these tests is unknown, the amount of data the gateways handle is not believed to be the cause.
+\par On Figure \ref{sec:pr_tukey}, numbers along the side correspond to the cluster numbers shown in Table \ref{tbl:pr_clusters} and Figure \ref{fig:pr_raw_data}. Six means stand out as being distinctly different: 1-4, 2-4, 3-4, 4-5, 4-6, and 4-7. Cluster 4 is statistically different from all other clusters, with \Sexpr{alpha*100}\% confidence. However, the other data gives reason to believe that throughput was not the cause of loss increase and variation. No changing trend is seen in any of the surrounding throughputs' losses (either up or down) and faster throughputs (Clusters 5 through 7) show loss comparable to the slower throughputs (Clusters 1 through 3). While the precise cause of the increased loss in some of these tests is unknown, the amount of data the gateways handle is not believed to be the cause.
 
 \par The results of these tests are limited to just the implementation of \ac{ARG} and imply only a minimally possible throughput. Despite these limitations, \ac{ARG} performs well with reasonably rapid traffic of over four \ac{Mbps}, giving no reason to believe it is not capable of higher rates.
 
@@ -545,7 +606,7 @@ fuzzer.boot.ci = sapply(fuzzer.boot, function(x) {
 	})
 @
 
-\par The results processor this thesis uses to generate statistics on runs is unable to process the logs from the malicious traffic generators, making it difficult to determine precisely what occurs in each replication. This calls into question the accuracy of the results from the run processor. Nonetheless, the \Sexpr{signif(fuzzer.boot.overall.stat, 2)}\% loss over each run indicates \ac{ARG} experiences significant difficulty when faced with malicious traffic. A manual examination of log files does seem to indicate this is the case, with some traffic successfully traversing across the network but a huge amount being rejected. 
+\par The custom run-processing tool this thesis uses to generate packet loss statistics is unable to process the logs from the malicious traffic generators, making it difficult to determine precisely what occurs in each replication. This calls into question the accuracy of the results from the run processor. Nonetheless, the \Sexpr{signif(fuzzer.boot.overall.stat, 2)}\% loss over each run indicates \ac{ARG} experiences significant difficulty when faced with malicious traffic. A manual examination of log files does seem to indicate this is the case, with some traffic successfully traversing across the network but a huge amount being rejected. 
 
 \begin{comment}
 Table \ref{tbl:fuzzer_loss_reasons} gives the reasons behind each rejection.
@@ -565,13 +626,15 @@ create_rejection_table('fuzzer_loss_reasons', 'Fuzzer Packet Reject Reasons', fu
 \item Does \ac{ARG} classify traffic correctly?
 \par Overall, \ac{ARG} does classify traffic correctly. Throughout the testing, no actual false negatives occurred, indicating \ac{ARG}'s \ac{NAT} system is robust and provides a solid way to classify invalid inbound traffic. However, the traffic used to test this system is fairly benign and does not intentionally attemp to circumvent \ac{ARG}. Testing needs to be done with a more intelligent threat. 
 
-\par For expected traffic on the network, whether it is between \ac{ARG}-protected networks or to external hosts, \ac{ARG} is reasonably accurate. In basic tests involving a range of traffic types, \ac{ARG} averaged less than \Sexpr{basic.boot.overall.stat}\% loss of valid, expected traffic. This falls well below Chapter \ref{chp:methodology}'s definition of ``reasonable loss'' of \Sexpr{reasonable}\%. Based on this, \ac{ARG} accurately classifies traffic.
+\par For expected traffic on the network, whether it is between \ac{ARG}-protected networks or to external hosts, \ac{ARG} is reasonably accurate. In basic tests involving a range of traffic types, \ac{ARG} averaged less than \Sexpr{basic.boot.overall.stat}\% loss of valid, expected traffic. This falls well below Chapter \ref{chp:methodology}'s definition of ``acceptable loss'' of \Sexpr{acceptable}\%. Based on this, \ac{ARG} accurately classifies traffic.
 
 \item What is the max packet rate \ac{ARG} can handle?
 \par The testing done for this research did not find an upper limit on the amount of traffic \ac{ARG} could handle, with the gateways showing the capability of handling over \Sexpr{round(max_packet_rate/1024, 1)} \ac{Mbps} with little change in loss rate. While a system deployed in front of a corporate network would need to handle much higher rates, these tests find no reason to believe \ac{ARG} incapable of scaling well.
 
 \item What is the maximum supportable hop rate? How does latency affect this?
-\par When \ac{ARG} operates on a network with a one-way latency less than 15 milliseconds, hops may occur every 50 to 75 milliseconds and still maintain a viable communication channel (losses are less than \Sexpr{reasonable}\%). Beyond this point, packets begin flowing smoothly when the time between hops exceeds four times the latency. However, there is reason to believe hops could be faster in a real-world deployment, due to the test network factors Section \ref{sec:results_hoprate_tests} discusses. This is a significant contribution because previous research focuses on address changes on the order of minutes or hours, rather than multiple times a second. \tbd{cite}
+\par When \ac{ARG} operates on a network with a one-way latency less than 15 milliseconds, hops may occur every 50 to 75 milliseconds and still maintain a viable communication channel (losses are less than \Sexpr{acceptable}\%). Beyond this point, packets begin flowing smoothly when the time between hops exceeds four times the latency. However, there is reason to believe hops could be faster in a real-world deployment, due to the test network factors Section \ref{sec:results_hoprate_tests} discusses. This is a significant contribution because previous research focuses on address changes on the order of minutes or hours, rather than multiple times a second. 
+
+\par Realistically, network latencies vary wildly. However, \ac{ARG} allows flexibility in setting the hop rate for every gateway separately and could be easily expanded to allow gateways to change the hop rates they use between each other while leaving the rate used for others alone. Section \ref{sec:future_work} discusses this in more depth. This flexibility allows networks with low-latency fiber-connected networks to hop frequently and high-latency satellite-connected networks to hop more slowly. The results here provide guidance on the maximum hop rate to chose based on network conditions.
 
 \item Is \ac{ARG} stable when presented with corrupt, malformed, or replayed packets?
 \par \ac{ARG} is stable in the face of bad traffic. Long-running fuzz tests do not cause \ac{ARG} to crash, nor do they permanently break traffic flow. However, malformed traffic does appear to have an impact on valid packet loss, based on both automated analysis and a manual inspection. The cause of this needs exploration to determine the correct fix.
