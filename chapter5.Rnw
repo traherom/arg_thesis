@@ -151,7 +151,8 @@ create_rejection_table = function(name, caption, table) {
 \par The raw results for the loss of valid packets on each test are shown in Figure \ref{fig:basic_raw_data}. Figure \ref{fig:basic_mean_ci} shows the mean and \acp{CI} of each test, using a \Sexpr{alpha*100}\% confidence level. Due to a lack of normality in the experimental results, these numbers are calculated via bootstrapping with \Sexpr{replicates} replicates.
 
 \begin{figure}
-\caption{Basic Test Data}
+\caption{Basic Tests, Raw Valid Packet Loss}
+\label{fig:basic_raw_data}
 \centering
 <<echo=FALSE>>=
 # Graph and generate stats on basic tests with test num vs loss rate 
@@ -164,11 +165,11 @@ axis(1, at=names(basic.boot), labels=names(basic.boot))
 ylab = seq(0, max(ylim), .5)
 axis(2, at=ylab, labels=paste(ylab, '%', sep=''))
 @
-\caption{Basic tests raw data, valid packet loss}
-\label{fig:basic_raw_data}
 \end{figure}
 
 \begin{figure}
+\caption{Basic Tests, Valid Packet Loss Means and \acp{CI}}
+\label{fig:basic_mean_ci}
 \centering
 << echo=FALSE, warning=FALSE>>=
 ylim=c(0, max(basic.boot.ci, na.rm=TRUE))
@@ -191,8 +192,6 @@ plotCI(0:(length(basic.boot)-1), basic.boot.stats,
 #text(0:(length(basic.boot)-1) + .5, basic.boot.stats,
 #	labels=sapply(basic.boot.stats, function(x) round(x, digits=4)))
 @
-\caption{Loss rate, basic test means and \acp{CI}}
-\label{fig:basic_mean_ci}
 \end{figure}
 
 \par These figures reveal a low packet loss across all test scenarios. At worst, Test 3---TCP traffic between \ac{ARG} protected clients only---lost between \Sexpr{basic.boot.ci[1,4]}\% and \Sexpr{basic.boot.ci[2,4]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, valid packet loss averaged \Sexpr{basic.boot.overall.stat}\%, with a \ac{CI} of $(\Sexpr{I(basic.boot.overall.ci)})$, again with \Sexpr{alpha*100}\% confidence. These results confirm Chapter \ref{chp:methodology}'s hypothesis that \ac{ARG} causes packet loss less than \Sexpr{acceptable}\%, at least under normal conditions.
@@ -252,7 +251,7 @@ axis(2, at=ylab, labels=paste(ylab, '%', sep=''))
 \end{comment}
 
 \begin{table}
-\caption{Invalid Traffic Packet Loss}
+\caption{Basic Tests, Invalid Packet Loss}
 \label{tbl:basic_invalid_loss}
 \centering
 \begin{tabular}{l|c|c|c}
@@ -279,7 +278,7 @@ for(test in invalid_tests) {
 		cat(ci[1])
 		cat('\\%)')
 	} else {
-		cat('(100\\%, 100)')
+		cat('(100\\%, 100\\%)')
 	}
 
 	# Replications
@@ -386,7 +385,7 @@ plot_latency_hoprate = function(hoprate, loss_rate_col, title='', xlim=NULL, yli
 @
 
 \begin{figure}
-\caption{Loss Rate, \ac{ARG} Network Traffic}
+\caption{Hop Rate Tests, Traffic between \ac{ARG} Networks Only Loss Rate}
 \label{fig:hrlat_udptcp_inter_full}
 \centering
 <<echo=FALSE>>=
@@ -397,7 +396,7 @@ repetitions = plot_results['repetitions']
 \end{figure}
 
 \begin{figure}
-\caption{Loss Rate, \ac{ARG} Network Traffic, Scaled}
+\caption{Hop Rate Tests, Scaled View of Traffic between \ac{ARG} Networks}
 \label{fig:hrlat_udptcp_inter_zoomed}
 \centering
 <<echo=FALSE>>=
@@ -414,18 +413,18 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.udptcp.interarg', ylim=c(0, 5
 \par As Section \ref{sec:eth_routing} discusses, Ethernet uses \ac{ARP} requests and responses to determine the source and destination for packets on the local network. In the test environment, the gateways and the external host are all on the same local network. This results in extra Ethernet \ac{ARP} requests and responses to determine the destination of packets. On a normal Ethernet segment with minimal latency (the zero millisecond test), the \ac{ARP} process takes minimal time and has little impact on operation. To speed the process even further, \ac{ARP} data is cached, so when a system wants to send to the same \ac{IP} again, it references the ARP cache table and does not have to go through the request-response process again. With fast hop rates, however, gateways frequently need to send to different \ac{IP} addresses and therefore must send and receive the requisite \acp{ARP} very frequently (generally, once every hop). When the network latency is not zero, these additional frames can cause significant delays. Figure \ref{fig:triple_arp_issue} illustrates what happens when a time synchronization between gateways occurs with a five millisecond one-way latency.
 
 \begin{figure}
-\caption{Time Synchronization, Including \ac{ARP}s}
+\caption{Time Synchronization Process, Including \acp{ARP}}
 \label{fig:triple_arp_issue}
 \centering
 \begin{subfigure}[t]{.6\linewidth}
 \centering
 \includegraphics[width=1.0\linewidth]{triple_arp_issue}
-\caption{With 5 millsecond \ac{ARP}}
+\caption{With 5 millisecond \ac{ARP}}
 \end{subfigure}
 \begin{subfigure}[t]{.6\linewidth}
 \centering
 \includegraphics[width=1.0\linewidth]{triple_arp_issue_no_arp}
-\caption{With 0 millsecond \ac{ARP} (not shown)}
+\caption{With insignificant \ac{ARP} (not shown)}
 \end{subfigure}
 \end{figure}
 
@@ -436,7 +435,7 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.udptcp.interarg', ylim=c(0, 5
 \par \ac{ARG} appears to have little additional impact on \ac{TCP}, when compared to \ac{UDP}. Figure \ref{fig:hrlat_tcp_inter} displays losses associated with only \ac{TCP} packets travelling between gateways. Compared to Figure \ref{fig:hrlat_udptcp_inter_full} (which includes UDP and TCP packets), trends appear similar. 
 
 \begin{figure}
-\caption{Loss Rate, TCP Packets Only}
+\caption{Hop Rate Tests, \ac{TCP} Traffic Only Loss Rate}
 \label{fig:hrlat_tcp_inter}
 \centering
 <<echo=FALSE>>=
@@ -444,20 +443,16 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.tcp.interarg', yby=5)
 @
 \end{figure}
 
-<<echo=FALSE>>=
-
-@
-
 \par Table \ref{tbl:hoprate_loss_reasons} shows the packet rejection reasons for all hop rate tests. As expected, far and away the most common rejection reason for this set of tests is incorrect source and/or destination \acp{IP}. Other entries in this table are discussed in Section \ref{sec:basic_valid_packet_loss}.
 
 <<echo=FALSE, results='asis'>>=
-create_rejection_table('hoprate_loss_reasons', 'Hoprate Loss Reasons', hoprate)
+create_rejection_table('hoprate_loss_reasons', 'Hop Rate Test Loss Reasons', hoprate)
 @
 
 \par Finally, Figure \ref{fig:hrlat_extra} demonstrates there is little correlation between hop rate and the flow of traffic to external hosts. In the worst sample of all \Sexpr{nrow(hoprate)} runs, packet loss to and from the external host reached only \Sexpr{signif(max(hoprate[,'valid.loss.rate.extraarg']), 2)}\%. This makes sense, as the changing \ac{IP} is only referenced when the \ac{NAT} module first creates a table entry and consults that information for all future packets on that connection. Barring genuine bugs in that process, the hop rate is completely irrelevant to performance of external hosts.
 
 \begin{figure}
-\caption{Loss Rate, Externally-Bound Packets Only}
+\caption{Hop Rate Tests, Externally-Bound Packet Loss Rate}
 \label{fig:hrlat_extra}
 \centering
 <<echo=FALSE>>=
@@ -534,7 +529,7 @@ for(clust in unique(packetrate[,'bps.clust'])) {
 \end{table}
 
 \begin{figure}
-\caption{Loss verses throughput, raw packet rate data with clustering}
+\caption{Packet Rate Tests, Clustered Loss verses Throughput}
 \label{fig:pr_raw_data}
 \centering
 <<echo=FALSE>>=
@@ -572,7 +567,7 @@ max_packet_rate = max(packetrate[,'kbps'])
 \par Figure \ref{fig:pr_raw_data} shows the raw data from these tests, with colors indicating the \Sexpr{max(packetrate[,'bps.clust'])} K-means clusters, grouped by bit-wise throughput. This graph includes all packets on the network. Visually, the plot reveals fairly similar loss in each cluster, although some clusters exhibit a fair amount of variation. A Tukey test with each cluster confirms this result, as shown in \ref{fig:pr_tukey}. 
 
 \begin{figure}
-\caption{Tukey Test Against Clustered Packet Rate Data}
+\caption{Packet Rate Tests, Tukey Test Against Clustered Data}
 \label{fig:pr_tukey}
 <<echo=FALSE>>=
 m = aov(valid.loss.rate~factor(bps.clust), packetrate)
