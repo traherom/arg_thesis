@@ -176,18 +176,6 @@
 %% an optional width in square brackets, as in  "\listofsymbols[.3in]".  
 %% Both of these lists will be listed in the order that they appear in the text.
 
-\newenvironment{changemargin}[1]{%
-\begin{list}{}{%
-\setlength{\topsep}{0pt}%
-\setlength{\topmargin}{#1}%
-\setlength{\leftmargin}{#1}%
-\setlength{\rightmargin}{#1}%
-\setlength{\listparindent}{\parindent}%
-\setlength{\itemindent}{\parindent}%
-\setlength{\parsep}{\parskip}%
-}%
-\item[]}{\end{list}}
-
 \begin{document}
 
 % The acronym package can be used to add a list of acronyms.  Because
