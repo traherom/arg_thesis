@@ -1,0 +1,35 @@
+digraph G {
+	size="8.5,11"; page="8.5,11"; margin=0;
+	packet [label="Packet", shape="parallelogram"]
+	seq_num [label="Sequence Number Valid?", shape="diamond"]
+	packet -> seq_num
+
+	is_wrapped [label="Type == Wrapped?", shape="diamond"]
+	reject1 [label="Drop", shape="rectangle"]
+	seq_num -> is_wrapped [label="yes"]
+	seq_num -> reject1 [label="no"]
+
+	hmac_ok [label="HMAC ok?", shape="diamond"]
+	sig_ok [label="Signature ok?", shape="diamond"]
+	is_wrapped -> hmac_ok [label="yes"]
+	is_wrapped -> sig_ok [label="no"]
+
+	reject2 [label="Drop", shape="rectangle"]
+	reject3 [label="Drop", shape="rectangle"]
+	is_wrap_or_trust [label="Type == Wrapped or Trust?", shape="diamond"]
+	hmac_ok -> is_wrap_or_trust [label="yes"]
+	sig_ok -> is_wrap_or_trust [label="yes"]
+	hmac_ok -> reject2 [label="no"]
+	sig_ok -> reject3 [label="no"]
+
+	decrypt_rsa [label="Decrypt with\nRSA private key", shape="rectangle"]
+	decrypt_aes [label="Decrypt with\nAES shared key", shape="rectangle"]
+
+	is_wrap_or_trust -> decrypt_rsa [label="no"]
+	is_wrap_or_trust -> decrypt_aes [label="yes"]
+
+	validated [label="Unencrypted packet", shape="parallelogram"]
+	decrypt_rsa -> validated
+	decrypt_aes -> validated
+}
+

@@ -1,5 +1,6 @@
 temptex := $(patsubst %.Rnw,%.tex,$(wildcard *.Rnw))
 thesis_files := thesis.tex abstract.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_ip.tex appendix_protocol.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex newcommands.tex rfc.bib research.bib acronyms.tex flow_director.pdf flow_packet_validation.pdf packet_structure.pdf results.csv
+diagrams := diagrams/*.pdf diagrams/*.dot
 
 all : thesis.pdf
 
@@ -18,7 +19,7 @@ thesis.pdf : thesis.aux
 	pdflatex thesis
 	pdflatex thesis
 
-thesis.aux : $(thesis_files)
+thesis.aux : $(thesis_files) $(diagrams)
 	pdflatex -draftmode thesis
 	bibtex thesis
 
@@ -39,9 +40,9 @@ rfc.bib :
 	R -e 'library("knitr"); knit("$<")'
 
 # DOT .dot files (GraphViz)
-%.png : ../diagrams/%.dot
+%.png : diagrams/%.dot
 	dot "$<" -Tpng -o "$@" 
-%.pdf : ../diagrams/%.dot
+%.pdf : diagrams/%.dot
 	dot "$<" -Tps -o "$*.ps"
 	ps2eps -f "$*.ps"
 	ps2pdf -dEPSCrop "$*.eps" "$@"

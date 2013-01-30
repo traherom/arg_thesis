@@ -1,0 +1,49 @@
+digraph G {
+	margin=0;
+	is_arp [label="Is ARP Request?", shape="diamond"]
+	packet [label="Packet", shape="parallelogram"]
+
+	packet -> is_arp
+
+	arp_resp [label="ARP Response", shape="rectangle"]
+	direction [label="Direction?", shape="diamond"]
+
+	is_arp -> arp_resp [label="Yes"]
+	is_arp -> direction [label="No"]
+
+	from_arg [label="From ARG Network?", shape="diamond"]
+	to_arg [label="To ARG Network?", shape="diamond"]
+
+	direction -> from_arg [label="Incoming"]
+	direction -> to_arg [label="Outgoing"]
+
+	admin [label="Admin?", shape="diamond"]
+	nat_in [label="NAT, incoming", shape="rectangle"]
+
+	from_arg -> admin [label="Yes"]
+	from_arg -> nat_in [label="No"]
+
+	hop_adm [label="Hopper, admin", shape="rectangle"]
+	src_ip [label="Current Source IP?", shape="diamond"]
+	dest_ip [label="Current Dest IP?", shape="diamond"]
+
+	admin -> hop_adm [label="Yes"]
+	admin -> src_ip [label="No"]
+
+	reject [label="Drop", shape="diamond"]
+
+	src_ip -> dest_ip [label="Yes"]
+	src_ip -> reject [label="No"]
+
+	hop_in [label="Hopper, incoming", shape="rectangle"]
+
+	dest_ip -> hop_in [label="Yes"]
+	dest_ip -> reject [label="No"]
+
+	nat_out [label="NAT, outgoing", shape="rectangle"]
+	hop_out [label="Hopper, outgoing", shape="rectangle"]
+
+	to_arg -> hop_out [label="Yes"]
+	to_arg -> nat_out [label="No"]
+}
+
