@@ -43,7 +43,7 @@
 \FloatBarrier
 \section{System Services}
 \label{sec:services}
-\par \ac{ARG} has three components that this thesis tests. Most important is the hopper module, which provides a rapidly-changing external \ac{IP} address and details on connected ARG networks. Using this information, it transports packets between ARG-protected networks. Packets to and from external hosts---hosts that are not part of an ARG network---go through the \ac{NAT} module. Finally, the director module hands packets off to each of the other modules and collects the results back to be logged and potentially acted upon. More details on these components are in Chapter \ref{chp:implementation}.
+\par This thesis tests three components of \ac{ARG}. Most important is the hopper module, which provides a rapidly-changing external \ac{IP} address and details on connected ARG networks. Using this information, it transports packets between ARG-protected networks. Packets to and from external hosts---hosts that are not part of an ARG network---go through the \ac{NAT} module. Finally, the director module hands packets off to each of the other modules and collects the results back to be logged and potentially acted upon. More details on these components are in Chapter \ref{chp:implementation}.
 
 \par The potential outcomes of the director are shown below, broken into separate sections based on incoming or outgoing packets. Other services do not directly offer outcomes relevant to this research.
 
@@ -104,7 +104,7 @@
 \label{sec:parameters}
 \par As a network application, \ac{ARG} is affected by both the machine on which it runs and the network over which it communicates. \ac{ARG}'s local performance is most affected by processor and memory speeds, with encryption potentially consuming a fair amount of processor time and memory speeds impacting virtually all aspects of operation.
 
-\par The primary physical network parameter that affects \ac{ARG} is latency. To ensure that two \ac{ARG} gateways are able to communicate reliably, packets sent from one gateway to the other must arrive before the \ac{IP} address used in the send are no longer current. If hops occur too frequently then a high one-way latency will cause sent packets to frequently arrive after the receiving gateway has hopped to a different \ac{IP} address. 
+\par The primary physical network parameter that affects \ac{ARG} is latency. To ensure that two \ac{ARG} gateways are able to communicate reliably, packets sent from one gateway to the other must arrive before the \ac{IP} address used in the send are no longer current. If hops occur too frequently, then a high one-way latency will cause sent packets to frequently arrive after the receiving gateway has hopped to a different \ac{IP} address. 
 
 \par The primary configuration setting for \ac{ARG} is the hop rate. \ac{ARG} allows the time between hops to be customized from several times a second to minutes apart with millisecond precision. Each gateway may be configured to hop at different rates, but for the sake of this thesis the hop rates are always identical in a given test.
 
@@ -238,5 +238,5 @@
 
 \section{Summary}
 \label{sec:method_summary}
-\par This chapter discusses the methodology and goals of this research. It then defines the \ac{SUT} and its relevant factors. Finally, the test network setup and the exact tests run against it are covered, along with what metrics are collected and analyzed. 
+\par This chapter discusses the goals of this research and defines the \ac{SUT} and its relevant factors. The methodology in use is covered, with details on the test network and the exact tests run on this network. Finally, this chapter enumerates the metrics the tests collect and analyze. 
 

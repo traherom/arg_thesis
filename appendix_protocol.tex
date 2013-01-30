@@ -32,7 +32,7 @@ Time Offset & 4 bytes & Integer
 
 \par Note that these message types are formatted identically. The only difference is the type number used, as this allows gateways to determine when it is a request for new data or just a response to a previous request.
 
-\begin{table}{H}
+\begin{table}[H]
 \caption{Data in \ac{ARG} \texttt{CONN\_REQ} and \texttt{CONN\_RESP} messages}
 \label{tbl:arg_conn_data_struct}
 \centering
@@ -105,7 +105,7 @@ E & 10 bytes & Raw
 \begin{enumerate}
 	\item Local receives a packet on its internal interface.
 	\item Local takes the outbound packet and encrypts with with remote symmetric key. Local determines the destination gateway based on \ac{IP} range.
-	\item Local sends WRAPPED message to remote current IP with the encrypted packet included. An \ac{HMAC} of the packet is included in the header.
+	\item Local sends WRAPPED message to remote current IP with the encrypted packet included. An \ac{HMAC} of the packet (encrypted data and headers) is included in the header.
 	\item Remote receives and validates the message.
 	\item Remote sends the original, decrypted packet into the internal network.
 \end{enumerate}
