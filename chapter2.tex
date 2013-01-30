@@ -14,7 +14,7 @@
 \par Regardless of which version is in use, high-level routing remains conceptually the same. Routers maintain a table of \ac{IP} addresses, masks, and the interfaces associated with each. When a packet is received, the router consults this table and decides what interface to send the packet out on based on the most specific entry. For example, in the network shown in Figure \ref{fig:routing_example_network} the laptop with \ac{IP} 10.5.0.25 wants to send a packet to 172.100.10.3. When 10.5.0.25 sends its packet, the following sequence of events occurs:
 
 \begin{figure}
-\caption{\ac{IP} Routing Example Network}
+\caption{\ac{IP} routing example network}
 \label{fig:routing_example_network}
 \centering
 \includegraphics[width=1.0\textwidth]{routing_example_network}
@@ -24,7 +24,7 @@
 \item The packet leaves 10.5.0.25 and Router A receives it on its interface Port 1.
 \item Router A compares the packet's destination \ac{IP} (172.100.10.3) to its table, which looks like Table \ref{tbl:routing_example_routera_table}.
 	\begin{table}[h]
-	\caption{\ac{IP} Routing Example: Router A Table}
+	\caption{\ac{IP} routing example: Router A table}
 	\label{tbl:routing_example_routera_table}
 	\centering
 	\begin{tabular}{r|c|c|c}
@@ -51,7 +51,7 @@
 \par To do this, routers must maintain a \ac{NAT} table. This table consists of the source and destination information as well as a new port number, allowing the router to consistently transform traffic in both directions. For example, a router might have a table like the one shown in Table \ref{tab:nat_example}.
 
 \begin{table}
-\caption{\ac{NAT} Table Example}
+\caption{\ac{NAT} table example}
 \label{tab:nat_example}
 \centering
 \begin{tabular}{r|ccccc}
@@ -76,7 +76,7 @@
 \par When a packet is first created, however, the host system only knows the destination \ac{IP}. Before the packet can be sent out, the sender must determine the destination \ac{MAC} address. This is done through an \ac{ARP} request, a process illustrated in Figure \ref{fig:arp_example}.
 
 \begin{figure}[ht]
-\caption{\ac{ARP} Exchange Example}
+\caption{\ac{ARP} exchange example}
 \label{fig:arp_example}
 \centering
 \includegraphics[width=0.8\textwidth]{arp}
@@ -97,7 +97,7 @@
 \begin{figure}
 	\centering
 	\includegraphics[width=0.75\textwidth]{exnetwork}
-	\caption[\ac{IP} Hopping Example Network]{\ac{IP} Hopping Example Network Layout. Red nodes are malicious.}
+	\caption[\ac{IP} hopping example network]{\ac{IP} hopping example network layout. Red nodes are malicious.}
 	\label{fig:exnetwork}
 \end{figure}
 
@@ -144,7 +144,7 @@
 \par Cryptographic hash functions take a given sequence of bytes and return a fixed-length string of bits representing that data. While their output is not unique for every input, cryptographic hashes attempt to make it infeasible to generate two messages with the same hash or to modify an input and get the same hash. As illustrated in Table \ref{tbl:hashing_example}, these properties allow the use of hashes to verify data because even small changes result in different output.
 
 \begin{table}[h]
-\caption{Hashing Example}
+\caption{Hashing example}
 \label{tbl:hashing_example}
 \centering
 \begin{tabular}{r|l|l}

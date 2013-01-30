@@ -26,7 +26,7 @@
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{arg_concept_network}
-	\caption{\ac{ARG} Conceptual Network Layout}
+	\caption{\ac{ARG} conceptual network layout}
 	\label{fig:arg_concept_network}
 \end{figure}
 
@@ -47,7 +47,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \par The director is in charge of receiving packets on the internal and external interfaces of the gateway. Upon receipt of a packet, the director parses the packet and decides how to handle it. The decision tree it follows is illustrated in Figure \ref{fig:arg_director_flow} and discussed below.
 
 \begin{figure}
-\caption{\ac{ARG} Director Flow}
+\caption{\ac{ARG} director flow}
 \label{fig:arg_director_flow}
 \centering
 \includegraphics[width=1.0\textwidth,clip=true,trim=0 0 0 0]{flow_director}
@@ -68,7 +68,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \par When the hopper first starts, it initializes a list of gateways with data from configuration files. The information maintained in this structure is shown in Table \ref{tab:gatestate}. 
 
 \begin{table}
-\caption{Information Hopper Component Maintains on Other \ac{ARG} Gateways}
+\caption{Information hopper module maintains on other \ac{ARG} gateways}
 \label{tab:gatestate}
 \centering
 \begin{tabular}{l|l}
@@ -88,7 +88,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \par Beyond the administrative thread, actions occur in the hopper only when the director passes off packets to it. Outgoing packets are always wrapped, encrypted, and signed, as covered under the ``route packet'' process in Section \ref{sec:arg_protocol_route}. Incoming packets go through the validation process shown in Figure \ref{fig:arg_hopper_in_validation} before being handled. Note that \ac{IP} checking is done in the Director before control reaches the Hopper. After validation exact handling depends on the packet type, but is generally covered in Section \ref{sec:arg_protocol} as part of the protocol discussion.
 
 \begin{figure}
-\caption{\ac{ARG} Incoming Packet Validation Process}
+\caption{\ac{ARG} incoming packet validation process}
 \label{fig:arg_hopper_in_validation}
 \centering
 \includegraphics[width=1.0\textwidth,clip=true,trim=0 0 0 0]{flow_packet_validation}
@@ -101,7 +101,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \par The only difference from a normal \ac{NAT} system is the addition of an extra field for the current \ac{IP} in the \ac{NAT} table. The new version of the table with example data is shown in Table \ref{tab:arg_nat_example} with the new column in bold.
 
 \begin{table}
-\caption{\ac{ARG} \ac{NAT} Table Example}
+\caption{\ac{ARG} \ac{NAT} table example}
 \label{tab:arg_nat_example}
 \centering
 \begin{tabular}{r|cccccc}
@@ -120,7 +120,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \par The \ac{ARG} protocol is designed to be fairly stateless, simplifying the implementation and lowering the likelihood of an exploit forcing the gateway into an unexpected state. Packets are sent at the transport layer because port numbers are not needed, but the protocol could be adapted easily to work as a \ac{UDP} payload. \ac{ARG} packets are identified by \ac{IP} protocol 253, a protocol reserved for experimentation \cite{rfc3692}. The header structure of an \ac{ARG} packet is shown in Table \ref{tab:arg_packet_structure}.
 
 \begin{table}
-\caption{\ac{ARG} Packet Data}
+\caption{\ac{ARG} packet data}
 \label{tab:arg_packet_structure}
 \centering
 \begin{tabular}{l|l|l}
@@ -138,7 +138,7 @@ Additional data & 0-32,629 bytes & See Appendix \ref{chp:protocol}
 \par For this research, the protocol version field is set to 1 at all times. The type field tells the receiving gateway how to process the data contained in the message. Possible values are shown in Table \ref{tbl:arg_protocol_types}. More details on the format of each message type are given in Appendix \ref{chp:protocol}. Length is the network-order size in bytes of the data from the version to the end of the data; given the size of the message header, the minimum for this is 136. The sequence number is a monotonically increasing unsigned integer value used to prevent replay attacks.
 
 \begin{table}
-\caption{\ac{ARG} Message Types}
+\caption{\ac{ARG} message types}
 \label{tbl:arg_protocol_types}
 \begin{tabular}{l|c|l}
 \textbf{Mnemonic} & \textbf{Value} & \textbf{Description}\\
@@ -154,7 +154,7 @@ Additional data & 0-32,629 bytes & See Appendix \ref{chp:protocol}
 \par The signature field may actually contain two possible values: a true \ac{RSA} digital signature of the packet or an \ac{HMAC} of the packet, depending on the message type. Packets of type \texttt{PING} or \texttt{CONN\_REQ}/\texttt{CONN\_RESP} are encrypted with the public key of the receiver and signed with the private key of the sender.\footnote{This order is backwards according to best-practice \ac{RSA} and should be corrected to sign-then-encrypt \cite{RobustPrinciplesPK}. It may also be wise to add the name of the sending gateway to each message to help prevent similar mistakes in the future \cite{EngPricCrypto}. The order \ac{ARG} uses allows an attacker to sign a message and claim it as their own \cite{rfc2633}. However, \ac{ARG} gateways will still reject these falsified messages because they will not have a public key for the signer. A gateway could successfully sign another gateway's message, but this indicates a compromised of the gateway itself, at which point the attacker has full access to the entire network anyway.} All other packets---types \texttt{WRAPPED} and \texttt{TRUST\_DATA}---are encrypted with the symmetric key of the receiver and include an \ac{HMAC} of the encrypted data using with the symmetric key of the sender, following standard Encrypt-then-MAC practice \cite{AuthEncryptThenMAC}. The encryption and signing combinations used for each message type as well as whether or not the source and destination \ac{IP} addresses are strictly checked are summarized in Table \ref{tbl:arg_protocol_security}.
 
 \begin{table}
-\caption{\ac{ARG} Message Security Summary}
+\caption{\ac{ARG} message security summary}
 \label{tbl:arg_protocol_security}
 \centering
 \begin{tabular}{l|l|l|l}
