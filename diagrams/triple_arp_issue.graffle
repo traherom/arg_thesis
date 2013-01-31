@@ -28,7 +28,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-01-07 19:07:52 +0000</string>
+	<string>2013-01-31 18:42:26 +0000</string>
 	<key>Modifier</key>
 	<string>Ryan Morehart</string>
 	<key>NotesVisible</key>
@@ -57,7 +57,7 @@
 		<key>NSPaperSize</key>
 		<array>
 			<string>size</string>
-			<string>{612.00002479553223, 792}</string>
+			<string>{612.00002098083496, 792}</string>
 		</array>
 		<key>NSPrintReverseOrientation</key>
 		<array>
@@ -87,7 +87,7 @@
 			<key>BackgroundGraphic</key>
 			<dict>
 				<key>Bounds</key>
-				<string>{{0, 0}, {875, 905}}</string>
+				<string>{{0, 0}, {935.19108280254773, 839}}</string>
 				<key>Class</key>
 				<string>SolidGraphic</string>
 				<key>ID</key>
@@ -111,7 +111,7 @@
 			<key>CanvasOrigin</key>
 			<string>{0, 0}</string>
 			<key>CanvasSize</key>
-			<string>{875, 905}</string>
+			<string>{935.19108280254773, 839}</string>
 			<key>ColumnAlign</key>
 			<integer>1</integer>
 			<key>ColumnSpacing</key>
@@ -652,8 +652,8 @@
 					<integer>34</integer>
 					<key>Points</key>
 					<array>
-						<string>{376.53972159057179, 530.86506113207452}</string>
-						<string>{307.4604066385138, 560.1766482283291}</string>
+						<string>{376.53968939235256, 530.85482221660232}</string>
+						<string>{307.46033230003883, 560.15299019376312}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -685,8 +685,8 @@
 					<integer>31</integer>
 					<key>Points</key>
 					<array>
-						<string>{307.46504742784009, 603.31684080626746}</string>
-						<string>{376.53523371414076, 630.59325988347518}</string>
+						<string>{307.46498081873119, 603.33891081345962}</string>
+						<string>{376.53507960024115, 630.64424825088884}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -838,7 +838,7 @@
 									<key>Pattern</key>
 									<integer>1</integer>
 									<key>TailArrow</key>
-									<string>0</string>
+									<string>NegativeControls</string>
 								</dict>
 							</dict>
 						</dict>
@@ -858,8 +858,8 @@
 					<integer>14</integer>
 					<key>Points</key>
 					<array>
-						<string>{307.46133647907953, 454.55022229664792}</string>
-						<string>{377.42041761356853, 483.78478182204668}</string>
+						<string>{307.45897772867482, 455.29978273625261}</string>
+						<string>{376.54284710920274, 485.15236077400232}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -891,8 +891,8 @@
 					<integer>8</integer>
 					<key>Points</key>
 					<array>
-						<string>{376.54165638965867, 379.47593064628853}</string>
-						<string>{307.45847733145848, 409.59091147809625}</string>
+						<string>{376.54162287238307, 379.46541428505105}</string>
+						<string>{307.45839987560959, 409.5666111290268}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -924,8 +924,8 @@
 					<integer>6</integer>
 					<key>Points</key>
 					<array>
-						<string>{307.45851188130655, 303.43424603986807}</string>
-						<string>{376.54180085138483, 333.47881034639204}</string>
+						<string>{307.45843450680894, 303.45853497730531}</string>
+						<string>{376.54162172046517, 333.53493504623975}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1205,7 +1205,7 @@
 			<key>BackgroundGraphic</key>
 			<dict>
 				<key>Bounds</key>
-				<string>{{0, 0}, {875, 905}}</string>
+				<string>{{0, 0}, {875, 815}}</string>
 				<key>Class</key>
 				<string>SolidGraphic</string>
 				<key>ID</key>
@@ -1229,7 +1229,7 @@
 			<key>CanvasOrigin</key>
 			<string>{0, 0}</string>
 			<key>CanvasSize</key>
-			<string>{875, 905}</string>
+			<string>{875, 815}</string>
 			<key>ColumnAlign</key>
 			<integer>1</integer>
 			<key>ColumnSpacing</key>
@@ -1238,6 +1238,79 @@
 			<string>1 0/72 in = 1.0000 in</string>
 			<key>GraphicsList</key>
 			<array>
+				<dict>
+					<key>Class</key>
+					<string>Group</string>
+					<key>Graphics</key>
+					<array>
+						<dict>
+							<key>Bounds</key>
+							<string>{{151.66971447027709, 441.11852191606755}, {53.600000000000001, 13.999999999999979}}</string>
+							<key>Class</key>
+							<string>ShapedGraphic</string>
+							<key>ID</key>
+							<integer>26</integer>
+							<key>Rotation</key>
+							<real>270</real>
+							<key>Shape</key>
+							<string>Rectangle</string>
+							<key>Style</key>
+							<dict>
+								<key>fill</key>
+								<dict>
+									<key>Draws</key>
+									<string>NO</string>
+								</dict>
+								<key>shadow</key>
+								<dict>
+									<key>Draws</key>
+									<string>NO</string>
+								</dict>
+								<key>stroke</key>
+								<dict>
+									<key>Draws</key>
+									<string>NO</string>
+								</dict>
+							</dict>
+							<key>Text</key>
+							<dict>
+								<key>Pad</key>
+								<integer>0</integer>
+								<key>VerticalPad</key>
+								<integer>0</integer>
+							</dict>
+							<key>Wrap</key>
+							<string>NO</string>
+						</dict>
+						<dict>
+							<key>Class</key>
+							<string>LineGraphic</string>
+							<key>ID</key>
+							<integer>27</integer>
+							<key>Points</key>
+							<array>
+								<string>{196.4697144702771, 196.00000339754888}</string>
+								<string>{196.4697144702771, 732.00000339754899}</string>
+							</array>
+							<key>Style</key>
+							<dict>
+								<key>stroke</key>
+								<dict>
+									<key>HeadArrow</key>
+									<string>FilledArrow</string>
+									<key>Legacy</key>
+									<true/>
+									<key>Pattern</key>
+									<integer>1</integer>
+									<key>TailArrow</key>
+									<string>NegativeControls</string>
+								</dict>
+							</dict>
+						</dict>
+					</array>
+					<key>ID</key>
+					<integer>25</integer>
+				</dict>
 				<dict>
 					<key>Class</key>
 					<string>LineGraphic</string>
@@ -1250,8 +1323,8 @@
 					<integer>102</integer>
 					<key>Points</key>
 					<array>
-						<string>{365.45864925097106, 279.37913315235221}</string>
-						<string>{434.54136000418595, 309.36684089394555}</string>
+						<string>{365.45864929806038, 279.37910875817835}</string>
+						<string>{434.54136014544162, 309.36678454036138}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1490,13 +1563,13 @@
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{167.51657409667973, 287.62185470722039}, {20.966851806640623, 13.999999999999975}}</string>
+							<string>{{168.02971659260808, 287.6218550567603}, {20.966851806640623, 13.999999999999975}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>ID</key>
 							<integer>76</integer>
 							<key>Rotation</key>
-							<real>270</real>
+							<real>269.99996948242188</real>
 							<key>Shape</key>
 							<string>Rectangle</string>
 							<key>Style</key>
@@ -1541,21 +1614,21 @@
 							<integer>77</integer>
 							<key>Points</key>
 							<array>
-								<string>{196, 195.99999620931817}</string>
-								<string>{196, 405.66851427572431}</string>
+								<string>{196.51313675054922, 195.99999551023853}</string>
+								<string>{196.51314896513463, 405.66851357664439}</string>
 							</array>
 							<key>Style</key>
 							<dict>
 								<key>stroke</key>
 								<dict>
 									<key>HeadArrow</key>
-									<string>FilledArrow</string>
+									<string>NegativeControls</string>
 									<key>Legacy</key>
 									<true/>
 									<key>Pattern</key>
 									<integer>1</integer>
 									<key>TailArrow</key>
-									<string>0</string>
+									<string>NegativeControls</string>
 								</dict>
 							</dict>
 						</dict>
@@ -1723,6 +1796,29 @@
 					<key>ID</key>
 					<integer>63</integer>
 				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{245.77950629741864, 186.00685682406726}, {135, 555.99999999999966}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>ID</key>
+					<integer>21</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+				</dict>
 			</array>
 			<key>GridInfo</key>
 			<dict/>
@@ -1785,13 +1881,11 @@
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>0</integer>
+		<integer>1</integer>
 		<key>ExpandedCanvases</key>
 		<array/>
-		<key>FitInWindow</key>
-		<true/>
 		<key>Frame</key>
-		<string>{{241, 13}, {1011, 998}}</string>
+		<string>{{186, 0}, {1011, 878}}</string>
 		<key>ListView</key>
 		<false/>
 		<key>OutlineWidth</key>
@@ -1803,9 +1897,9 @@
 		<key>SidebarWidth</key>
 		<integer>138</integer>
 		<key>VisibleRegion</key>
-		<string>{{1, 1}, {873, 904}}</string>
+		<string>{{-9.9737142843160829, 2.5657142892097942}, {895.94742979206012, 804.6080010961914}}</string>
 		<key>Zoom</key>
-		<real>1</real>
+		<real>0.974387526512146</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>
@@ -1815,8 +1909,8 @@
 			</array>
 			<array>
 				<string>No ARP</string>
-				<real>0.0</real>
-				<real>1</real>
+				<real>0.974387526512146</real>
+				<real>1.9500000476837158</real>
 			</array>
 		</array>
 	</dict>

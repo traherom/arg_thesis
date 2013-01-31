@@ -45,11 +45,11 @@ $ sudo ./arg <conf file>
 
 \par A path to a configuration file is required. The path should point to the main configuration file, with supporting files in the same directory as the main one. See Section \ref{sec:arg_conf_files} for more details.
 
-\par \ac{ARG} will start up and configure itself, then after a brief delay attempt to connect to other gateways for which it has configuration information. To end its execution at any time, press \texttt{ctrl-c} to cleanly kill it or send it \texttt{SIGTERM} via \texttt{kill} (i.e. \lstinline{sudo killall -SIGTERM arg}) to end it without cleaning up.
+\par \ac{ARG} will start up and configure itself, then after a brief delay attempt to connect to other gateways for which it has configuration information. To end \acs{ARG}'s execution at any time, press \texttt{ctrl-c} to cleanly kill it or send it \texttt{SIGTERM} via \texttt{kill} (i.e. \lstinline{sudo killall -SIGTERM arg}) to end it without cleaning up.
 
 \subsection{Configuration Files}
 \label{sec:arg_conf_files}
-\par \ac{ARG} requires at least three separate configuration files on start up, plus one for every gateway it should have startup knowledge about. The main configuration file may be called anything and contains four lines:
+\par \ac{ARG} requires at least three separate configuration files on start up, plus one for every gateway it should have initial knowledge about. The main configuration file may be called anything and contains four lines:
 \lstinputlisting[caption=main.conf]{confexample/main-gate.conf}
 
 \par In order, these are: gate name, internal network interface, external network interface, and hop rate. Hop rate \textit{must} be given in milliseconds.
