@@ -16,4 +16,7 @@ Sweave.sty
 *.ps
 chapter5.tex
 .dropbox
+*.nav
+*.snm
+*Icon*
 

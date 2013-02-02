@@ -1,0 +1,233 @@
+\ProvidesPackage{afit-beamer-template}[2012/10/19 v0.2 for beamer 3.01]
+%
+% Note: This theme requires the pgfcomp, color, etoolbox, and textpos packages.
+%
+% This is a theme for beamer inspired by the official PowerPoint template of
+% the Air Force Institute of Technology.  The aim was to replicate the official
+% template, thus allowing the use of an alternative to PowerPoint for official
+% briefings.
+%
+% The starter version downloaded from a post at the following URL.
+% http://programming-r-pro-bro.blogspot.com/2011/11/create-your-own-beamer-template.html
+%
+% Modifications made by David J. Weller-Fahy.
+
+% This style file consists of the four themes required to create a full
+% presentation beamer theme: Inner, Outer, Color, and Font.
+
+\mode<presentation> % This is a presentation after all!
+
+% Set the graphics location (relative to location of including file).
+\graphicspath{{./afit-beamer-template/}}
+
+\usepackage{pgfcomp-version-0-65}
+\usepackage{color}
+\usepackage{etoolbox}
+\usepackage[absolute, overlay]{textpos} % Position elements on page absolutely.
+\TPGrid{20}{20} % Set up 20x20 grid for use within the document.
+
+%% Color theme
+% Define the set of colors assigned to various parts of the presentation.
+\definecolor{verydarkblue}{RGB}{0, 0, 102} % For presentation/slide titles
+\definecolor{notverydarkblue}{RGB}{0, 0, 139} % For description item headings
+
+\definecolor{dropshadow}{RGB}{192,192,192} % Drop shadow for letters
+
+\definecolor{barleft}{RGB}{0, 0, 153} % Bars (bar left side)
+\definecolor{barmiddle}{RGB}{51, 51, 204} % Bars (bar middle)
+\definecolor{barright}{RGB}{221, 221, 221} % Bars (bar right side)
+
+\definecolor{AlBody}{RGB}{213,24,0}
+\definecolor{ExBody}{RGB}{213,24,0}
+% Blending <clr1>!<percentage of clr1>!<clr2> will not work with \definecolor.
+
+% Assign colors to elements of the presentation.
+\setbeamercolor{title}{fg = verydarkblue} % Presentation title
+\setbeamercolor{frametitle}{fg = verydarkblue} % Frame titles
+\setbeamercolor{structure}{fg = verydarkblue} % Header/Footer text
+\setbeamercolor{section in toc}{fg = black} % TOC sections
+\setbeamercolor{section in toc shaded}{fg = black} % TOC highlighted
+\setbeamercolor{subsection in toc}{fg = black} % TOC sections
+\setbeamercolor{subsection in toc shaded}{fg = black} % TOC highlighted
+\setbeamercolor{subsubsection in toc}{fg = black} % TOC sections
+\setbeamercolor{subsubsection in toc shaded}{fg = black} % TOC highlighted
+\setbeamercolor{description item}{fg = notverydarkblue} % Description headers
+\setbeamercolor{caption}{fg = black} % Figure/table caption text
+\setbeamercolor{caption name}{fg = verydarkblue} % Figure/table caption name
+\setbeamercolor{block body}{fg = verydarkblue} % Standard block contents
+\setbeamercolor{normal text}{fg = black} % Default text color
+\setbeamercolor{headline}{fg = verydarkblue} % Default headline text color
+\setbeamercolor{footline}{fg = verydarkblue} % Default footline text color
+
+% NOTE: Setting for (sub)+items also affects other environments like enumerate.
+\setbeamercolor{item}{fg = black} % First level of bullets
+\setbeamercolor{subitem}{fg = black} % Second level of bullets
+\setbeamercolor{subsubitem}{fg = black} % Third level of bullets
+
+\setbeamertemplate{background canvas}{ % Set background to AFIT Emblem.
+  \includegraphics[width = \paperwidth, height = \paperheight]%
+    {AFIT-Emblem-Background}%
+}
+
+
+%% Font theme
+\usepackage{helvet} % The bosses will want Arial (they always do)... sigh.
+\usepackage[T1]{fontenc}
+\setbeamerfont{title}{size = \huge} % Presentation title size
+\setbeamerfont{frametitle}{size = \Large} % Frame title size
+
+
+%% Inner theme
+\useinnertheme{circles} % Use circles for item indicators
+
+% Although I like the circles for most things, for the table of contents the
+% numbers are not (IMO) useful.  Therefore, define a new beamer template for
+% sections in the TOC which uses the same \textbullet used in itemize.
+% Implementation based on segments of beamerbaseauxtemplates.sty.
+\defbeamertemplate{section in toc}{circle unnumbered}{
+  \leavevmode
+  \small
+  \raise0.5pt\hbox{\textbullet}
+  \hspace{.5ex}
+  \inserttocsection\par
+}
+
+\setbeamertemplate{section in toc}[circle unnumbered]
+
+
+%% Outer theme
+\newcommand{\usaf@logo}{\includegraphics[height = 0.4in]{USAF-symbol-only}}
+\newcommand{\afit@emblem}{\includegraphics[height = 0.4in]{AFIT-Emblem-Blue}}
+
+\newcommand{\afit@logoline}[1]{%
+% Parameter 1 contains the text.
+  \begin{textblock}{2}(.2, .2)\usaf@logo\end{textblock}%
+  \textblockorigin{\paperwidth}{0mm} % Set origin to upper-right corner.
+  \begin{textblock}{-4}(-3.7, .2)\afit@emblem\end{textblock}%
+  \textblockorigin{0mm}{0mm} % Set origin to upper-right corner.
+  % Parbox length calculated using inches, then converted to x * \paperwidth.
+  % x = (\paperwidth - (emblemlen - symbollen) + (.2 * \paperwidth/20))/11
+  \ifnumcomp{\insertframenumber}{>}{1}{%
+    \begin{textblock}{14}(2, 0)%
+      \begin{beamercolorbox}[wd = \textwidth, ht = 25pt]{}%
+        \centering\textbf{#1}%
+      \end{beamercolorbox}%
+    \end{textblock}
+    \vspace{25pt}
+  }{}%
+  \ifnumcomp{\insertframenumber}{=}{1}{%
+    \begin{textblock}{18.06}(0.05, 1.05)%
+      \parbox{\textwidth}{%
+        \centering%
+        \textcolor{dropshadow}{\scalebox{1.1}{\textbf{#1}}}%
+      }%
+    \end{textblock}%
+    \begin{textblock}{18.06}(0, 1)%
+      \begin{beamercolorbox}[wd = \textwidth]{}%
+        \parbox{\textwidth}{%
+          \centering%
+          \structure{\scalebox{1.1}{\textbf{#1}}}%
+        }%
+      \end{beamercolorbox}%
+    \end{textblock}%
+  }{}%
+}%
+
+\newcommand{\afit@bar}[5]{%
+  \pgfdeclarehorizontalshading{afit@barshade}{#1}{%
+    color(0)=(#3); color(#2)=(#4)%
+  }
+  \pgfbox[#5,center]{\pgfuseshading{afit@barshade}}
+}
+
+\newcommand{\afit@hftxt}[2]{%
+  \scalebox{#1}{\emph{\textbf{
+    #2%
+  }}}%
+}%
+
+\newcommand{\afit@topbar}[1]{%
+  \begin{textblock}{7}(0, 2.65)%
+    \afit@bar{.008\paperheight}{.32\paperwidth}{barleft}{barmiddle}{left}%
+  \end{textblock}%
+  \textblockorigin{\paperwidth}{0mm} % Set origin to upper-right corner.
+  \begin{textblock}{-7}(0, 2.65)%
+    \afit@bar{.008\paperheight}{.32\paperwidth}{barmiddle}{barright}{right}%
+  \end{textblock}%
+  \textblockorigin{0mm}{0mm} % Set origin to upper-left corner.
+  \begin{textblock}{20}(0, 2.5)%
+    \begin{beamercolorbox}[wd = \paperwidth, center]{}%
+      \parbox[t]{.38\paperwidth}{\centering%
+        \afit@hftxt{#1}{\structure{The AFIT of Today is the Air Force of
+          Tomorrow.
+        }}%
+      }%
+    \end{beamercolorbox}%
+  \end{textblock}%
+}
+
+\newcommand{\afit@bottombar}{%
+  \begin{textblock}{5}(0, 19.15)%
+    \afit@bar{.008\paperheight}{.25\paperwidth}{barleft}{barmiddle}{left}%
+  \end{textblock}%
+  \textblockorigin{\paperwidth}{0mm} % Set origin to upper-right corner.
+  \begin{textblock}{-5}(0, 19.15)%
+    \afit@bar{.008\paperheight}{.25\paperwidth}{barmiddle}{barright}{right}%
+  \end{textblock}%
+  \ifnumcomp{\insertframenumber}{>}{1}{%
+    \begin{textblock}{5}(-.15,19.75)%
+      \pgfbox[right, center]{\insertframenumber/\inserttotalframenumber}%
+    \end{textblock}%
+  }{}%
+  \textblockorigin{0mm}{0mm} % Set origin to upper-left corner.
+  \begin{beamercolorbox}[wd = \paperwidth, dp = 10pt, center]{}%
+    \parbox[t]{.5\paperwidth}{\centering%
+      \afit@hftxt{0.85}{Air University: The Intellectual and Leadership Center
+        of the Air Force.%
+      }%
+      \newline%
+      \afit@hftxt{0.85}{Aim High\ldots{}Fly -- Fight -- Win}%
+    }%
+  \end{beamercolorbox}%
+}
+
+\setbeamertemplate{frametitle}{%
+  \afit@logoline{\insertframetitle}%
+  \afit@topbar{.38}%
+}
+
+\setbeamertemplate{footline}{\afit@bottombar} % Set the footline
+\setbeamertemplate{navigation symbols}{} % Remove navigation symbols.
+
+\setbeamertemplate{title page}{% Title page
+  \afit@logoline{\Large{Air Force Institute of Technology}}%
+  \afit@topbar{.5}%
+  \begin{columns}%
+    \column{.42\paperwidth}\begin{block}{}%
+      \centering
+      \vspace{4em}
+      \includegraphics[width = .15\paperwidth]{AFIT-Shield-trans}
+      \vspace{-1.8em}
+      \includegraphics[width = .85\textwidth]{USAF-symbol}
+      \vspace{3.1em} % This pushes the frametitle/headline into position.
+    \end{block}%
+    \column{.58\paperwidth}\begin{block}{}%
+      \begin{beamercolorbox}[]{}\parbox{.56\paperwidth}{%
+        \centering%
+        \vspace{1.5em}%
+        {\large\emph{\textbf{\inserttitle}}}
+
+        \vspace{1em}%
+        \textbf{\insertauthor}
+
+        \vspace{.75em}%
+        {\scriptsize\insertinstitute}
+
+        \vspace{.5em}%
+        {\tiny\insertdate}
+      }\end{beamercolorbox}
+    \end{block}%
+  \end{columns}%
+}
+
+\mode<all>
