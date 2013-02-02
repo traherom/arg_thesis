@@ -154,7 +154,7 @@ create_rejection_table = function(name, caption, table) {
 \caption{Basic tests, raw valid packet loss}
 \label{fig:basic_raw_data}
 \centering
-<<echo=FALSE>>=
+<<basic_tests_valid_raw, echo=FALSE>>=
 # Graph and generate stats on basic tests with test num vs loss  
 ylim=c(0, max(basic[,'valid.loss.rate'], na.rm=TRUE))
 
@@ -171,7 +171,7 @@ axis(2, at=ylab, labels=paste(ylab, '%', sep=''))
 \caption{Basic tests, valid packet loss means and confidence intervals}
 \label{fig:basic_mean_ci}
 \centering
-<< echo=FALSE, warning=FALSE>>=
+<<basic_tests_valid_mean, echo=FALSE, warning=FALSE>>=
 ylim=c(0, max(basic.boot.ci, na.rm=TRUE))
 
 plot.new()
@@ -236,7 +236,7 @@ basic.inv.boot.ci = sapply(basic.inv.boot, function(x) {
 \caption{Invalid traffic packet loss}
 \label{fig:basic_invalid_loss}
 \centering
-<<basic_invalid_loss, out.width=".75\\textwidth", echo=FALSE, warning=FALSE>>=
+<<basic_tests_invalid_mean, out.width=".75\\textwidth", echo=FALSE, warning=FALSE>>=
 # Show loss of invalid traffic for tests 5-8.
 invalid_runs = !valid_runs
 ylim = c(99.9, 100)
@@ -388,7 +388,7 @@ plot_latency_hoprate = function(hoprate, loss_rate_col, title='', xlim=NULL, yli
 \caption[Hop rate tests, packet loss of \ac{UDP} and \ac{TCP} traffic between \ac{ARG} networks]{Hop rate tests, packet loss of \ac{UDP} and \ac{TCP} traffic between \ac{ARG} networks. Note: X axis is not linear.}
 \label{fig:hrlat_udptcp_inter_full}
 \centering
-<<echo=FALSE>>=
+<<hop_rate_udptcp_interarg, echo=FALSE>>=
 plot_results = plot_latency_hoprate(hoprate, 'valid.loss.rate.udptcp.interarg', yby=5)
 worst_sd = plot_results['sd']
 repetitions = plot_results['repetitions']
@@ -399,7 +399,7 @@ repetitions = plot_results['repetitions']
 \caption{Hop rate tests, scaled view of packet loss between \ac{ARG} networks}
 \label{fig:hrlat_udptcp_inter_zoomed}
 \centering
-<<echo=FALSE>>=
+<<hop_rate_udptcp_interarg_scaled, echo=FALSE>>=
 a = plot_latency_hoprate(hoprate, 'valid.loss.rate.udptcp.interarg', ylim=c(0, 5), yby=.5)
 @
 \end{figure}
@@ -442,7 +442,7 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.udptcp.interarg', ylim=c(0, 5
 \caption{Hop rate tests, packet loss of \ac{TCP} traffic between \ac{ARG} networks} 
 \label{fig:hrlat_tcp_inter}
 \centering
-<<echo=FALSE>>=
+<<hop_rate_tcp_interarg, echo=FALSE>>=
 a = plot_latency_hoprate(hoprate, 'valid.loss.rate.tcp.interarg', yby=5)
 @
 \end{figure}
@@ -459,7 +459,7 @@ create_rejection_table('hoprate_loss_reasons', 'Hop rate test loss reasons', hop
 \caption{Hop rate tests, packet loss of externally-bound traffic}
 \label{fig:hrlat_extra}
 \centering
-<<echo=FALSE>>=
+<<hop_rate_extraarg, echo=FALSE>>=
 a = plot_latency_hoprate(hoprate, 'valid.loss.rate.extraarg', yby=.005)
 @
 \end{figure}
@@ -536,7 +536,7 @@ for(clust in unique(packetrate[,'bps.clust'])) {
 \caption{Packet rate tests, clustered loss verses throughput}
 \label{fig:pr_raw_data}
 \centering
-<<echo=FALSE>>=
+<<max_rate_clustered, echo=FALSE>>=
 # Plot 
 ylim = c(0, .4)
 
@@ -573,7 +573,7 @@ max_packet_rate = max(packetrate[,'kbps'])
 \begin{figure}
 \caption{Packet rate tests, Tukey test against clustered data}
 \label{fig:pr_tukey}
-<<echo=FALSE>>=
+<<max_rate_tukey, echo=FALSE>>=
 m = aov(valid.loss.rate~factor(bps.clust), packetrate)
 old_par = par(no.readonly=TRUE)
 par(cex.axis=.5)

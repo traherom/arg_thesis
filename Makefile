@@ -10,7 +10,7 @@ thesis : thesis.pdf
 defense : thesis defense.pdf
 
 test : all
-	open thesis.pdf
+	open thesis.pdf defense.pdf
 
 clean : clean-temp
 	rm -f thesis.pdf
