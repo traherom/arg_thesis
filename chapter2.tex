@@ -179,7 +179,7 @@ Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb
 \label{sec:auth_and_encrypt}
 \par By combining encryption and authentication, two parties can communication with confidentiality and integrity. For public key encryption, a sender signs the message with their own private key, then encrypts the message with the public key of the recipient \cite{An01authenticatedencryption}. The recipient decrypts the message with their private key, then verifies the signature with the public key of the sender.
 
-\par For symmetric encryption, the opposite order is used. First the sender encrypts the data with one symmetric key, then adds an \ac{HMAC} of the ciphertext \cite{AuthEncrypt}. The receiver computes the \ac{HMAC} of the cipher text and verifies the attached one to ensure the integrity and authenticity of the message. The receiver then decrypts the data.
+\par For symmetric encryption, the opposite order is used. First the sender encrypts the data with one symmetric key, then adds an \ac{HMAC} of the ciphertext \cite{AuthEncryptThenMAC}. The receiver computes the \ac{HMAC} of the cipher text and verifies the attached one to ensure the integrity and authenticity of the message. The receiver then decrypts the data.
 
 \section{\acf{TOTP}}
 \label{sec:totp}
