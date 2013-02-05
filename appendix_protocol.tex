@@ -91,24 +91,24 @@ E & 10 bytes & Raw
 \subsection{Time synchronization}
 \label{sec:arg_time_sync}
 \begin{enumerate}
-	\item Local sends \texttt{PING} containing random 4-byte unsigned integer in the \texttt{Request ID} field (see Table \ref{tbl:arg_ping_struct}), \texttt{null} (0) in \texttt{Response ID}, and its time offset in \texttt{Time Offset}, which is the different between the current time and its base time. 
-	\item Local notes the time it sent the request
+	\item Local sends \texttt{PING} containing random 4-byte unsigned integer in the \texttt{Request ID} field (see Table \ref{tbl:arg_ping_struct}), \texttt{null} (0) in \texttt{Response ID}, and its time offset in \texttt{Time Offset}, which is the difference between the current time and its base time. 
+	\item Local notes the time it sent the request.
 	\item Remote validates the message and responds with a new \texttt{PING}, giving a new random request integer, the received response int (from local) set to the request int, and its own time offset.
-	\item Local ensures received response int matches the request int it sent.
-	\item Local determines the connection latency from the send time, then remote's time base is calculated based on half of this. That is,
+	\item Local ensures received response integer matches the request integer it sent.
+	\item Local determines the connection's round-trip latency from the send time, then remote's time base is calculated based on half of this. That is,
 	$$\text{remote time base} = \text{received time offset} - \frac{\text{latency}}{2}$$
 	This value is saved and used in \ac{IP} calculations for the remote gateway in the future.
 
 	\item Local marks the remote gateway as having time sync data available and, if connection data is available, remote is marked as connected. If connection data is not available, local schedules a connect process.
-	\item Local sends a response to remote, with \texttt{Request ID} set to 0, \texttt{Response ID} set to the value remote sent in its request, and time offset set as appropriate.
-	\item Remote receives and validates the final response, saves off the data, and marks local as connected if appropriate (or schedules a connection data request if needed).
+	\item Local sends a response to remote, with \texttt{Request ID} set to 0, \texttt{Response ID} set to the value remote sent in its request, and \texttt{Time Offset} set as in step 1. This second \texttt{PING} send from local is necessary because remote does not know the latency of the initial request.
+	\item Remote receives and validates the final response, saves the data, and marks local as connected if connection data is already available (or schedules a connection data request if needed).
 \end{enumerate}
 
 \subsection{Trust Data Exchange}
 \begin{enumerate}
 	\item For each gateway it knows about, local sends a \texttt{TRUST\_DATA} packet to remote, containing the gateway name, base \ac{IP}, \ac{IP} mask, and public key to the remote gateway. Each packet covers one gateway, with no data about the local or remote gateways included.
-	\item Remote validates the message, then adds the data in each \texttt{TRUST\_DATA} packet to their list of gateways (if they don't already have it). At this point the new gateway appears just like one read in from a configuration file.
-	\item After some period of time, remote attempts to connect to the new gateway, just as they would any other gateway they had not yet successfully contacted.
+	\item Remote validates the message, then adds the data in each \texttt{TRUST\_DATA} packet to their list of gateways (if they do not already have it). At this point the new gateway appears just like one read in from a configuration file.
+	\item Within two seconds, remote attempts to connect to the new gateway, just as they would any other gateway they had not yet successfully contacted.
  \end{enumerate}
 
 \subsection{Route packet}
