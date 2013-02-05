@@ -30,7 +30,7 @@ digraph G {
 	admin -> hop_adm [label="Yes"]
 	admin -> src_ip [label="No"]
 
-	reject [label="Drop", shape="diamond"]
+	reject [label="Drop", shape="rectangle"]
 
 	src_ip -> dest_ip [label="Yes"]
 	src_ip -> reject [label="No"]
