@@ -508,7 +508,7 @@ packetrate.boot = by(packetrate[,'valid.loss.rate'], packetrate[,'test'], functi
 	})
 packetrate.boot.stats = sapply(packetrate.boot, function(x) x$t0)
 packetrate.boot.ci = sapply(packetrate.boot, function(x) {
-	ci = boot.ci(x, conf=alpha, type='packetrate')$packetrate
+	ci = boot.ci(x, conf=alpha, type='basic')$basic
 	return(ci[4:5])
 	})
 
@@ -610,7 +610,7 @@ par(old_par)
 # Calculate overall average
 fuzzer.boot.overall = boot(data=fuzzer[,'valid.loss.rate'], statistic=bootstrap_stats, R=replicates)
 fuzzer.boot.overall.stat = fuzzer.boot.overall$t0
-fuzzer.boot.overall.ci = boot.ci(fuzzer.boot.overall, conf=alpha, type='fuzzer')$fuzzer[4:5]
+fuzzer.boot.overall.ci = boot.ci(fuzzer.boot.overall, conf=alpha, type='basic')$basic[4:5]
 
 # Calculate mean for each test number
 fuzzer.boot = by(fuzzer[,'valid.loss.rate'], fuzzer[,'test'], function(x) {
@@ -618,12 +618,12 @@ fuzzer.boot = by(fuzzer[,'valid.loss.rate'], fuzzer[,'test'], function(x) {
 	})
 fuzzer.boot.stats = sapply(fuzzer.boot, function(x) x$t0)
 fuzzer.boot.ci = sapply(fuzzer.boot, function(x) {
-	ci = boot.ci(x, conf=alpha, type='fuzzer')$fuzzer
+	ci = boot.ci(x, conf=alpha, type='basic')$basic
 	return(ci[4:5])
 	})
 @
 
-\par The custom run-processing tool this thesis uses to generate packet loss statistics is unable to process the logs from the malicious traffic generators, making it difficult to determine precisely what occurs in each run. This calls into question the accuracy of the results from the run processor. Nonetheless, the tool reports a mean packet loss of around \Sexpr{signif(fuzzer.boot.overall.stat, 2)}\%, which indicates \ac{ARG} experiences significant difficulty when faced with malicious traffic. A manual examination of log files does seem to indicate this is the case, with some traffic successfully traversing the network but a huge amount being rejected. 
+\par The custom run-processing tool this thesis uses to generate packet loss statistics is unable to process the logs from the malicious traffic generators, making it difficult to determine precisely what occurs in each run. This calls into question the accuracy of the results from the run processor. Nonetheless, the tool reports a mean packet loss between \Sexpr{signif(fuzzer.boot.overall.ci[1], 3)}\% and \Sexpr{signif(fuzzer.boot.overall.ci[2], 3)}\% (with \Sexpr{alpha*100}\% confidence), which indicates \ac{ARG} experiences significant difficulty when faced with malicious traffic. A manual examination of log files does seem to indicate this is the case, with some traffic successfully traversing the network but a huge amount being rejected. 
 
 \begin{comment}
 Table \ref{tbl:fuzzer_loss_reasons} gives the reasons behind each rejection.
@@ -633,7 +633,7 @@ tots = create_rejection_table('fuzzer_loss_reasons', 'Fuzzer packet reject reaso
 @
 \end{comment}
 
-\par Despite the high losses, \ac{ARG} does appear to remain stable throughout the barrage. In all cases, \ac{ARG} never crashes and maintains around the same ability \tbd{make into CI?} to handle valid traffic (that is, although the losses appear high, they remain consistent throughout). Further research is needed to identify the causes behind the high losses, but the problem likely lies in implementation and not architecture. Even if \ac{ARG} crashes, traffic flow entirely stops, preventing the attacker from penetrating the network.
+\par Despite the high losses, \ac{ARG} does appear to remain stable throughout the barrage. In all cases, \ac{ARG} never crashes and maintains around the same ability to handle valid traffic (that is, although the losses appear high, they remain consistent throughout). Further research is needed to identify the causes behind the high losses, but the problem likely lies in implementation and not architecture. Even if \ac{ARG} crashes, traffic flow entirely stops, preventing the attacker from penetrating the network.
 
 \section{Overall Analysis}
 \label{sec:results_overall}

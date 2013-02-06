@@ -30,7 +30,7 @@ thesis.aux : $(thesis_files) $(diagrams)
 	bibtex thesis
 
 watch : 
-	makewatch $(thesis_files) chapter5.Rnw
+	makewatch $(thesis_files) chapter2.Rnw chapter5.Rnw
 
 # Download RFC bib if needed
 rfc.bib :

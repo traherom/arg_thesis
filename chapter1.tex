@@ -17,7 +17,7 @@
 	\item Is \ac{ARG} stable when presented with corrupt, malformed, and/or replayed packets?
 \end{itemize}
 
-\par Each question is tested in a separate series of experiments. Direct measurement on a physical network is used for all results. Nodes on the test network represent the types of hosts found on a typical, corporate-style network. These include trusted hosts inside trusted networks which communicate freely, internal and external servers that must be accessible to hosts inside these trusted networks, and malicious hosts outside the networks. \ac{ARG} sits in front of the trusted networks. \tbd{added, reread}
+\par Each question is tested in a separate series of experiments. Direct measurement on a physical network is used for all results. Nodes on the test network represent the types of hosts found on a typical, corporate-style network. These include trusted hosts inside trusted networks which communicate freely, internal and external servers that must be accessible to hosts inside these trusted networks, and malicious hosts outside the networks. \ac{ARG} sits in front of the trusted networks and provides network address space randomization to the internal hosts.
 
 %\par The limitations on the answers to each of these questions varies. If \ac{ARG} shows an acceptable level of classification accuracy, it will demonstrate the viability of (in this regard) similar systems. Likewise, the maximum supportable hop rate from \ac{ARG} demonstrates that at least that rate is possible. On the other hand, if \ac{ARG} does not support a fast packet rate it only reveals flaws in its own design, not of others. \tbd{not sure about this paragraph. Needed? Leave until analysis?}
 
