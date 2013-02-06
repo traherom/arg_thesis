@@ -14,7 +14,7 @@
 	<key>BackgroundGraphic</key>
 	<dict>
 		<key>Bounds</key>
-		<string>{{0, 0}, {576.00002479553223, 733}}</string>
+		<string>{{0, 0}, {576.00002098083496, 733}}</string>
 		<key>Class</key>
 		<string>SolidGraphic</string>
 		<key>ID</key>
@@ -46,7 +46,7 @@
 	<key>Creator</key>
 	<string>Ryan Morehart</string>
 	<key>DisplayScale</key>
-	<string>1 0/72 in = 1 0/72 in</string>
+	<string>1 0/72 in = 1.0000 in</string>
 	<key>ExportShapes</key>
 	<array>
 		<dict>
@@ -1534,8 +1534,8 @@
 			<integer>293</integer>
 			<key>Points</key>
 			<array>
-				<string>{455.73745334397637, 275.6133714554706}</string>
-				<string>{508.84072407047216, 292.77699772926417}</string>
+				<string>{455.73745334397643, 275.6133714554706}</string>
+				<string>{508.84072407047211, 292.77699772926417}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -3401,8 +3401,8 @@
 			<integer>268</integer>
 			<key>Points</key>
 			<array>
-				<string>{434.65554359816247, 247.66532239057688}</string>
-				<string>{508.85445286706334, 206.66532558954313}</string>
+				<string>{434.65552757019435, 247.66531376883555}</string>
+				<string>{508.85445239380925, 206.66525463143222}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -6558,8 +6558,8 @@
 			<integer>251</integer>
 			<key>Points</key>
 			<array>
-				<string>{311.63317085802794, 343.69137432179542}</string>
-				<string>{367.80696527327922, 373.01195603766519}</string>
+				<string>{310.9965605630502, 344.03007888130844}</string>
+				<string>{366.32748235146869, 373.78207881273477}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -6593,8 +6593,8 @@
 			<integer>250</integer>
 			<key>Points</key>
 			<array>
-				<string>{298.06267090912286, 308.5716521852101}</string>
-				<string>{382.73653746437088, 272.76548813026335}</string>
+				<string>{298.05958820442856, 308.56997106043485}</string>
+				<string>{382.7244555771934, 272.75909556894345}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -6628,8 +6628,8 @@
 			<integer>249</integer>
 			<key>Points</key>
 			<array>
-				<string>{140.7405, 317.26607683415619}</string>
-				<string>{219.6395904885014, 319.65392388558541}</string>
+				<string>{141.7405, 321.11857530181192}</string>
+				<string>{220.16676240799805, 321.11572841168498}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -11945,7 +11945,7 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{65, 280}, {75.740499999999997, 72.239900000000006}}</string>
+			<string>{{66, 285}, {75.740499999999997, 72.239900000000006}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>ID</key>
@@ -15677,7 +15677,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2012-12-31 15:29:25 +0000</string>
+	<string>2013-02-06 21:30:18 +0000</string>
 	<key>Modifier</key>
 	<string>Ryan Morehart</string>
 	<key>NotesVisible</key>
@@ -15708,7 +15708,7 @@
 		<key>NSPaperSize</key>
 		<array>
 			<string>size</string>
-			<string>{612.00002479553223, 792}</string>
+			<string>{612.00002098083496, 792}</string>
 		</array>
 		<key>NSPrintReverseOrientation</key>
 		<array>
@@ -15758,7 +15758,7 @@
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{4, -0}, {1676, 1028}}</string>
+		<string>{{4, 0}, {1436, 878}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -15772,7 +15772,7 @@
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{-482, -78}, {1541, 889}}</string>
+		<string>{{-362, -3}, {1301, 739}}</string>
 		<key>Zoom</key>
 		<real>1</real>
 		<key>ZoomValues</key>
