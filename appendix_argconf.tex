@@ -59,15 +59,15 @@ $ sudo ./arg <conf file>
 \lstinputlisting[caption=gate.pub, numbers=none, label=lst:ex_pub, breakatwhitespace=false]{confexample/gate.pub}
 \lstinputlisting[caption=gate.priv, numbers=none, label=lst:ex_priv, breakatwhitespace=false]{confexample/gate.priv}
 
-\par The first two lines of the public key file are, in order, the base \ac{IP} address and mask for the gateway. The \tbd{describe other params in context of RSA equation}
-
-\par These files can be produced quickly through the included \texttt{gen\_gate\_config} utility. This tool is built alongside \texttt{arg}, see Section \ref{sec:arg_env}. Usage is:
+\par The first two lines of the public key file are, in order, the base \ac{IP} address and mask for the gateway. The remainder of the parameters are hexadecimal integer values matching to parts of the \ac{RSA} equations. The library used for encryption in \ac{ARG} (PolarSSL) provides a straightforward way of reading these into the internal key structures. The exact details of each value are not overly important, as the public and private key files files can be produced quickly through the included \texttt{gen\_gate\_config} utility. This tool is built alongside \texttt{arg}, see Section \ref{sec:arg_env}. Usage is:
 
 \begin{lstlisting}
 $ ./gen_gate_config <name> <base ip> <mask>
 \end{lstlisting}
 
 \par This will produce a \texttt{<name>.pub} and \texttt{<name>.priv} file with the information given and a random public and private key.
+
+\par For reference, \texttt{N} and \texttt{E} in both of configuration files come from the \ac{RSA} encryption equation $c \equiv m^e (\text{mod}~n)$. The values \texttt{D}, \texttt{P}, and \texttt{Q} in the private key file represent the original key generation values, as shown in the equations $n = pq$ and $d \equiv e^{-1} (\text{mod}~\phi(n))$. The remainder of the values are multiplied forms of the the previous values (e.g., DP is $D \times P$).
 
 \par For every gateway that this gate should know about, another \texttt{<othegatename>.pub} should be placed in the directory. For instance, if \texttt{gateA} knows about \texttt{gateB}, then a \texttt{gateB.pub} file must exist. The information inside is the same format as its own \texttt{.pub} file. Look at Section \ref{sec:arg_run_example} for an example of the file structure and expected output.
 
