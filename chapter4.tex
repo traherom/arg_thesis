@@ -1,7 +1,7 @@
 \chapter{Methodology}
 \label{chp:methodology}
 
-\par This chapter discusses the methodology used to measure the effectiveness of \ac{ARG} at correctly classifying valid and invalid traffic, the maximum supportable hop rate at various network latencies, the maximum packet rate \ac{ARG} can handle, and the overall stability of the system under test. Section \ref{sec:problem_def} discusses the problem this research seeks to answer. Section \ref{sec:boundaries} defines the \ac{SUT}, and Section \ref{sec:services} goes into detail on the possible outcomes of the \ac{CUT}. Section \ref{sec:workload} covers the workload presented to the \ac{SUT}, Section \ref{sec:metrics} covers the metrics collected, and Section \ref{sec:parameters} covers the configurable parameters of the \ac{SUT}. Section \ref{sec:factors} brings the previous sections together, giving a comprehensive list of the factors varied for each test. Sections \ref{sec:eval_technique} and \ref{sec:exp_design} detail the actual tests and the purpose of each.
+\par This chapter discusses the methodology used to measure the effectiveness of \ac{ARG} at correctly classifying valid and invalid traffic, the shortest supportable hop interval at various network latencies, the maximum packet rate \ac{ARG} can handle, and the overall stability of the system under test. Section \ref{sec:problem_def} discusses the problem this research seeks to answer. Section \ref{sec:boundaries} defines the \ac{SUT}, and Section \ref{sec:services} goes into detail on the possible outcomes of the \ac{CUT}. Section \ref{sec:workload} covers the workload presented to the \ac{SUT}, Section \ref{sec:metrics} covers the metrics collected, and Section \ref{sec:parameters} covers the configurable parameters of the \ac{SUT}. Section \ref{sec:factors} brings the previous sections together, giving a comprehensive list of the factors varied for each test. Sections \ref{sec:eval_technique} and \ref{sec:exp_design} detail the actual tests and the purpose of each.
 
 \section{Problem Definition}
 \label{sec:problem_def}
@@ -12,7 +12,7 @@
 \begin{enumerate}
 \item Does \ac{ARG} classify traffic correctly? What percentage of false positives (valid packets blocked) and false negatives (invalid traffic allowed through) does it introduce?
 \item What is the maximum packet rate and throughput \ac{ARG} can support?
-\item What is the maximum hop rate---the frequency with which \ac{ARG} changes \ac{IP} addresses---that still allows for reliable communication? How does latency affect this?
+\item What is the minimum supportable time between hops? How does latency affect this?
 \item Is \ac{ARG} stable when presented with corrupt, malformed, or replayed packets?
 \end{enumerate}
 
@@ -20,7 +20,7 @@
 
 %\par The working hypothesis for this research is, as speculated by Sandia, a \ac{DYNAT} system allows for quick identification of unexpected (and potentially malicious) packets entering a network. There are few identifiers within the scope of \ac{DYNAT} by which outgoing packets could be filtered. Given that, no filtering is done for outbound packets and hence no change in behavior is observed when compared to the control network. 
 
-\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop rate appropriate for the network latency. In addition, this thesis hypothesizes that packet loss becomes acceptable when the hop rate matches or exceeds the network latency, where acceptable loss is defined as less than 2\%. This percentage is based on the loss seen on Massachusetts Institute of Technology's wireless networks \cite{MITWifiLoss}. The other two questions under test are informational in nature as the results apply only to this specific hopping gateway implementation, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 10 \ac{Mbps} of traffic. 
+\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop interval appropriate for the network latency. In addition, this thesis hypothesizes that packet loss becomes acceptable when the hop interval matches or exceeds the network latency, where acceptable loss is defined as less than 2\%. This percentage is based on the loss seen on Massachusetts Institute of Technology's wireless networks \cite{MITWifiLoss}. The other two questions under test are informational in nature as the results apply only to this specific hopping gateway implementation, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 10 \ac{Mbps} of traffic. 
 
 \subsection{Approach}
 \label{sec:approach}
@@ -90,7 +90,7 @@
 
 \par The primary physical network parameter that affects \ac{ARG} is latency. To ensure that two \ac{ARG} gateways are able to communicate reliably, packets sent from one gateway to the other must arrive before the \ac{IP} addresses used in the send are no longer current. If hops occur too frequently, then a high one-way latency will cause sent packets to frequently arrive after the receiving gateway has hopped to a different \ac{IP} address. (Adapting to latency is an area of potential improvement, as Section \ref{sec:future_work} discusses.)
 
-\par The primary configuration setting for \ac{ARG} is the hop rate. \ac{ARG} allows the time between hops to be customized from several times a second to minutes apart with millisecond precision. Each gateway may be configured to hop at different rates, but for the sake of this thesis the hop rates are always identical in a given test.
+\par The primary configuration setting for \ac{ARG} is the hop interval. \ac{ARG} allows the time between hops to be customized from several times a second to minutes apart with millisecond precision. Each gateway may be configured to hop at different rates, but for the sake of this thesis the hop intervals are always identical in a given test.
 
 \section{Factors}
 \FloatBarrier
@@ -105,7 +105,7 @@
 	\begin{tabular}{r|l}
 	\textbf{Factor} & \textbf{Possible Levels} \\
 	\hline
-	Hop rate (ms) & 1000, 500, 300, 200, 100, 75, 60, 50, 40, 30, 15, 10, 5\\
+	Hop interval (ms) & 1000, 500, 300, 200, 100, 75, 60, 50, 40, 30, 15, 10, 5\\
 	Round-trip latency (ms) & 500, 100, 30, 20, 0\\
 	Packet delay (s) & 0.3, 0.2, 0.1, 0.05, 0.01, 0.005, 0.001\\
 	Traffic direction and type & See detailed description
@@ -114,8 +114,8 @@
 \end{table}
 
 \begin{itemize}
-\item Hop rate
-	\par Varying the rate at which \ac{ARG} switches to a new external \ac{IP} allows testing of the maximum supportable hop rate. Hops every 1000 milliseconds give ample time for packets to travel across the network at all but the most extreme latencies, while hops every 5 milliseconds stress even ideal network conditions.
+\item Hop interval 
+	\par Varying the rate at which \ac{ARG} switches to a new external \ac{IP} allows testing of the shortest supportable hop interval. Hops every 1000 milliseconds give ample time for packets to travel across the network at all but the most extreme latencies, while hops every 5 milliseconds stress even ideal network conditions.
 
 \item Latency between \ac{ARG} gateways
 	\par The test network runs through a single switch running four \acp{VLAN}, with an average latency under 1 millisecond. Introducing artificial latency simulates a more realistic range of environments.
@@ -150,7 +150,7 @@
 
 \section{Performance Metrics}
 \label{sec:metrics}
-\par As previously stated, this research primarily focuses on the classification accuracy of \ac{ARG} and the interaction of hop rate and latency. Measurements on \ac{ARG} therefore concentrate on the outcomes from the director. However, basic statistics on network performance are collected. The metrics of interest include:
+\par As previously stated, this research primarily focuses on the classification accuracy of \ac{ARG} and the interaction of the hop interval and latency. Measurements on \ac{ARG} therefore concentrate on the outcomes from the director. However, basic statistics on network performance are collected. The metrics of interest include:
 
 \begin{itemize}
 \item Percentage of invalid packets accepted
@@ -224,16 +224,16 @@
 \par These possible traffic flows are used in four sets of experiments, given below. Each experiment set answers a different research goal.
 \begin{itemize}
 	\item Basic tests
-	\par This sequence of tests verifies that \ac{ARG} classifies traffic correctly by running every test shown in Figure \ref{fig:testnum_flows} against \ac{ARG}. Latency is set to 20 milliseconds (\ac{RTT}) for all tests and traffic generators produce packets around every 0.3 seconds. To determine if hop rate has a statistically significant impact on certain types of traffic, every test runs twice, once with a long hop interval of 500 milliseconds and once with a shorter interval of 50 milliseconds, which is just slightly more than double the round-trip latency.
+	\par This sequence of tests verifies that \ac{ARG} classifies traffic correctly by running every test shown in Figure \ref{fig:testnum_flows} against \ac{ARG}. Latency is set to 20 milliseconds (\ac{RTT}) for all tests and traffic generators produce packets around every 0.3 seconds. To determine if the time between hops has a statistically significant impact on certain types of traffic, every test runs twice, once with a long hop interval of 500 milliseconds and once with a shorter interval of 50 milliseconds, which is just slightly more than double the round-trip latency.
 
-	\item Max Throughput
+	\item Maximum Throughput
 	\par This sequence gives an indication of what throughput and packet rate \ac{ARG} is capable of handling. Packet delay goes through all levels shown in Table \ref{tbl:factors}, which leads to roughly corresponding increases in the throughput the gateways must handle. As with the basic tests, the hop interval alternates between 500 ms and 50 ms to see if the additional \ac{IP} calculation load impacts the maximum rate. Test 4 is used across all runs to because it utilizes both \ac{TCP} and \ac{UDP} traffic flowing in all valid directions. \ac{RTT} is set to 20 ms.
 
-	\item Max hop rate
-	\par This sequence determines the maximum hop rate at various latencies. Hop rate and latency go through the levels shown in Table \ref{tbl:factors} in a full factorial fashion (every latency-hop rate combination). Packet rate is fixed at 0.3 seconds. Test 4 is used throughout.
+	\item Minimum hop interval 
+	\par This sequence determines the minimum time between \ac{IP} address changes at various latencies. The hop interval and latency go through the levels shown in Table \ref{tbl:factors} in a full factorial fashion (every latency-hop interval combination). Packet rate is fixed at 0.3 seconds. Test 4 is used throughout.
 
 	\item Fuzzer
-	\par This sequence is not tested rigorously for traffic flow success and failure, but ensures that \ac{ARG} remains stable despite malformed traffic. The traffic flows from Test 8 are used, with additional traffic coming from fuzzers running that replay and/or alter all gateway traffic they see. Hop rate varies between 500 ms and 50 ms, latency is fixed at 20 ms, and packets are sent at 0.3 second intervals.
+	\par This sequence is not tested rigorously for traffic flow success and failure, but ensures that \ac{ARG} remains stable despite malformed traffic. The traffic flows from Test 8 are used, with additional traffic coming from fuzzers running that replay and/or alter all gateway traffic they see. Hop intervals vary between 500 ms and 50 ms, latency is fixed at 20 ms, and packets are sent at 0.3 second intervals.
 \end{itemize}
 
 \par A 95\% confidence interval is used for all experiments. Experiments are each run for five minutes, sufficient time for the system to stabilize (pilot studies show that \ac{ARG} fully connects in under 10 seconds on the test network). Wide variation is possible in the actual traffic seen in a single run, so a minimum of 10 replications are used for each experiment.

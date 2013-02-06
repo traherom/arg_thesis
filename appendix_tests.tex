@@ -33,7 +33,7 @@ Prot/Ext & \texttt{sudo tcpdump -i eth1 -w clientX.pcap -n ip and not arp}
 \end{tabular}
 \end{table}
 
-\item Set \ac{ARP} cache size on gateways and external host to allow for 65,536 entries. This is needed at high hop rates only because all systems are on the same network segment.
+\item Set \ac{ARP} cache size on gateways and external host to allow for 65,536 entries. This is needed at short hop intervals only because all systems are on the same network segment.
 \item Push configuration files for \ac{ARG}. \texttt{ProtA1} and \texttt{ProtC1} each know about \texttt{ProtB1}, but not about each other. \texttt{ProtB1} is given configuration files for both \texttt{ProtA1} and \texttt{ProtC1}.
 \item Start \ac{ARG} on the gateways. 
 \item Start traffic generators on hosts, as appropriate for the test being run. See Section \ref{sec:exp_design} for general flow of traffic for each test type.
