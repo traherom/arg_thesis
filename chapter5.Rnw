@@ -165,7 +165,7 @@ create_rejection_table = function(name, caption, table) {
 \par The raw results for the loss of valid packets on each test are shown in Figure \ref{fig:basic_raw_data}. Figure \ref{fig:basic_mean_ci} shows the mean and \acp{CI} of each test, using a \Sexpr{alpha*100}\% confidence level. Due to a lack of normality in the experimental results, these numbers are calculated via bootstrapping with \Sexpr{replicates} replicates.
 
 \begin{figure}
-\caption{Basic tests, raw valid packet loss}
+\caption[Basic tests, raw valid packet loss]{Basic tests, raw valid packet loss. Traffic flow numbers correspond to the flows in Figure \ref{fig:testnum_flows}.}
 \label{fig:basic_raw_data}
 \centering
 <<basic_tests_valid_raw, echo=FALSE>>=
@@ -182,7 +182,7 @@ axis(2, at=ylab, labels=paste(ylab, '%', sep=''))
 \end{figure}
 
 \begin{figure}
-\caption{Basic tests, valid packet loss means and confidence intervals}
+\caption[Basic tests, valid packet loss means and confidence intervals]{Basic tests, valid packet loss means and confidence intervals. Traffic flow numbers correspond to the flows in Figure \ref{fig:testnum_flows}}
 \label{fig:basic_mean_ci}
 \centering
 <<basic_tests_valid_mean, echo=FALSE, warning=FALSE>>=
@@ -208,7 +208,7 @@ plotCI(0:(length(basic.boot)-1), basic.boot.stats,
 @
 \end{figure}
 
-\par These figures reveal a low packet loss across all test scenarios. At worst, Flow 3---TCP traffic between \ac{ARG} protected clients only---lost between \Sexpr{basic.boot.ci[1,4]}\% and \Sexpr{basic.boot.ci[2,4]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, valid packet loss averaged \Sexpr{basic.boot.overall.stat}\%, with a \ac{CI} of $(\Sexpr{I(basic.boot.overall.ci[1])}\%, \Sexpr{I(basic.boot.overall.ci[2])}\%)$, again with \Sexpr{alpha*100}\% confidence. These results confirm Chapter \ref{chp:methodology}'s hypothesis that \ac{ARG} causes packet loss less than \Sexpr{acceptable}\%, at least under normal conditions.
+\par These figures reveal low packet loss across all test scenarios. At worst, Flow 3---TCP traffic between \ac{ARG} protected clients only---lost between \Sexpr{basic.boot.ci[1,4]}\% and \Sexpr{basic.boot.ci[2,4]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, valid packet loss averaged \Sexpr{basic.boot.overall.stat}\%, with a \ac{CI} of $(\Sexpr{I(basic.boot.overall.ci[1])}\%, \Sexpr{I(basic.boot.overall.ci[2])}\%)$, again with \Sexpr{alpha*100}\% confidence. These results confirm Chapter \ref{chp:methodology}'s hypothesis that \ac{ARG} causes packet loss less than \Sexpr{acceptable}\%, at least under normal conditions.
 
 \par Figure \ref{fig:basic_raw_data} displays two outliers on Flow 3. Examining the data reveals the dropped packets exceeded the maximum size of a packet \ac{ARG} can pass between gateways. As Chapter \ref{chp:implementation} covers, \ac{ARG} wraps packets between gateways in its own headers, increasing the size of the packet. Ethernet II has a default maximum transmission unit of 1500 bytes, so \ac{ARG} drops packets that pass this limit after being wrapped (\ac{ARG} is unable to fragment packets or inform the sender that fragmentation is needed, as Section \ref{sec:future_work} mentions). In fact, the maximum packet size issue is the most common reason for packet rejection in the basic set of tests (in tests with only valid traffic), as shown in Table \ref{tbl:basic_loss_reasons_valid}. While test traffic is controlled for size, an oversight in the test traffic generators fails to account for \ac{TCP} options, which can increase the size of the packet beyond the limit. \ac{TCP} options here refers to the optional header data after the main \ac{TCP} headers \cite{rfc793}.
 
@@ -449,7 +449,7 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.udptcp.interarg', ylim=c(0, 5
 
 \par On the Internet, the triple-latency problem does not occur. An \ac{ARG} gateway sending a packet to another gateway uses \ac{ARP} requests to get the hardware address of the local router, a process which takes under a millisecond on most Ethernet networks. Once the \ac{ARG} gateway has the hardware address of the router, it sends the data packet out to the other gateway. After the packet leaves the local network, \ac{IP} address hopping does not affect network operation at all, resulting in the packets between gateways experiencing same latency as any other data on the network. A 30 millisecond one-way latency across the Internet (or other \ac{WAN}) means packets genuinely take (on average) 30 milliseconds to reach their destination, whereas a 30 millisecond latency on the test network often means packets take 90 milliseconds.
 
-\par Despite having no latency, the zero millisecond test exhibits high loss until around 75 milliseconds hops, similar to when the 15 millisecond latency test indicates a usable connection. This may indicate a that hopping more frequently than every 50-75 milliseconds is impractical regardless of network conditions with the current implementation. It may be possible for the sender of a packet to calculate ``future'' \ac{IP} addresses to use for each packet sent, so that the addresses are current when they arrive at the destination. This is an area for future research, as Section \ref{sec:future_work} discusses. Previous research into address space randomization and \ac{IP} hopping limit themselves to hopping on the order of minutes or hours and never explore the maximum rate possible.
+\par Despite having no latency, the zero millisecond test exhibits high loss until around 75 milliseconds hops, similar to when the 15 millisecond latency test indicates a usable connection. This may indicate that hopping more frequently than every 50-75 milliseconds is impractical regardless of network conditions with the current implementation. It may be possible for the sender of a packet to calculate ``future'' \ac{IP} addresses to use for each packet sent, so that the addresses are current when they arrive at the destination. This is an area for future research, as Section \ref{sec:future_work} discusses. Previous research into address space randomization and \ac{IP} hopping limit themselves to hopping on the order of minutes or hours and never explore the maximum rate possible.
 
 \par \ac{ARG} appears to have little additional impact on \ac{TCP}, when compared to \ac{UDP}. Figure \ref{fig:hrlat_tcp_inter} displays losses associated with only \ac{TCP} packets travelling between gateways. Compared to Figure \ref{fig:hrlat_udptcp_inter_full} (which includes UDP and TCP packets), trends appear similar. 
 
@@ -468,7 +468,7 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.tcp.interarg', yby=5)
 tots = create_rejection_table('hoprate_loss_reasons', 'Hop interval test loss reasons', hoprate)
 @
 
-\par Finally, Figure \ref{fig:hrlat_extra} demonstrates there is little correlation between the hop internal and the flow of traffic to external hosts. Over all \Sexpr{nrow(hoprate)} hop interval test runs, packet loss to and from the external host never exceeds \Sexpr{signif(max(hoprate[,'valid.loss.rate.extraarg']), 2)}\%. This makes sense, as the changing \ac{IP} is only referenced when the \ac{NAT} module first creates a table entry. Later packets on the same connection consult the table information and are unaware of any \ac{IP} address changes. 
+\par Finally, Figure \ref{fig:hrlat_extra} demonstrates there is little correlation between the hop interval and the flow of traffic to external hosts. Over all \Sexpr{nrow(hoprate)} hop interval test runs, packet loss to and from the external host never exceeds \Sexpr{signif(max(hoprate[,'valid.loss.rate.extraarg']), 2)}\%. This makes sense, as the changing \ac{IP} is only referenced when the \ac{NAT} module first creates a table entry. Later packets on the same connection consult the table information and are unaware of any \ac{IP} address changes. 
 
 \begin{figure}
 \caption{Hop interval tests, packet loss of externally-bound traffic}
@@ -600,7 +600,7 @@ par(old_par)
 
 \par On Figure \ref{fig:pr_tukey}, numbers along the side correspond to the cluster numbers shown in Table \ref{tbl:pr_clusters} and Figure \ref{fig:pr_raw_data}. Six means stand out as being distinctly different: 1-4, 2-4, 3-4, 4-5, 4-6, and 4-7. Cluster 4 is statistically different from all other clusters, with \Sexpr{alpha*100}\% confidence. However, the other data gives reason to believe that throughput was not the cause of loss increase and variation. No changing trend is seen in any of the surrounding throughputs' losses (either up or down) and faster throughputs (Clusters 5 through 7) show loss comparable to the slower throughputs (Clusters 1 through 3). While the precise cause of the increased loss in some of these tests is unknown, the amount of data the gateways handle is not believed to be the cause.
 
-\par The results of these tests are limited to just the implementation of \ac{ARG} and imply only a minimally possible throughput. Despite these limitations, \ac{ARG} performs well with reasonably rapid traffic of over four \ac{Mbps}, giving no reason to believe it is not capable of higher rates. Time constraints prohibited more rapid throughput tests.
+\par The results of these tests are limited to just the implementation of \ac{ARG} and imply only a minimally possible throughput. Despite these limitations, \ac{ARG} performs well with reasonably rapid traffic of over four \ac{Mbps}, giving no reason to believe it is not capable of higher rates. Time constraints prohibit more rapid throughput tests.
 
 \section{Fuzzing Test}
 \label{sec:results_fuzzer_tests}

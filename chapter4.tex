@@ -1,7 +1,7 @@
 \chapter{Methodology}
 \label{chp:methodology}
 
-\par This chapter discusses the methodology used to measure the effectiveness of \ac{ARG} at correctly classifying valid and invalid traffic, the shortest supportable hop interval at various network latencies, the maximum packet rate \ac{ARG} can handle, and the overall stability of the system under test. Section \ref{sec:problem_def} discusses the problem this research seeks to answer. Section \ref{sec:boundaries} defines the \ac{SUT}, and Section \ref{sec:services} goes into detail on the possible outcomes of the \ac{CUT}. Section \ref{sec:workload} covers the workload presented to the \ac{SUT}, Section \ref{sec:metrics} covers the metrics collected, and Section \ref{sec:parameters} covers the configurable parameters of the \ac{SUT}. Sections \ref{sec:eval_technique} and \ref{sec:exp_design} detail the actual tests and the purpose of each.
+\par This chapter discusses the methodology used to measure the effectiveness of \ac{ARG} at correctly classifying valid and invalid traffic, the shortest supportable hop interval at various network latencies, the maximum packet rate \ac{ARG} can handle, and the overall stability of the system under test. Section \ref{sec:problem_def} discusses the problem this research seeks to answer. Section \ref{sec:boundaries} defines the \ac{SUT}, and Section \ref{sec:services} goes into detail on the possible outcomes of the \ac{CUT}. Section \ref{sec:workload} covers the workload presented to the \ac{SUT}, Section \ref{sec:parameters} covers the configurable parameters of the \ac{SUT}, and Section \ref{sec:metrics} covers the metrics collected. Sections \ref{sec:eval_technique} and \ref{sec:exp_design} detail the actual tests and the purpose of each.
 
 \section{Problem Definition}
 \label{sec:problem_def}
@@ -88,44 +88,7 @@
 
 \par The primary physical network parameter that affects \ac{ARG} is latency. To ensure that two \ac{ARG} gateways are able to communicate reliably, packets sent from one gateway to the other must arrive before the \ac{IP} addresses used in the send are no longer current. If hops occur too frequently, a high one-way latency will cause sent packets to frequently arrive after the receiving gateway has hopped to a different \ac{IP} address. (Adapting to latency is an area of potential improvement, as Section \ref{sec:future_work} discusses.) The test environment inherently introduces less than one millisecond of latency, but artificial latency can be added to simulate a more realistic range of network conditions.
 
-\par The primary configuration setting for \ac{ARG} is the hop interval. \ac{ARG} allows the time between hops to be customized from several times a second to minutes apart with millisecond precision. Each gateway may be configured to hop at different rates, but for the sake of this thesis the hop intervals are always identical in a given test. Hops every 1000 milliseconds give ample time for packets to travel across the network at all but the most extreme latencies, while hops every five milliseconds stress even ideal network conditions.
-
-\begin{comment}
-\section{Factors}
-\FloatBarrier
-\label{sec:factors}
-\par Based on the system and workload parameters given above, the following factors are varied as part of the experiment. All others remain constant throughout the experiment. Factors and levels are summarized in Table \ref{tbl:factors} and described in detail below.
-
-\begin{table}
-\begin{center}
-	\caption{Experimental factors and levels}
-	\label{tbl:factors}
-	
-	\begin{tabular}{r|l}
-	\textbf{Factor} & \textbf{Possible Levels} \\
-	\hline
-	Hop interval (ms) & 1000, 500, 300, 200, 100, 75, 60, 50, 40, 30, 15, 10, 5\\
-	Round-trip latency (ms) & 500, 100, 30, 20, 0\\
-	Packet delay (s) & 0.3, 0.2, 0.1, 0.05, 0.01, 0.005, 0.001\\
-	Traffic direction and type & See detailed description
-	\end{tabular}
-\end{center}
-\end{table}
-
-\begin{itemize}
-\item Hop interval 
-	\par Varying the rate at which \ac{ARG} switches to a new external \ac{IP} allows testing of the shortest supportable hop interval. Hops every 1000 milliseconds give ample time for packets to travel across the network at all but the most extreme latencies, while hops every 5 milliseconds stress even ideal network conditions.
-
-\item Latency between \ac{ARG} gateways
-	\par The test network runs through a single switch running four \acp{VLAN}, with an average latency under 1 millisecond. Introducing artificial latency simulates a more realistic range of environments.
-
-\item Packet Delay
-	\par Each test spawns a number of traffic generators at different points in the test network. The packet delay shown here is used as a wait between each packet sent. Lower delays result in more frequent sends and force the gateways to deal with more packets per second.
-
-\item Traffic direction and type
-	\par \ac{ARG} is capable of handling \ac{TCP}, \ac{UDP}, and \ac{ICMP} traffic. All tests use equal amounts of \ac{TCP} and \ac{UDP} traffic, but some vary the direction. Section \ref{sec:exp_design} gives a full description of the various tests and Figure \ref{fig:testnum_flows} illustrates the direction of all traffic on the network.
-\end{itemize}
-\end{comment}
+\par The primary configuration setting for \ac{ARG} is the hop interval. \ac{ARG} allows the time between hops to be customized from several times a second to minutes apart with millisecond precision. Each gateway may be configured to hop at different rates, but for the sake of this thesis the hop intervals for each gateway are identical in a given test. 
 
 \section{Evaluation Technique}
 \label{sec:eval_technique}
@@ -168,7 +131,7 @@
 
 \section{Experimental Design}
 \label{sec:exp_design}
-\par Based on the system and workload parameters given in Sections \ref{sec:workload} and \ref{sec:parameters} and the goals of this research (as presented in Section \ref{sec:goals}), there are eight traffic flows of interest. Each consists of different types of traffic and flow destinations. These are most easily visualized in Figure \ref{fig:testnum_flows}.
+\par Based on the system and workload parameters given in Sections \ref{sec:workload} and \ref{sec:parameters} and the goals of this research (as presented in Section \ref{sec:goals}), there are eight traffic flows of interest. Each consists of different types of traffic and flow destinations. These are most easily visualized in Figure \ref{fig:testnum_flows} on page \pageref{fig:testnum_flows}.
 
 \begin{figure}
 \caption[Experiment traffic flow directions and protocols]{Experiment traffic flow directions and protocols. Black solid lines indicate valid traffic, red dashed lines are invalid.}
@@ -228,7 +191,7 @@
 	\par Table \ref{tbl:basic_factors} displays the factor levels used for this series of tests. This sequence of tests verifies that \ac{ARG} classifies traffic correctly by running every test shown in Figure \ref{fig:testnum_flows} against \ac{ARG}. Latency is set to 20 milliseconds (\ac{RTT}) for all tests and traffic generators produce packets around every 0.3 seconds. To determine if the time between hops has a statistically significant impact on certain types of traffic, every test runs twice, once with a long hop interval of 500 milliseconds and once with a shorter interval of 50 milliseconds, which is just slightly more than double the round-trip latency.
 
 \begin{table}
-\caption{Experimental factors and levels for basic tests}
+\caption{Factor levels for basic tests}
 \label{tbl:basic_factors}
 \centering
 \begin{tabular}{l|l}
@@ -242,10 +205,10 @@ Traffic direction and type & Flows 0--8 (See Figure \ref{fig:testnum_flows})
 \end{table}
 
 	\item Maximum Throughput
-	\par Table \ref{tbl:throughput_factors} displays the factor levels used for this series of tests. This sequence gives an indication of what throughput and packet rate \ac{ARG} is capable of handling. Packet delay goes through all levels shown in Table \ref{tbl:throughput_factors}, which leads to roughly corresponding increases in the throughput the gateways must handle. As with the basic tests, the hop interval alternates between 500 ms and 50 ms to see if the additional \ac{IP} calculation load impacts the maximum rate. Flow 4 is used across all runs to because it utilizes both \ac{TCP} and \ac{UDP} traffic flowing in all valid directions. \ac{RTT} is set to 20 ms.
+	\par Table \ref{tbl:throughput_factors} displays the factor levels used for this series of tests. This sequence gives an indication of what throughput and packet rate \ac{ARG} is capable of handling. Packet delay goes through all levels shown, which leads to roughly corresponding increases in the throughput the gateways must handle. As with the basic tests, the hop interval alternates between 500 ms and 50 ms to see if the additional \ac{IP} calculation load impacts the maximum rate. Flow 4 is used across all runs to because it utilizes both \ac{TCP} and \ac{UDP} traffic flowing in all valid directions. \ac{RTT} is set to 20 ms.
 
 \begin{table}
-\caption{Experimental factors and levels for throughput tests}
+\caption{Factor levels for throughput tests}
 \label{tbl:throughput_factors}
 \centering
 \begin{tabular}{l|l}
@@ -259,17 +222,17 @@ Traffic direction and type & Flow 4 (See Figure \ref{fig:testnum_flows})
 \end{table}
 
 	\item Minimum hop interval 
-	\par Table \ref{tbl:hoprate_factors} displays the factor levels used for this series of tests. This sequence determines the minimum time between \ac{IP} address changes at various latencies. The hop interval and latency go through the levels shown in Table \ref{tbl:hoprate_factors} in a full factorial fashion (every latency-hop interval combination). Packet rate is fixed at 0.3 seconds. Flow 4 is used throughout.
+	\par Table \ref{tbl:hoprate_factors} displays the factor levels used for this series of tests. This sequence determines the minimum time between \ac{IP} address changes at various latencies. The hop interval and latency go through the levels shown in a full factorial fashion (every latency-hop interval combination). Packet rate is fixed at 0.3 seconds. Flow 4 is used throughout.
 
 \begin{table}
-\caption{Experimental factors and levels for minimum hop interval tests}
+\caption{Factor levels for minimum hop interval tests}
 \label{tbl:hoprate_factors}
 \centering
 \begin{tabular}{l|l}
 \textbf{Factor} & \textbf{Possible Levels} \\
 \hline
 Hop interval (ms) & 1000, 500, 300, 200, 100, 75, 60, 50, 40, 30, 15, 10, 5\\
-Round-trip latency (ms) & 20\\
+Round-trip latency (ms) & 0, 30, 100, 500\\
 Packet delay (s) & 0.3\\
 Traffic direction and type & Flow 4 (See Figure \ref{fig:testnum_flows})
 \end{tabular}
@@ -279,7 +242,7 @@ Traffic direction and type & Flow 4 (See Figure \ref{fig:testnum_flows})
 	\par Table \ref{tbl:fuzz_factors} displays the factor levels used for this series of tests. This sequence is not tested rigorously for traffic flow success and failure, but ensures that \ac{ARG} remains stable despite malformed traffic. Traffic Flow 8 is used, with additional traffic coming from fuzzers running that replay and/or alter all gateway traffic they see. Hop intervals vary between 500 ms and 50 ms, latency is fixed at 20 ms, and packets are sent at 0.3 second intervals.
 
 \begin{table}
-\caption{Experimental factors and levels for fuzz tests}
+\caption{Factor levels for fuzz tests}
 \label{tbl:fuzz_factors}
 \centering
 \begin{tabular}{l|l}
@@ -293,7 +256,7 @@ Traffic direction and type & Flow 8 (See Figure \ref{fig:testnum_flows})
 \end{table}
 \end{itemize}
 
-\par A 95\% confidence interval is used for all experiments. Experiments are each run for five minutes, sufficient time for the system to stabilize (pilot studies show that \ac{ARG} fully connects in under 10 seconds on the test network). Wide variation is possible in the actual traffic seen in a single run, so a minimum of 10 replications are used for each experiment.
+\par A 95\% confidence interval is used for all experiments. Experiments are each run for five minutes, sufficient time for the system to stabilize (pilot studies show that \ac{ARG} fully connects in under 10 seconds on the test network). Some variation is possible in the actual traffic seen in a single run, so a minimum of 10 replications are used for each experiment.
 
 \section{Summary}
 \label{sec:method_summary}
