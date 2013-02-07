@@ -24,8 +24,8 @@ digraph G {
 	from_arg -> nat_in [label="No"]
 
 	hop_adm [label="Hopper, admin", shape="rectangle"]
-	src_ip [label="Current Source IP?", shape="diamond"]
-	dest_ip [label="Current Dest IP?", shape="diamond"]
+	src_ip [label="Valid Source IP?", shape="diamond"]
+	dest_ip [label="Valid Dest IP?", shape="diamond"]
 
 	admin -> hop_adm [label="Yes"]
 	admin -> src_ip [label="No"]

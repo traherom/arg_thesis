@@ -34,9 +34,20 @@
 
 \par At startup, each gateway generates a random symmetric encryption key and a ``hop key.'' They then attempt to connect to all other gateways for which they have configuration files through a series of data and time synchronization packets. Once two gateways fully connect, they exchange data about all other gateways they have configured, allowing \ac{ARG} nodes to connect to gateways for which they do not have physical configuration files. Periodically gateways re-send time synchronization information, ensuring that changing network conditions do not kill communication. Section \ref{sec:arg_protocol} and Appendix \ref{chp:protocol} cover each of these packet exchanges in more detail.
 
-\par Once connected, packets between ARG networks are encapsulated, encrypted, and authenticated by the originating network's gateway, with each packet given the destination network's current \ac{IP} address. On receipt, a gateway checks that the \acp{IP} match what they expect (both its own IP and the source's IP), then validates the authentication information (signature/\ac{HMAC}) before forwarding the original packet into their network. \acp{IP} may match either the current address or the previous one, allowing packets sent just before an \ac{IP} change to still be accepted. Packets to external hosts flow through the \ac{NAT}-style system covered in Section \ref{sec:arg_nat}. 
+\par Once connected, packets between ARG networks are encapsulated, encrypted, and authenticated by the originating network's gateway, with each packet given the destination network's current \ac{IP} address. On receipt, a gateway checks that the \acp{IP} match what they expect (both its own IP and the source's IP), then validates the authentication information (signature/\ac{HMAC}) before forwarding the original packet into their network.Packets to external hosts flow through the \ac{NAT}-style system covered in Section \ref{sec:arg_nat}. 
 
-%\par Multi-homed networks are not taken into account in this proposal. Further research is needed to see what changes would need to be made to support this setup. If an ARG gateway were placed at each of the connections to the outside network, it is likely that some communication between the two is required to keep them working together \cite{SandiaDynat}, but the exact form this would take needs consideration. \tbd{move to limitations?}
+\par During the evaluation of \acp{IP}, gateways allow packets to match either the current address or the previous one. This allows packets sent just before an \ac{IP} change to still be accepted. If a gateway's hop interval is shorter than twice the one-way latency, packets will never be accepted, as illustrated in Figure \ref{fig:late_packet_example}.
+
+\begin{figure}
+\caption{Packet sent between gateways when latency exceeds twice the hop interval}
+\label{fig:late_packet_example}
+\centering
+\noindent\makebox[\textwidth]{%
+\includegraphics[width=1.2\textwidth]{late_packet_example}
+}
+\end{figure}
+
+\par In Figure \ref{fig:late_packet_example}, Gate A sends a packet to Gate B with the destination addresses set to the current \ac{IP} at that time (172.200.210.85). The packet takes 50 milliseconds to travel across the network, during which time the gateways change addresses twice. When the packet reaches Gate B it is rejected, because the packet's destination \ac{IP} does not match the current (172.200.38.138) or previous (172.200.60.97) \acp{IP}.
 
 \section{Components}
 \label{sec:arg_components}
