@@ -21,7 +21,7 @@
 \end{figure}
 
 \begin{enumerate}[1.]
-\item The packet leaves 10.5.0.25, and Router A receives it on its interface Port 1.
+\item The packet leaves 10.5.0.25 and Router A receives it on its interface Port 1.
 \item Router A compares the packet's destination \ac{IP} (172.100.10.3) to its table, which looks like Table \ref{tbl:routing_example_routera_table}.
 	\begin{table}[h]
 	\caption{\ac{IP} routing example: Router A table}
@@ -155,7 +155,7 @@ Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb
 \end{tabular}
 \end{table}
 
-\par Here even a small change (\textit{o} to \textit{a}) resulted in a significantly different output. If the sender gave both the data and the hash to a recipient, the recipient would be able to repeat the hash on the data and verify that their hash matches the one the sender gave them. Hash algorithms like the \ac{SHA} family used in this example are widely published, so anyone can produce a valid hash of any data they want. This means that hashes alone do not prevent against malicious modification: an attacker can modify data, then produce a new hash to match. To counter this problem, either a digital signature or a \ac{HMAC} must be used, as covered in Section \ref{sec:authentication}.
+\par Here even a small change (\textit{o} to \textit{a}) resulted in a significantly different output. If the sender gave both the data and the hash to a recipient, the recipient would be able to repeat the hash on the data and verify that their hash matches the one the sender gave them. Hash algorithms, like the \ac{SHA} family used in this example, are widely published, so anyone can produce a valid hash of any data they want. This means that hashes alone do not prevent against malicious modification: an attacker can modify data, then produce a new hash to match. To counter this problem, either a digital signature or a \ac{HMAC} must be used, as covered in Section \ref{sec:authentication}.
 
 \subsection{Encryption}
 \label{sec:encryption}
