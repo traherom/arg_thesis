@@ -25,7 +25,7 @@ results = results[,1:ncol(results)-1] # Remove blank column at end
 loss_cols = c(colnames(results)[startsWith(colnames(results), 'valid.loss.rate')], 'invalid.loss.rate')
 results[,loss_cols] = results[,loss_cols] * 100
 
-# Tests were 0-indexed. Make them 1-indexed for readability
+# Traffic flows were 0-indexed. Make them 1-indexed for readability
 #results[,'test'] = results[,'test'] + 1
 
 # Convert ms values to integers
@@ -173,7 +173,7 @@ create_rejection_table = function(name, caption, table) {
 ylim=c(0, max(basic[,'valid.loss.rate'], na.rm=TRUE))
 
 plot(basic[,'test'], basic[,'valid.loss.rate'],
-	xlab="Test Number", xaxt='n',
+	xlab="Traffic Flow Number", xaxt='n',
 	ylab="Valid Packet Loss", ylim=ylim, yaxt='n')
 axis(1, at=names(basic.boot), labels=names(basic.boot))
 ylab = seq(0, max(ylim), .5)
@@ -190,7 +190,7 @@ ylim=c(0, max(basic.boot.ci, na.rm=TRUE))
 
 plot.new()
 plot.window(xlim=c(0, length(basic.boot)-1), ylim=ylim)
-title(main="", xlab="Test Number", ylab="Mean Valid Packet Loss")
+title(main="", xlab="Traffic Flow Number", ylab="Mean Valid Packet Loss")
 
 axis(1, at=names(basic.boot), labels=names(basic.boot))
 ylab = seq(0, max(ylim), .05)
@@ -208,9 +208,9 @@ plotCI(0:(length(basic.boot)-1), basic.boot.stats,
 @
 \end{figure}
 
-\par These figures reveal a low packet loss across all test scenarios. At worst, Test 3---TCP traffic between \ac{ARG} protected clients only---lost between \Sexpr{basic.boot.ci[1,4]}\% and \Sexpr{basic.boot.ci[2,4]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, valid packet loss averaged \Sexpr{basic.boot.overall.stat}\%, with a \ac{CI} of $(\Sexpr{I(basic.boot.overall.ci[1])}\%, \Sexpr{I(basic.boot.overall.ci[2])}\%)$, again with \Sexpr{alpha*100}\% confidence. These results confirm Chapter \ref{chp:methodology}'s hypothesis that \ac{ARG} causes packet loss less than \Sexpr{acceptable}\%, at least under normal conditions.
+\par These figures reveal a low packet loss across all test scenarios. At worst, Flow 3---TCP traffic between \ac{ARG} protected clients only---lost between \Sexpr{basic.boot.ci[1,4]}\% and \Sexpr{basic.boot.ci[2,4]}\% of packets, with \Sexpr{alpha*100}\% confidence. Across all tests, valid packet loss averaged \Sexpr{basic.boot.overall.stat}\%, with a \ac{CI} of $(\Sexpr{I(basic.boot.overall.ci[1])}\%, \Sexpr{I(basic.boot.overall.ci[2])}\%)$, again with \Sexpr{alpha*100}\% confidence. These results confirm Chapter \ref{chp:methodology}'s hypothesis that \ac{ARG} causes packet loss less than \Sexpr{acceptable}\%, at least under normal conditions.
 
-\par Figure \ref{fig:basic_raw_data} displays two outliers on Test 3. Examining the data reveals the dropped packets exceeded the maximum size of a packet \ac{ARG} can pass between gateways. As Chapter \ref{chp:implementation} covers, \ac{ARG} wraps packets between gateways in its own headers, increasing the size of the packet. Ethernet II has a default maximum transmission unit of 1500 bytes, so \ac{ARG} drops packets that pass this limit after being wrapped (\ac{ARG} is unable to fragment packets or inform the sender that fragmentation is needed, as Section \ref{sec:future_work} mentions). In fact, the maximum packet size issue is the most common reason for packet rejection in the basic set of tests (in tests with only valid traffic), as shown in Table \ref{tbl:basic_loss_reasons_valid}. While test traffic is controlled for size, an oversight in the test traffic generators fails to account for \ac{TCP} options, which can increase the size of the packet beyond the limit. \ac{TCP} options here refers to the optional header data after the main \ac{TCP} headers \cite{rfc793}.
+\par Figure \ref{fig:basic_raw_data} displays two outliers on Flow 3. Examining the data reveals the dropped packets exceeded the maximum size of a packet \ac{ARG} can pass between gateways. As Chapter \ref{chp:implementation} covers, \ac{ARG} wraps packets between gateways in its own headers, increasing the size of the packet. Ethernet II has a default maximum transmission unit of 1500 bytes, so \ac{ARG} drops packets that pass this limit after being wrapped (\ac{ARG} is unable to fragment packets or inform the sender that fragmentation is needed, as Section \ref{sec:future_work} mentions). In fact, the maximum packet size issue is the most common reason for packet rejection in the basic set of tests (in tests with only valid traffic), as shown in Table \ref{tbl:basic_loss_reasons_valid}. While test traffic is controlled for size, an oversight in the test traffic generators fails to account for \ac{TCP} options, which can increase the size of the packet beyond the limit. \ac{TCP} options here refers to the optional header data after the main \ac{TCP} headers \cite{rfc793}.
 
 <<echo=FALSE, results='asis'>>=
 valid_runs = apply(basic, 1, function(x) x['test'] < 5)
@@ -226,7 +226,7 @@ tots = create_rejection_table('basic_loss_reasons_valid', 'Basic tests 1-4 packe
 
 \FloatBarrier
 \subsection{Invalid Packet Loss}
-\par Tests 5 through 8 include invalid traffic that \ac{ARG} should reject and hence should be ``lost.'' Table \ref{tbl:basic_invalid_loss} displays the percentage of invalid traffic rejected (with 95\% \acp{CI}), clearly revealing \ac{ARG} has an extremely low false negative rate. As shown, over the course of 28 repetitions only one test appears to have allowed a single packet through. %\Sexpr{alpha*100}\% \ac{CI} are theoretically displayed, but all showed 100\% invalid packet loss.
+\par Traffic Flows 5 through 8 include invalid traffic that \ac{ARG} should reject and hence should be ``lost.'' Table \ref{tbl:basic_invalid_loss} displays the percentage of invalid traffic rejected (with 95\% \acp{CI}), clearly revealing \ac{ARG} has an extremely low false negative rate. As shown, over the course of 28 repetitions only one test appears to have allowed a single packet through. %\Sexpr{alpha*100}\% \ac{CI} are theoretically displayed, but all showed 100\% invalid packet loss.
 
 <<echo=FALSE, results='hide'>>=
 # Calculate overall average
@@ -257,7 +257,7 @@ ylim = c(99.9, 100)
 plotmeans(basic[invalid_runs, 'invalid.loss.rate']~basic[invalid_runs, 'test'], p=alpha,
 		connect=FALSE,
 		minbar=0, maxbar=100, ylim=ylim, yaxt='n',
-		xlab="Test Number", ylab="Invalid Packet Loss")
+		xlab="Traffic Flow Number", ylab="Invalid Packet Loss")
 ylab = seq(0, max(ylim), .01)
 axis(2, at=ylab, labels=paste(ylab, '%', sep=''))
 @
@@ -269,13 +269,13 @@ axis(2, at=ylab, labels=paste(ylab, '%', sep=''))
 \label{tbl:basic_invalid_loss}
 \centering
 \begin{tabular}{l|c|c|c}
-\textbf{Test} & \textbf{Mean} & \textbf{\ac{CI}} & \textbf{Replications}\\
+\textbf{Flow} & \textbf{Mean} & \textbf{\ac{CI}} & \textbf{Replications}\\
 \hline
 <<results='asis', echo=FALSE>>=
 invalid_runs = !valid_runs
 invalid_tests = c(5:8)
 for(test in invalid_tests) {
-	cat('Test ')
+	cat('Flow ')
 	cat(test)
 	cat(' & ')
 
@@ -306,7 +306,7 @@ for(test in invalid_tests) {
 \end{tabular}
 \end{table}
 
-\par Test 8 shows a small deviation from the expected 100\% packet rejection, as 1 of 746 packets made it through, but further examination of this number shows a rare post-processing problem. If two identical packets are sent at the same time, the test run processor leaves the second one unmarked, which is interpreted later as successfully received. The problem lies with the log analyzer, not \ac{ARG} itself, which did in fact reject every packet. This result offers convincing evidence that \ac{ARG} effectively blocks unexpected inbound traffic, but it gives no indication of its suitability against more focused attacks. 
+\par Flow 8 shows a small deviation from the expected 100\% packet rejection, as 1 of 746 packets made it through, but further examination of this number shows a rare post-processing problem. If two identical packets are sent at the same time, the test run processor leaves the second one unmarked, which is interpreted later as successfully received. The problem lies with the log analyzer, not \ac{ARG} itself, which did in fact reject every packet. This result offers convincing evidence that \ac{ARG} effectively blocks unexpected inbound traffic, but it gives no indication of its suitability against more focused attacks. 
 
 <<echo=FALSE, results='asis'>>=
 # Get the total for each possible rejection reason for the invalid tests only
@@ -318,7 +318,7 @@ tots = create_rejection_table('basic_loss_reasons_invalid', 'Basic tests 5-8 pac
 \FloatBarrier
 \section{Minimum Hop Interval}
 \label{sec:results_hoprate_tests}
-\par The minimum hop interval sequence of tests measures the change in packet loss at specific latencies as the time between hops decreases. For these tests, a fixed packet rate and Test 4 are always used. Section \ref{sec:exp_design} covers the specifics of these tests. The figures below document the results of the tests, broken up by traffic type and direction.
+\par The minimum hop interval sequence of tests measures the change in packet loss at specific latencies as the time between hops decreases. For these tests, a fixed packet rate and Flow 4 are always used. Section \ref{sec:exp_design} covers the specifics of these tests. The figures below document the results of the tests, broken up by traffic type and direction.
 
 <<echo=FALSE>>=
 # Change latency to one-way (currently RTT)
@@ -422,7 +422,7 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.udptcp.interarg', ylim=c(0, 5
 
 \par Interestingly, the zero millisecond latency trials exhibit a noticeably different decline than the others, with zero milliseconds giving a relatively steady decline in packet loss and the others remaining relatively flat before a rapid drop. The 15 millisecond latency curve gives a hint the shapes may not be as different as they appear, as it shows two or three mid-way data points on the way down to acceptable packet loss. With tests against more hop intervals, these curves would likely show a more gradual (although still rapid) decline. 
 
-\par Chapter \ref{chp:methodology} hypothesizes that packet loss reaches acceptable levels when the time between hops is equal to (or exceeds) the one-way network latency. Theoretically, this time frame should allow a packet to cross the network from one gateway to another before the receiver changes \ac{IP} addresses twice, even if the packet is sent just before the receiver hops the first time (as mentioned in Chapter \ref{chp:implementation}, gateways accept packets at the current and previous \ac{IP} \tbd{mullins wants a diagram of this? Illustrating... what?}). Any shorter hop interval results in a period of time before each hop that guarantees sent packets arrive too late.  Figure \ref{fig:hrlat_udptcp_inter_zoomed}, however, shows that loss drops below \Sexpr{acceptable}\% when the hop interval is around four times the latency. This difference from the anticipated behavior is likely the result of the test environment.
+\par Chapter \ref{chp:methodology} hypothesizes that packet loss reaches acceptable levels when the time between hops is equal to (or exceeds) the one-way network latency. Theoretically, this time frame should allow a packet to cross the network from one gateway to another before the receiver changes \ac{IP} addresses twice, even if the packet is sent just before the receiver hops the first time (as mentioned in Chapter \ref{chp:implementation}, gateways accept packets at the current and previous \ac{IP} \tbd{mullins wants a diagram of this? Illustrating packet sending and receiving, time lapse, etc}). Any shorter hop interval results in a period of time before each hop that guarantees sent packets arrive too late.  Figure \ref{fig:hrlat_udptcp_inter_zoomed}, however, shows that loss drops below \Sexpr{acceptable}\% when the hop interval is around four times the latency. This difference from the anticipated behavior is likely the result of the test environment.
 
 \par As Section \ref{sec:eth_routing} discusses, Ethernet uses \ac{ARP} requests and responses to determine the source and destination for packets on the local network. In the test environment, the gateways and the external host are all on the same local network. This results in extra Ethernet \ac{ARP} requests and responses, when compared to operation over the Internet. On a normal Ethernet segment with minimal latency (the zero millisecond test), the \ac{ARP} process takes minimal time and has little impact on operation. To speed the process even further, \ac{ARP} data is cached, so when a system wants to send to the same \ac{IP} again, it references the ARP cache table and does not have to go through the request-response process again. With short hop intervals, however, gateways frequently need to send to different \ac{IP} addresses and therefore must send and receive the requisite \acp{ARP} very frequently (generally, once every hop). When the network latency is not zero, these additional frames can cause significant delays. Figure \ref{fig:triple_arp_issue} illustrates what happens when a time synchronization between gateways occurs with a five millisecond one-way latency.
 
@@ -481,7 +481,7 @@ a = plot_latency_hoprate(hoprate, 'valid.loss.rate.extraarg', yby=.005)
 
 \section{Maximum Packet Rate}
 \label{sec:results_packetrate_tests}
-\par The final numerical test performed against \ac{ARG} measures the maximum packet rate it is capable of supporting. For these tests, latency is set to 20 milliseconds and Test 4 is used. Hop intervals vary between 50 ms and 500 ms to check if this has an effect on the supported packet rate. Most importantly, traffic generators are run with steadily increasing send rates. Section \ref{sec:exp_design} contains more details. Because throughput varies somewhat on each run, the data is clustered into the groupings listed in Table \ref{tbl:pr_clusters} and colored in Figure \ref{fig:pr_raw_data}.
+\par The final numerical test performed against \ac{ARG} measures the maximum packet rate it is capable of supporting. For these tests, latency is set to 20 milliseconds and Flow 4 is used. Hop intervals vary between 50 ms and 500 ms to check if this has an effect on the supported packet rate. Most importantly, traffic generators are run with steadily increasing send rates. Section \ref{sec:exp_design} contains more details. Because throughput varies somewhat on each run, the data is clustered into the groupings listed in Table \ref{tbl:pr_clusters} and colored in Figure \ref{fig:pr_raw_data}.
 
 <<echo=FALSE>>=
 # Sort base on throughput
