@@ -1,13 +1,13 @@
 temptex := $(patsubst %.Rnw,%.tex,$(wildcard *.Rnw))
-thesis_files := thesis.tex abstract.tex acknowledgments.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_ip.tex appendix_protocol.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex newcommands.tex rfc.bib research.bib acronyms.tex flow_director.pdf flow_packet_validation.pdf packet_structure.pdf results.csv
-defense_files := defense.tex
 diagrams := diagrams/*.pdf diagrams/*.dot
+thesis_files := thesis.tex abstract.tex acknowledgments.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_ip.tex appendix_protocol.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex newcommands.tex rfc.bib research.bib acronyms.tex packet_structure.pdf results.csv
+defense_files := defense.tex
 
 all : thesis defense
 
 thesis : thesis.pdf
 
-defense : thesis defense.pdf
+defense : thesis defense.pdf $(diagrams)
 
 test : all
 	open thesis.pdf defense.pdf

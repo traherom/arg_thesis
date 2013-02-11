@@ -14,7 +14,7 @@
 	<key>BackgroundGraphic</key>
 	<dict>
 		<key>Bounds</key>
-		<string>{{0, 0}, {576.00002098083496, 733}}</string>
+		<string>{{0, 0}, {576.00002479553223, 733}}</string>
 		<key>Class</key>
 		<string>SolidGraphic</string>
 		<key>ID</key>
@@ -1534,8 +1534,8 @@
 			<integer>293</integer>
 			<key>Points</key>
 			<array>
-				<string>{455.73745334397643, 275.6133714554706}</string>
-				<string>{508.84072407047211, 292.77699772926417}</string>
+				<string>{455.73745334397637, 275.6133714554706}</string>
+				<string>{508.84072407047216, 292.77699772926417}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -3401,8 +3401,8 @@
 			<integer>268</integer>
 			<key>Points</key>
 			<array>
-				<string>{434.65552757019435, 247.66531376883555}</string>
-				<string>{508.85445239380925, 206.66525463143222}</string>
+				<string>{434.65552711969997, 247.66531351555628}</string>
+				<string>{508.85445237399784, 206.66525259600664}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -3431,8 +3431,8 @@
 			<integer>267</integer>
 			<key>Points</key>
 			<array>
-				<string>{449.74988192520669, 393.98018406508788}</string>
-				<string>{504.98809814453125, 393}</string>
+				<string>{449.75, 394.78312840771633}</string>
+				<string>{504.98809814453125, 394.78312840771633}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -6558,8 +6558,8 @@
 			<integer>251</integer>
 			<key>Points</key>
 			<array>
-				<string>{310.9965605630502, 344.03007888130844}</string>
-				<string>{366.32748235146869, 373.78207881273477}</string>
+				<string>{310.88272200727818, 344.09064503240558}</string>
+				<string>{366.06298370523524, 373.91976976120384}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -6593,8 +6593,8 @@
 			<integer>250</integer>
 			<key>Points</key>
 			<array>
-				<string>{298.05958820442856, 308.56997106043485}</string>
-				<string>{382.7244555771934, 272.75909556894345}</string>
+				<string>{298.0593904440791, 308.56986322803726}</string>
+				<string>{382.72368058354596, 272.75868549980532}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -6628,8 +6628,8 @@
 			<integer>249</integer>
 			<key>Points</key>
 			<array>
-				<string>{141.7405, 321.11857530181192}</string>
-				<string>{220.16676240799805, 321.11572841168498}</string>
+				<string>{141.74049999999997, 321.1197281895723}</string>
+				<string>{220.17190910642569, 321.1192688077515}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -15677,7 +15677,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-02-06 21:30:18 +0000</string>
+	<string>2013-02-11 15:34:03 +0000</string>
 	<key>Modifier</key>
 	<string>Ryan Morehart</string>
 	<key>NotesVisible</key>
@@ -15708,7 +15708,7 @@
 		<key>NSPaperSize</key>
 		<array>
 			<string>size</string>
-			<string>{612.00002098083496, 792}</string>
+			<string>{612.00002479553223, 792}</string>
 		</array>
 		<key>NSPrintReverseOrientation</key>
 		<array>
@@ -15772,15 +15772,15 @@
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{-362, -3}, {1301, 739}}</string>
+		<string>{{-52, 173.29843234788439}, {681.15184436434333, 386.91100152594129}}</string>
 		<key>Zoom</key>
-		<real>1</real>
+		<real>1.9099999666213989</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>
 				<string>Canvas 1</string>
-				<real>1</real>
-				<real>1</real>
+				<real>1.9099999666213989</real>
+				<real>1.7999999523162842</real>
 			</array>
 		</array>
 	</dict>
