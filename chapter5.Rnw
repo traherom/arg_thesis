@@ -110,8 +110,8 @@ create_rejection_table = function(name, caption, table) {
 
 	# Sum just the rejection reason columns
 	reasons = table[, sapply(colnames(table), function(x) {
-			return(startsWith(x, 'inbound')  startsWith(x, 'outbound')
-					 x == 'unknown'  x == 'lost.on.wire')
+			return(startsWith(x, 'inbound') || startsWith(x, 'outbound')
+					|| x == 'unknown' ||  x == 'lost.on.wire')
 		})]
 	reasons = apply(reasons, 2, function(x) sum(x, na.rm=TRUE))
 	reasons = sort(reasons, decreasing=TRUE)
@@ -139,7 +139,7 @@ create_rejection_table = function(name, caption, table) {
 
 	# Reasons
 	for(i in 1:length(reasons)) {
-		if(is.na(reasons[i])  reasons[i] == 0)
+		if(is.na(reasons[i]) || reasons[i] == 0)
 			next
 		
 		r = names(reasons)[i]
