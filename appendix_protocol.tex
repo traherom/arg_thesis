@@ -15,10 +15,12 @@
 \caption{Data in \ac{ARG} \texttt{WRAPPED} message}
 \label{tbl:arg_wrapped_struct}
 \centering
-\begin{tabular}{l|l|l}
+\begin{tabular}{lll}
+\toprule
 \textbf{Data} & \textbf{Size} & \textbf{Data Type}\\
 \hline
-Packet Data & - & Raw, encrypted packet
+Packet Data & - & Raw, encrypted packet\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -30,12 +32,14 @@ Packet Data & - & Raw, encrypted packet
 \caption{Data in \ac{ARG} \texttt{PING} message}
 \label{tbl:arg_ping_struct}
 \centering
-\begin{tabular}{l|l|l}
+\begin{tabular}{lll}
+\toprule
 \textbf{Data} & \textbf{Size} & \textbf{Data Type}\\
 \hline
 Request ID & 4 bytes & Unsigned Integer\\
 Response ID & 4 bytes & Unsigned Integer\\
-Time Offset & 4 bytes & Unsigned Integer
+Time Offset & 4 bytes & Unsigned Integer\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -48,13 +52,15 @@ Time Offset & 4 bytes & Unsigned Integer
 \caption{Data in \ac{ARG} \texttt{CONN\_REQ} and \texttt{CONN\_RESP} messages}
 \label{tbl:arg_conn_data_struct}
 \centering
-\begin{tabular}{l|l|l}
+\begin{tabular}{lll}
+\toprule
 \textbf{Data} & \textbf{Size} & \textbf{Data Type}\\
 \hline
 Symmetric Key & 32 bytes & Raw\\
 \ac{IV} & 32 bytes & Raw\\
 Hop Key & 16 bytes & Raw\\
-Hop Interval & 4 bytes & Unsigned Integer
+Hop Interval & 4 bytes & Unsigned Integer\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -66,14 +72,16 @@ Hop Interval & 4 bytes & Unsigned Integer
 \caption{Data in \ac{ARG} \texttt{TRUST\_DATA} message}
 \label{tbl:arg_trust_struct}
 \centering
-\begin{tabular}{l|l|l}
+\begin{tabular}{lll}
+\toprule
 \textbf{Data} & \textbf{Size} & \textbf{Data Type}\\
 \hline
 Gate Name & 10 bytes & Null-padded String\\
 Base \ac{IP} & 4 bytes & Unsigned Integer\\
 Mask & 4 bytes & Unsigned Integer\\
 N & 130 bytes & Raw\\
-E & 10 bytes & Raw
+E & 10 bytes & Raw\\
+\bottomrule
 \end{tabular}
 \end{table}
 

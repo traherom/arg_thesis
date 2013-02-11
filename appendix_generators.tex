@@ -66,7 +66,8 @@ $ ./gen_traffic.py -t udp -l -p 2000
 \caption{gen\_traffic.py command-line parameters}
 \label{tbl:gen_traffic_param}
 \centering
-\begin{tabular}{l|p{2in}|l|l}
+\begin{tabular}{lp{2in}ll}
+\toprule
 Parameter & Description & Possible Values & Default\\
 \hline
 \texttt{--type} & Type of traffic to work with & tcp, udp & \\
@@ -77,7 +78,8 @@ Parameter & Description & Possible Values & Default\\
 \texttt{--delay} & Delay in seconds between sends & $>=$0.0s & 1.0\\
 \texttt{--echo} & Echo received packet data back to sender rather than random & & false\\
 \texttt{--size} & Size of packet data to send & Number of bytes to send & Random\\
-\texttt{--output} & Log to given file & file name & stdout
+\texttt{--output} & Log to given file & file name & stdout\\
+\bottomrule
 \end{tabular}
 \end{table}
 

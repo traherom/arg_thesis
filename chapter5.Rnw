@@ -110,8 +110,8 @@ create_rejection_table = function(name, caption, table) {
 
 	# Sum just the rejection reason columns
 	reasons = table[, sapply(colnames(table), function(x) {
-			return(startsWith(x, 'inbound') || startsWith(x, 'outbound')
-					|| x == 'unknown' || x == 'lost.on.wire')
+			return(startsWith(x, 'inbound')  startsWith(x, 'outbound')
+					 x == 'unknown'  x == 'lost.on.wire')
 		})]
 	reasons = apply(reasons, 2, function(x) sum(x, na.rm=TRUE))
 	reasons = sort(reasons, decreasing=TRUE)
@@ -132,13 +132,14 @@ create_rejection_table = function(name, caption, table) {
 	cat(name)
 	cat('}\n')
 	cat('\\centering\n')
-	cat('\\begin{tabular}{l|c|c}\n')
+	cat('\\begin{tabular}{lcc}\n')
+	cat('\\toprule\n')
 	cat('\\textbf{Reason} & \\textbf{Count}  & \\textbf{\\% of Total Packets}\\\\\n')
 	cat('\\hline\n')
 
 	# Reasons
 	for(i in 1:length(reasons)) {
-		if(is.na(reasons[i]) || reasons[i] == 0)
+		if(is.na(reasons[i])  reasons[i] == 0)
 			next
 		
 		r = names(reasons)[i]
@@ -149,10 +150,10 @@ create_rejection_table = function(name, caption, table) {
 		r = paste(toupper(substr(r, 1, 1)), substring(r, 2), sep='')
 
 		cat(r, ' & ', prettyNum(reasons[i], big.mark=','), ' & ', reasons[i]/total_packets*100, '\\%', sep='')
-		if(i < length(reasons))
-			cat('\\\\\n')
+		cat('\\\\\n')
 	}
 
+	cat('\\bottomrule\n')
 	cat('\\end{tabular}\n')
 	cat('\\end{table}\n')
 
@@ -268,7 +269,8 @@ axis(2, at=ylab, labels=paste(ylab, '%', sep=''))
 \caption{Basic tests, packet loss of invalid traffic}
 \label{tbl:basic_invalid_loss}
 \centering
-\begin{tabular}{l|c|c|c}
+\begin{tabular}{lccc}
+\toprule
 \textbf{Flow} & \textbf{Mean} & \textbf{\ac{CI}} & \textbf{Replications}\\
 \hline
 <<results='asis', echo=FALSE>>=
@@ -299,10 +301,10 @@ for(test in invalid_tests) {
 	cat(' & ')
 	cat(sum(basic[,'test'] == test))
 
-	if(test < max(invalid_tests))
-		cat('\\\\\n')
+	cat('\\\\\n')
 }
-@
+@%
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -528,7 +530,8 @@ clust_colors = c("black", "red", "green", "purple",
 \caption{Packet rate clusters}
 \label{tbl:pr_clusters}
 \centering
-\begin{tabular}{c|c|c|c}
+\begin{tabular}{cccc}
+\toprule
 \textbf{Clust} & \textbf{Mean (Kbps)}  & \textbf{Min (Kbps)}  & \textbf{Max (Kbps)} \\
 \hline
 <<echo=FALSE, results='asis'>>=
@@ -543,7 +546,8 @@ for(clust in unique(packetrate[,'bps.clust'])) {
 	cat(max(kbps))
 	cat('\\\\\n')
 }
-@
+@%
+\bottomrule
 \end{tabular}
 \end{table}
 

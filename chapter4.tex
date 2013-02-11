@@ -195,13 +195,15 @@
 \caption{Factor levels for basic tests}
 \label{tbl:basic_factors}
 \centering
-\begin{tabular}{l|l}
+\begin{tabular}{ll}
+\toprule
 \textbf{Factor} & \textbf{Possible Levels} \\
 \hline
 Hop interval (ms) & 500, 50\\
 Round-trip latency (ms) & 20\\
 Packet delay (s) & 0.3\\
-Traffic direction and type & Flows 0--8 (See Figure \ref{fig:testnum_flows})
+Traffic direction and type & Flows 0--8 (See Figure \ref{fig:testnum_flows})\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -212,13 +214,15 @@ Traffic direction and type & Flows 0--8 (See Figure \ref{fig:testnum_flows})
 \caption{Factor levels for throughput tests}
 \label{tbl:throughput_factors}
 \centering
-\begin{tabular}{l|l}
+\begin{tabular}{ll}
+\toprule
 \textbf{Factor} & \textbf{Possible Levels} \\
 \hline
 Hop interval (ms) & 500, 50\\
 Round-trip latency (ms) & 20\\
 Packet delay (s) & 0.2, 0.1, 0.05, 0.01, 0.005, 0.001\\
-Traffic direction and type & Flow 4 (See Figure \ref{fig:testnum_flows})
+Traffic direction and type & Flow 4 (See Figure \ref{fig:testnum_flows})\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -229,13 +233,15 @@ Traffic direction and type & Flow 4 (See Figure \ref{fig:testnum_flows})
 \caption{Factor levels for minimum hop interval tests}
 \label{tbl:hoprate_factors}
 \centering
-\begin{tabular}{l|l}
+\begin{tabular}{ll}
+\toprule
 \textbf{Factor} & \textbf{Possible Levels} \\
 \hline
 Hop interval (ms) & 1000, 500, 300, 200, 100, 75, 60, 50, 40, 30, 15, 10, 5\\
 Round-trip latency (ms) & 0, 30, 100, 500\\
 Packet delay (s) & 0.3\\
-Traffic direction and type & Flow 4 (See Figure \ref{fig:testnum_flows})
+Traffic direction and type & Flow 4 (See Figure \ref{fig:testnum_flows})\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -246,13 +252,15 @@ Traffic direction and type & Flow 4 (See Figure \ref{fig:testnum_flows})
 \caption{Factor levels for fuzz tests}
 \label{tbl:fuzz_factors}
 \centering
-\begin{tabular}{l|l}
+\begin{tabular}{ll}
+\toprule
 \textbf{Factor} & \textbf{Possible Levels} \\
 \hline
 Hop interval (ms) & 500, 50\\
 Round-trip latency (ms) & 20\\
 Packet delay (s) & 0.3\\
-Traffic direction and type & Flow 8 (See Figure \ref{fig:testnum_flows})
+Traffic direction and type & Flow 8 (See Figure \ref{fig:testnum_flows})\\
+\bottomrule
 \end{tabular}
 \end{table}
 \end{itemize}

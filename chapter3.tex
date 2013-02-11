@@ -80,7 +80,8 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \caption{Information hopper module maintains on other \ac{ARG} gateways}
 \label{tab:gatestate}
 \centering
-\begin{tabular}{l|l}
+\begin{tabular}{ll}
+\toprule
 	\textbf{Data} & \textbf{Information Source}\\
 	\hline
 	IP Range (IP and mask) & Configuration file (see Appendix \ref{chp:argconf})\\
@@ -89,6 +90,7 @@ The handling of packets within ARG is distinctly different if they are to an ext
 	Symmetric Key & Transferred during connection\\
 	Hop Key & Transferred during connection\\
 	Time Base & Calculated based on latency (see Appendix \ref{chp:protocol})\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -112,12 +114,14 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \label{tab:arg_nat_example}
 \centering
 \noindent\makebox[\textwidth]{%
-\begin{tabular}{r|cccccc}
+\begin{tabular}{rcccccc}
+\toprule
   & \textbf{Int IP}  & \textbf{Int Port}  & \textbf{Remote IP}  & \textbf{Remote Port}  & \textbf{\textit{Ext IP}}  & \textbf{Ext Port} \\
 \hline
 1 & \texttt{192.168.0.103} & 3547 & \texttt{74.125.225.69} & 443 & \textit{\texttt{172.1.123.35}} & 50003\\
 2 & \texttt{192.168.0.103} & 8751 & \texttt{207.109.73.34} & 80 & \textit{\texttt{172.1.73.1}} & 42630\\
-3 & \texttt{192.168.0.112} & 30452 & \texttt{4.27.2.253} & 80 & \textit{\texttt{172.1.86.173}} & 53920
+3 & \texttt{192.168.0.112} & 30452 & \texttt{4.27.2.253} & 80 & \textit{\texttt{172.1.86.173}} & 53920\\
+\bottomrule
 \end{tabular}}
 \end{table}
 
@@ -131,7 +135,8 @@ The handling of packets within ARG is distinctly different if they are to an ext
 \caption{\ac{ARG} packet data}
 \label{tab:arg_packet_structure}
 \centering
-\begin{tabular}{l|l|l}
+\begin{tabular}{lll}
+\toprule
 \textbf{Data} & \textbf{Size} & \textbf{Data Type}\\
 \hline
 Version & 1 byte & Unsigned Integer\\
@@ -139,7 +144,8 @@ Message Type & 1 byte & Enumeration, see Table \ref{tbl:arg_protocol_types}\\
 Message Length & 2 bytes & Unsigned Integer\\
 Sequence Number & 4 bytes & Unsigned Integer\\
 Signature & 128 bytes & Raw\\
-Payload & 0-32,629 bytes & Message-type specific, see Appendix \ref{chp:protocol}
+Payload & 0-32,629 bytes & Message-type specific, see Appendix \ref{chp:protocol}\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -148,14 +154,16 @@ Payload & 0-32,629 bytes & Message-type specific, see Appendix \ref{chp:protocol
 \begin{table}
 \caption{\ac{ARG} message types}
 \label{tbl:arg_protocol_types}
-\begin{tabular}{l|c|l}
+\begin{tabular}{lcl}
+\toprule
 \textbf{Mnemonic} & \textbf{Value} & \textbf{Description}\\
 \hline
 \texttt{WRAPPED} & 1 & Encapsulated packet from protected client to protected client\\
 \texttt{PING} & 2 & Time synchronization message\\
 \texttt{CONN\_RESP} & 3 & Connection data response message\\
 \texttt{CONN\_REQ} & 4 & Connection data and request for other gateway's data\\ 
-\texttt{TRUST\_DATA} & 5 & Configuration information 
+\texttt{TRUST\_DATA} & 5 & Configuration information \\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -167,7 +175,8 @@ Payload & 0-32,629 bytes & Message-type specific, see Appendix \ref{chp:protocol
 \caption{\ac{ARG} message security summary}
 \label{tbl:arg_protocol_security}
 \centering
-\begin{tabular}{l|l|l|l}
+\begin{tabular}{llll}
+\toprule
 \textbf{Type} & \textbf{Encryption} & \textbf{Signing} & \textbf{\acp{IP} checked?}\\
 \hline
 \texttt{WRAPPED} & AES, remote key & HMAC, local key & Yes\\
@@ -175,6 +184,7 @@ Payload & 0-32,629 bytes & Message-type specific, see Appendix \ref{chp:protocol
 \texttt{CONN\_RESP} & RSA, remote public key & Signature, local private key & No\\
 \texttt{CONN\_REQ} & RSA, remote public key & Signature, local private key & No\\
 \texttt{TRUST\_DATA} & AES, remote key & HMAC, local key & No\\
+\bottomrule
 \end{tabular}
 \end{table}
 

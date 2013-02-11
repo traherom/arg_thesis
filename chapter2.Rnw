@@ -27,12 +27,14 @@
 	\caption{\ac{IP} routing example: Router A table}
 	\label{tbl:routing_example_routera_table}
 	\centering
-	\begin{tabular}{r|c|c|c}
+	\begin{tabular}{rccc}
+	\toprule
 	 & \textbf{\ac{IP}} & \textbf{Mask} & \textbf{Interface}\\
 	\hline
 	1 & 10.5.0.25 & 255.255.0.0 & Port 1\\
 	2 & 172.100.10.0 & 255.255.255.0 & Port 2\\
 	3 & 172.100.0.0 & 255.255.0.0 & Port 3\\
+	\bottomrule
 	\end{tabular}
 	\end{table}
 \item Router A determines the \ac{IP} matches best with entry 2, which instructs the router to forward the packet via Port 2.
@@ -54,12 +56,14 @@
 \caption{\ac{NAT} table example}
 \label{tab:nat_example}
 \centering
-\begin{tabular}{r|ccccc}
+\begin{tabular}{rccccc}
+\toprule
   & \textbf{Int IP}  & \textbf{Int Port}  & \textbf{Remote IP}  & \textbf{Remote Port}  & \textbf{Ext Port} \\
 \hline
 1 & 192.168.0.103 & 3547 & 74.125.225.69 & 443 & 50003\\
 2 & 192.168.0.103 & 8751 & 207.109.73.34 & 80 & 42630\\
-3 & 192.168.0.112 & 30452 & 4.27.2.253 & 80 & 53920
+3 & 192.168.0.112 & 30452 & 4.27.2.253 & 80 & 53920\\
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -147,11 +151,13 @@
 \caption{Hashing example}
 \label{tbl:hashing_example}
 \centering
-\begin{tabular}{r|l|l}
+\begin{tabular}{rll}
+\toprule
 	& \textbf{Input}  & \textbf{Output (SHA-1)} \\
 \hline
 Original & The quick brown fox jumped & c950af1b07223c7d8590538189b3bcd9f4e08c6c\\
-Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb3941b1bb075a97f56
+Changed & The quick br\textit{\textbf{a}}wn fox jumped & 97c592d5c0d991b91c68edb3941b1bb075a97f56\\
+\bottomrule
 \end{tabular}
 \end{table}
 

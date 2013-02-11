@@ -23,13 +23,15 @@
 \caption{Test run \texttt{tcpdump} calls}
 \label{tbl:test_tcpdump_calls}
 \centering
-\begin{tabular}{l|l}
+\begin{tabular}{ll}
+\toprule
 \textbf{Host} & \textbf{Command}\\
 \hline
 Gateway & \texttt{sudo tcpdump -i eth2 -w gateX-inner.pcap -n ip and not arp}\\
 	& \texttt{sudo tcpdump -i eth1 -w gateX-outer.pcap -n ip and not arp}\\
 \hline
-Prot/Ext & \texttt{sudo tcpdump -i eth1 -w clientX.pcap -n ip and not arp}
+Prot/Ext & \texttt{sudo tcpdump -i eth1 -w clientX.pcap -n ip and not arp}\\
+\bottomrule
 \end{tabular}
 \end{table}
 
