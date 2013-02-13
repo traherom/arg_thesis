@@ -13,7 +13,7 @@ test : all
 	open thesis.pdf defense.pdf
 
 clean : clean-temp
-	rm -f thesis.pdf
+	rm -f thesis.pdf defense.pdf
 
 clean-temp : 
 	rm -f *.aux *.log *.blg *.bbl *.out *.lot *.lof *.toc *.aft
@@ -30,7 +30,7 @@ thesis.aux : $(thesis_files) $(diagrams)
 	bibtex thesis
 
 watch : 
-	makewatch $(thesis_files) chapter2.Rnw chapter5.Rnw
+	makewatch $(thesis_files) $(defense_files) chapter2.Rnw chapter5.Rnw
 
 # Download RFC bib if needed
 rfc.bib :
