@@ -61,6 +61,43 @@
 
 \section{Background}
 \begin{frame}
+	\frametitle{Background - Routing}
+
+	% Build 1
+	\begin{onlyenv}<1>
+	Hierarchical nature of IP routing allows IP hopping to work
+	\vspace{-10pt}
+	\begin{figure}
+	\centering
+	\includegraphics[height=.7\textheight]{routing_example_network}
+	\end{figure}
+	\end{onlyenv}
+
+	% Build 2
+	\begin{onlyenv}<2>
+	\scriptsize{%
+	\begin{table}
+	\centering
+	\begin{tabular}{rccc}
+	\toprule
+	 & \textbf{IP} & \textbf{Mask} & \textbf{Interface}\\
+	\hline
+	1 & 10.5.0.25 & 255.255.0.0 & Port 1\\
+	2 & 172.100.10.0 & 255.255.255.0 & Port 2\\
+	3 & 172.100.0.0 & 255.255.0.0 & Port 3\\
+	\bottomrule
+	\end{tabular}
+	\end{table}%
+	}
+	\vspace{-25pt}
+	\begin{figure}
+	\centering
+	\includegraphics[height=.6\textheight]{routing_example_network}
+	\end{figure}
+	\end{onlyenv}
+\end{frame}
+
+\begin{frame}
 	\frametitle{Background - IP Hopping}
 	\begin{itemize}
 	\item More formally part of ``network address space randomization''
@@ -87,43 +124,8 @@
 	\frametitle{Background - Gateway Hopping}
 	In gateway-based hopping, a system in front of the network transforms
 	packets entering and leaving.
-	\includegraphics[width=1\textwidth]{arg_concept_network}
-\end{frame}
 
-\begin{frame}
-	\frametitle{Background - Routing}
-
-	% Build 1
-	\begin{onlyenv}<1>
-	Hierarchical nature of IP routing allows IP hopping to work
-	\begin{figure}
-	\centering
-	\includegraphics[height=.5\textheight]{routing_example_network}
-	\end{figure}
-	\end{onlyenv}
-
-	% Build 2
-	\begin{onlyenv}<2>
-	\scriptsize{%
-	\begin{table}
-	\centering
-	\begin{tabular}{rccc}
-	\toprule
-	 & \textbf{IP} & \textbf{Mask} & \textbf{Interface}\\
-	\hline
-	1 & 10.5.0.25 & 255.255.0.0 & Port 1\\
-	2 & 172.100.10.0 & 255.255.255.0 & Port 2\\
-	3 & 172.100.0.0 & 255.255.0.0 & Port 3\\
-	\bottomrule
-	\end{tabular}
-	\end{table}%
-	}
-	\vspace{-25pt}
-	\begin{figure}
-	\centering
-	\includegraphics[height=.6\textheight]{routing_example_network}
-	\end{figure}
-	\end{onlyenv}
+	\noindent\makebox[\textwidth]{\includegraphics[width=1.2\textwidth]{hop_concept_network}}
 \end{frame}
 
 \section{Goals and Approach Overview}
