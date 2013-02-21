@@ -7,7 +7,7 @@
 \label{sec:problem_def}
 \subsection{Goals and Hypothesis}
 \label{sec:goals}
-\par This research seeks to test whether network address space randomization as discussed in Chapter \ref{chp:implementation} is suitable for deployment on a corporate or military network. Tests against this system are designed to answer four basic questions:
+\par This research tests whether network address space randomization as discussed in Chapter \ref{chp:implementation} is suitable for deployment on a corporate or military network. Tests against this system are designed to answer four basic questions:
 
 \begin{enumerate}
 \item Does \ac{ARG} classify traffic correctly? What percentage of false positives (valid packets blocked) and false negatives (invalid traffic allowed through) does it introduce?
@@ -20,7 +20,7 @@
 
 %\par The working hypothesis for this research is, as speculated by Sandia, a \ac{DYNAT} system allows for quick identification of unexpected (and potentially malicious) packets entering a network. There are few identifiers within the scope of \ac{DYNAT} by which outgoing packets could be filtered. Given that, no filtering is done for outbound packets and hence no change in behavior is observed when compared to the control network. 
 
-\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop interval appropriate for the network latency. In addition, this thesis hypothesizes that packet loss becomes acceptable when the hop interval matches or exceeds the one-way network latency, where acceptable loss is defined as less than 2\%. This percentage is based on the loss seen on Massachusetts Institute of Technology's wireless networks \cite{MITWifiLoss}. The other two questions under test are informational in nature as the results apply only to this specific hopping gateway implementation, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 10 \ac{Mbps} of traffic. 
+\par It is hypothesized that \ac{ARG} correctly classifies 99\% of traffic it encounters when operating with a hop interval appropriate for the network latency. In addition, this thesis hypothesizes that packet loss becomes acceptable when the hop interval matches or exceeds the one-way network latency, where acceptable loss is defined as less than 2\%. This percentage is based on the loss seen on Massachusetts Institute of Technology's wireless networks \cite{MITWifiLoss}. The other two questions are informational as the results apply only to this specific hopping gateway implementation, but it is believed that \ac{ARG} is stable in the face of malformed traffic and it can handle at least 10 \ac{Mbps} of traffic. 
 
 \subsection{Approach}
 \label{sec:approach}
