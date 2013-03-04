@@ -24,6 +24,8 @@ To build:
 
 	$ make
 
+A thesis.pdf should be produced.
+
 Notes
 =====
 Template
