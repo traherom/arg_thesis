@@ -582,12 +582,16 @@ Technology Electronic Thesis and Dissertation Class]
   \begingroup
     \singlespace
     \noindent Approved:\par
-    \sign@lines\afit@committee\afit@committeeSignedDates\par
-    \addvspace{2\afit@lineskip}%
-    \ifx\afit@doctype\afit@dissertation
-      \noindent Accepted:\par
-      \sign@lines{\afit@dean\\Dean{,} \afit@school}\afit@deanSignedDate\par
-    \fi
+	\IfFileExists{signatures.png}{%
+		\includegraphics[width=5.5in]{signatures.png}
+		}{%
+		\sign@lines\afit@committee\afit@committeeSignedDates\par
+		\addvspace{2\afit@lineskip}%
+		\ifx\afit@doctype\afit@dissertation
+		  \noindent Accepted:\par
+		  \sign@lines{\afit@dean\\Dean{,} \afit@school}\afit@deanSignedDate\par
+		\fi%
+		}
   \endgroup
 }
 

@@ -1,19 +1,16 @@
 temptex := $(patsubst %.Rnw,%.tex,$(wildcard *.Rnw))
 diagrams := diagrams/*.pdf diagrams/*.dot
-thesis_files := thesis.tex abstract.tex acknowledgments.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_ip.tex appendix_protocol.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex newcommands.tex rfc.bib research.bib acronyms.tex packet_structure.pdf results.csv
-defense_files := defense.tex
+thesis_files := thesis.tex abstract.tex acknowledgments.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_ip.tex appendix_protocol.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex newcommands.tex rfc.bib research.bib acronyms.tex packet_structure.pdf results.csv afit-etd.cls
 
-all : thesis defense
+all : thesis
 
 thesis : thesis.pdf
 
-defense : thesis defense.pdf $(diagrams)
-
 test : all
-	open thesis.pdf defense.pdf
+	open thesis.pdf 
 
 clean : clean-temp
-	rm -f thesis.pdf defense.pdf
+	rm -f thesis.pdf 
 
 clean-temp : 
 	rm -f *.aux *.log *.blg *.bbl *.out *.lot *.lof *.toc *.aft
@@ -30,7 +27,7 @@ thesis.aux : $(thesis_files) $(diagrams)
 	bibtex thesis
 
 watch : 
-	makewatch $(thesis_files) $(defense_files) chapter2.Rnw chapter5.Rnw
+	makewatch $(thesis_files) chapter2.Rnw chapter5.Rnw
 
 # Download RFC bib if needed
 rfc.bib :
