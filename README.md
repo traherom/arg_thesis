@@ -1,28 +1,37 @@
+Building
+========
 Environment
-===========
+-----------
 Needed tools:
+
 - make
 - pdflatex
 - R
 - dot/graphviz
 
 R needs the following packages installed:
-- knitr
+
+- knitr 
 - plotrix
 - coin
 - gplots
 - boot
 - cluster
 
-Building
-========
+Make
+----
 To build:
 
 	$ make
 
-
 Notes
 =====
+Template
+--------
+This template has been slightly modified from the default AFIT template
+to break content into separate files. A diff on the cls and thesis.tex
+file should be done if a new version of the template is integrated.
+
 Signatures
 ----------
 To build PDF with blank signatures lines, ensure signatures.png does
