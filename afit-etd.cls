@@ -266,7 +266,7 @@ Technology Electronic Thesis and Dissertation Class]
                         \ifx\afit@doctype\afit@report\@isAFITreporttrue\fi}
 
 \newcommand*\designator[1]{\newcommand*\afit@designator{#1}}
-\newcommand*\distribution[1]{\newcommand\afit@distribution{#1}}
+\newcommand*\distribution[1]{\newcommand\afit@distribution{\textbf{#1}}}
 
 \newcommand*\flyleafframe{\@AFITflyleafframetrue} 
 \newcommand*\AddlSupplementaryNotes[1]  {\renewcommand\sf@AddlSupplementaryNotes{#1}}
