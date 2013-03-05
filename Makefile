@@ -7,9 +7,6 @@ all : thesis
 
 thesis : thesis.pdf
 
-ha :
-	echo $(dot_to_pdf)
-
 test : all
 	open thesis.pdf 
 
