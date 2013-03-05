@@ -1,0 +1,6 @@
+\par This thesis explores the viability of using \ac{IP} address hopping in front of a network as a defensive measure. This research presents a custom gateway-based \ac{IP} hopping solution called \ac{ARG} that acts as a transparent \ac{IP} address hopping gateway. This thesis tests the overall stability of \ac{ARG}, the accuracy of its classifications, the maximum throughput it can support, and the maximum rate at which it can change \acp{IP} and still communicate reliably.
+
+\par This research is accomplished on a physical test network with nodes representing the types of hosts found on a typical, corporate-style network. Direct measurement is used to obtain all results for each factor level. Tests demonstrate \ac{ARG} classifies traffic correctly, with no false negatives and less than a 0.15\% false positive rate on average. The test environment conservatively shows this to be true as long as the \ac{IP} address change interval exceeds two times the network's round-trip latency; real-world deployments may allow for more frequent hopping. Results show \ac{ARG} capably handles traffic of at least four megabits per second with no impact on packet loss. Fuzz testing validates the stability of \ac{ARG} itself, although additional packet loss of around 23\% appears when under attack.
+
+\acresetall
+

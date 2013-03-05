@@ -595,8 +595,14 @@ Technology Electronic Thesis and Dissertation Class]
   \endgroup
 }
 
-\renewcommand\abstract[1]{\newcommand\afit@abstract{\@sabstracttoc{Abstract} #1}
-                          \newcommand\sf@abstract{#1}}
+\renewcommand\abstract[2][]{\newcommand\afit@abstract{\@sabstracttoc{Abstract} #2}
+                                   \newcommand\sf@abstract{%
+								       \ifx&#1&%
+                                           #2%
+									   \else%
+                                           #1%
+									   \fi%
+								   }}
 
 \newcommand\afit@dedication{\relax}
 \newcommand\dedication[1]{%
