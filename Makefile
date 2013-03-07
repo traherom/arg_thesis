@@ -3,9 +3,11 @@ dot_to_pdf := $(patsubst %.dot,%.pdf,$(wildcard diagrams/*.dot))
 diagrams := diagrams/*.pdf diagrams/*.dot $(dot_to_pdf)
 thesis_files := thesis.tex abstract.tex acknowledgments.tex chapter1.tex chapter2.tex chapter3.tex chapter4.tex chapter5.tex chapter6.tex appendix_ip.tex appendix_protocol.tex appendix_argconf.tex appendix_generators.tex appendix_processor.tex appendix_tests.tex newcommands.tex rfc.bib research.bib acronyms.tex packet_structure.pdf results.csv afit-etd.cls
 
-all : thesis
+all : thesis ris
 
 thesis : thesis.pdf
+
+ris : ris.pdf
 
 test : all
 	open thesis.pdf 

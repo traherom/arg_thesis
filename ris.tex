@@ -1,0 +1,61 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+
+\pagestyle{empty}
+
+% Frame page
+\usepackage{background}
+\usetikzlibrary{calc}
+\SetBgScale{1}
+\SetBgColor{black}
+\SetBgAngle{0}
+\SetBgOpacity{1}
+\SetBgVshift{-4}
+\SetBgContents{
+	\begin{tikzpicture}[thick]
+	\draw (-0.1,-0.1) -- (-0.1,1.04\textheight) -- (1.04\textwidth,1.04\textheight) -- (1.04\textwidth,0) -- (-0.1,-0.1);
+	\end{tikzpicture}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+
+\usepackage[nolist]{acronym}
+
+\begin{document}
+\input{acronyms.tex}
+
+\begin{tabular}{lllll}
+\textbf{Student} & \textbf{Faculty Advisor} & \textbf{Thesis Department} & \textbf{Keyword \#1} & \textbf{Keyword \#2}\\
+Morehart, R.A. & Mullins, B.E. & AFIT-ENG-13-M-35 & Networking & IP Hopping\\
+~\\
+\textbf{Sponsor} & \textbf{Agent} & \textbf{Phone} & \textbf{Program} & \textbf{Funding}\\
+- & - & - & - & \$0.00\\
+\end{tabular}
+
+\begin{center}
+\textbf{Title:} Evaluating the Effectiveness of IP Hopping via an Address Routing Gateway
+\end{center}
+
+\textbf{Subject:} Gateway-based Address Space Randomization
+
+\textbf{Air Force Program Description:}
+
+The critical nature of networks to the modern military necessitates continuous research into better methods of ensuring the networks' confidentiality, integrity, and availability. Network address space randomization techniques theoretically provide protection to a network by appearing to randomly change the addresses of hosts inside, presenting a challenge to an intruder attempting to break in and map the network. 
+
+\textbf{Impact Statement:}
+
+This research presents a custom gateway-based IP hopping solution called Address Routing Gateway (ARG) that combines previous work in this area. Direct measurement on a test network utilizing this system demonstrated the possibility of changing IPs over ten times per second and found a hard lower upper on hop rates with the current implementation. These results were not presented in previous research.
+
+\textbf{Technical Abstract:}
+\IfFileExists{short_abstract.tex}{\input{short_abstract}}{\input{abstract}}
+
+\textbf{Subject Terms:} Networking, address space randomization, IP hopping, routing
+
+\textbf{Publications:}
+
+\textbf{Presentations:}
+
+\end{document}
+
